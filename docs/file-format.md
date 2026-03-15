@@ -28,7 +28,9 @@ The `version` field exists for forward compatibility. A loader must reject (or w
   "data": {
     "label": "Production",      // Display name shown in the node header
     "inputs": [ ... ],          // Array of Port (left-side handles)
-    "outputs": [ ... ]          // Array of Port (right-side handles)
+    "outputs": [ ... ],         // Array of Port (right-side handles)
+    "description": "…",         // Optional: free-text note about this node
+    "formula": "out = in * 0.8" // Optional: expression documenting how outputs are computed
   }
 }
 ```
@@ -75,6 +77,8 @@ An edge always goes from an **output** port to an **input** port. Both `sourceHa
       "position": { "x": 150, "y": 200 },
       "data": {
         "label": "Production",
+        "description": "Converts demand signal and inventory level into goods produced.",
+        "formula": "goods_produced = demand_signal * (1 - inventory_level / capacity)",
         "inputs": [
           { "id": "a1b2c3d4-0000-0000-0000-000000000001", "label": "demand signal" },
           { "id": "a1b2c3d4-0000-0000-0000-000000000002", "label": "inventory level" }
@@ -120,6 +124,12 @@ An edge always goes from an **output** port to an **input** port. Both `sourceHa
 This example encodes a simple feedback loop: Production → Inventory → (stock level back to) Production.
 
 ---
+
+## Optional Fields
+
+`description` and `formula` are both optional. Omit them (or set to `""`) when not needed — the serializer omits fields that are `undefined` or empty string.
+
+The `formula` field is treated as plain documentation. The tool does not parse or evaluate it.
 
 ## Constraints
 

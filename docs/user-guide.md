@@ -8,11 +8,13 @@
 ├─────────────────────────────────────────────────┤
 │                                                 │
 │   ┌───────────────────┐                         │
-│ ○─┤ Production   Ports├─○                       │
+│ ○─┤ Production   Edit ├─○                       │
 │   │ demand signal     │ goods produced          │
+│   │ Converts inputs…  │ (description)           │
+│   │ out = in * 0.8    │ (formula)               │
 │   └───────────────────┘                         │
 │                          ┌──────────────────┐   │
-│                        ○─┤ Inventory   Ports├─○ │
+│                        ○─┤ Inventory   Edit ├─○ │
 │                          │ goods received   │   │
 │                          └──────────────────┘   │
 │                                       [minimap] │
@@ -40,13 +42,38 @@ Double-click the node's title text. An inline text field appears. Type the new n
 
 ---
 
+## Description and Formula
+
+Each node has two optional fields that document how it works.
+
+### Description
+
+A free-text note explaining what the node represents or does. Displayed in italic below the port list when set.
+
+### Formula
+
+A text expression describing how inputs are combined to produce outputs. Displayed in a monospace green block below the description when set. The tool does not evaluate the formula — it is documentation only. You can write it in any notation that makes sense for your model, for example:
+
+```
+output = demand * 0.8 + safety_stock
+stock_level = stock_level[t-1] + goods_received - shipments
+```
+
+### Editing
+
+Click **Edit** on any node to open the editor panel. The Description and Formula fields appear at the top. Type directly into the text areas — changes are applied immediately. Click **Done** to collapse the panel.
+
+When the editor is closed, any non-empty description or formula appears as a summary inside the node body.
+
+---
+
 ## Ports
 
 Ports are the named connection points on each node. **Input ports** appear on the left side; **output ports** appear on the right side.
 
 ### Opening the Port Editor
 
-Click the **Ports** button on any node. A small editor panel expands below the node body.
+Click the **Edit** button on any node. A small editor panel expands below the node body, containing the Description, Formula, and port management sections.
 
 ### Adding a Port
 
@@ -62,7 +89,7 @@ Click the **✕** button next to a port. The port is removed and any arrows that
 
 ### Closing the Port Editor
 
-Click **Done** (the button toggles between "Ports" and "Done").
+Click **Done** (the button toggles between "Edit" and "Done").
 
 ---
 

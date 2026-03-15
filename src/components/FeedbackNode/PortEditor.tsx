@@ -5,13 +5,19 @@ interface PortEditorProps {
   nodeId: string;
   inputs: Port[];
   outputs: Port[];
+  description: string | undefined;
+  formula: string | undefined;
 }
 
-export default function PortEditor({ nodeId, inputs, outputs }: PortEditorProps) {
+export default function PortEditor({ nodeId, inputs, outputs, description, formula }: PortEditorProps) {
   const { updateNodeData, getEdges, deleteElements } = useReactFlow()
 
+  function updateData(patch: Partial<FeedbackNodeData>) {
+    updateNodeData(nodeId, patch as Partial<FeedbackNodeData>)
+  }
+
   function updatePorts(newInputs: Port[], newOutputs: Port[]) {
-    updateNodeData(nodeId, { inputs: newInputs, outputs: newOutputs } as Partial<FeedbackNodeData>)
+    updateData({ inputs: newInputs, outputs: newOutputs })
   }
 
   function removePort(type: 'input' | 'output', portId: string) {
@@ -40,16 +46,58 @@ export default function PortEditor({ nodeId, inputs, outputs }: PortEditorProps)
   function addPort(type: 'input' | 'output') {
     const id = crypto.randomUUID()
     if (type === 'input') {
-      const label = `in${inputs.length + 1}`
-      updatePorts([...inputs, { id, label }], outputs)
+      updatePorts([...inputs, { id, label: `in${inputs.length + 1}` }], outputs)
     } else {
-      const label = `out${outputs.length + 1}`
-      updatePorts(inputs, [...outputs, { id, label }])
+      updatePorts(inputs, [...outputs, { id, label: `out${outputs.length + 1}` }])
     }
   }
 
   return (
     <div style={{ fontSize: 12 }}>
+      {/* Description */}
+      <div style={{ marginBottom: 10 }}>
+        <div style={{ fontWeight: 600, marginBottom: 4, color: '#444' }}>Description</div>
+        <textarea
+          value={description ?? ''}
+          onChange={e => updateData({ description: e.target.value || undefined })}
+          placeholder="Optional description of this node…"
+          rows={3}
+          style={{
+            width: '100%',
+            fontSize: 11,
+            padding: '4px 6px',
+            border: '1px solid #ccc',
+            borderRadius: 3,
+            resize: 'vertical',
+            fontFamily: 'inherit',
+            boxSizing: 'border-box',
+          }}
+          onMouseDown={e => e.stopPropagation()}
+        />
+      </div>
+
+      {/* Formula */}
+      <div style={{ marginBottom: 10 }}>
+        <div style={{ fontWeight: 600, marginBottom: 4, color: '#444' }}>Formula</div>
+        <textarea
+          value={formula ?? ''}
+          onChange={e => updateData({ formula: e.target.value || undefined })}
+          placeholder="e.g. output = input_a * 0.8 + input_b"
+          rows={3}
+          style={{
+            width: '100%',
+            fontSize: 11,
+            padding: '4px 6px',
+            border: '1px solid #ccc',
+            borderRadius: 3,
+            resize: 'vertical',
+            fontFamily: 'monospace',
+            boxSizing: 'border-box',
+          }}
+          onMouseDown={e => e.stopPropagation()}
+        />
+      </div>
+
       <PortSection
         title="Inputs"
         ports={inputs}
@@ -89,7 +137,6 @@ function PortSection({ title, ports, onAdd, onRemove, onRename }: PortSectionPro
             value={port.label}
             onChange={e => onRename(port.id, e.target.value)}
             style={{ flex: 1, fontSize: 11, padding: '1px 4px', border: '1px solid #ccc', borderRadius: 3 }}
-            // Prevent node drag when interacting with input
             onMouseDown={e => e.stopPropagation()}
           />
           <button

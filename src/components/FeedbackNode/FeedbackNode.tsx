@@ -9,7 +9,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
   const nodeData = data as FeedbackNodeData
   const [isEditingLabel, setIsEditingLabel] = useState(false)
   const [labelDraft, setLabelDraft] = useState(nodeData.label)
-  const [showPortEditor, setShowPortEditor] = useState(false)
+  const [showEditor, setShowEditor] = useState(false)
   const { updateNodeData } = useReactFlow()
 
   const commitLabel = useCallback(() => {
@@ -70,10 +70,10 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
         )}
         <button
           className="edit-ports-btn"
-          onClick={() => setShowPortEditor(v => !v)}
-          title="Edit ports"
+          onClick={() => setShowEditor(v => !v)}
+          title="Edit node details"
         >
-          {showPortEditor ? 'Done' : 'Ports'}
+          {showEditor ? 'Done' : 'Edit'}
         </button>
       </div>
 
@@ -96,9 +96,27 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
         </div>
       </div>
 
-      {showPortEditor && (
+      {/* Inline summary — shown when editor is closed and fields are set */}
+      {!showEditor && (nodeData.description || nodeData.formula) && (
+        <div className="node-meta">
+          {nodeData.description && (
+            <p className="node-description">{nodeData.description}</p>
+          )}
+          {nodeData.formula && (
+            <pre className="node-formula">{nodeData.formula}</pre>
+          )}
+        </div>
+      )}
+
+      {showEditor && (
         <div className="port-editor-wrapper">
-          <PortEditor nodeId={id} inputs={inputs} outputs={outputs} />
+          <PortEditor
+            nodeId={id as string}
+            inputs={inputs}
+            outputs={outputs}
+            description={nodeData.description}
+            formula={nodeData.formula}
+          />
         </div>
       )}
     </div>

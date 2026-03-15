@@ -12,6 +12,8 @@ export function serializeGraph(
       label: n.data.label,
       inputs: n.data.inputs,
       outputs: n.data.outputs,
+      ...(n.data.description !== undefined && { description: n.data.description }),
+      ...(n.data.formula !== undefined && { formula: n.data.formula }),
     },
   }))
 
@@ -38,6 +40,8 @@ export function deserializeGraph(graph: SerializedGraph): {
       label: n.data.label,
       inputs: n.data.inputs ?? [],
       outputs: n.data.outputs ?? [],
+      ...(n.data.description !== undefined && { description: n.data.description }),
+      ...(n.data.formula !== undefined && { formula: n.data.formula }),
     },
   }))
 

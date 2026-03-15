@@ -7,6 +7,8 @@ export interface FeedbackNodeData extends Record<string, unknown> {
   label: string;
   inputs: Port[];
   outputs: Port[];
+  description?: string;
+  formula?: string;
 }
 
 export interface SerializedNode {
