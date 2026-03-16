@@ -11,9 +11,10 @@ export function serializeGraph(
     data: {
       label: n.data.label,
       inputs: n.data.inputs,
-      outputs: n.data.outputs,
+      outputs: n.data.outputs,   // OutputPort[] — each may carry formula
       ...(n.data.description !== undefined && { description: n.data.description }),
-      ...(n.data.formula !== undefined && { formula: n.data.formula }),
+      ...(n.data.variables?.length && { variables: n.data.variables }),
+      // legacy n.data.formula is intentionally not written
     },
   }))
 
@@ -39,9 +40,10 @@ export function deserializeGraph(graph: SerializedGraph): {
     data: {
       label: n.data.label,
       inputs: n.data.inputs ?? [],
-      outputs: n.data.outputs ?? [],
+      outputs: n.data.outputs ?? [],   // old Port[] satisfies OutputPort[] (formula is optional)
       ...(n.data.description !== undefined && { description: n.data.description }),
-      ...(n.data.formula !== undefined && { formula: n.data.formula }),
+      ...(n.data.variables !== undefined && { variables: n.data.variables }),
+      // legacy n.data.formula silently dropped
     },
   }))
 

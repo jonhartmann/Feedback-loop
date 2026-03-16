@@ -125,17 +125,49 @@
   word-break: break-word;
 }
 
-.node-formula {
-  font-size: 11px;
+/* Formula pill displayed on each output port row */
+.port-formula-display {
+  font-size: 10px;
   font-family: monospace;
   color: #1a5a1a;
   background: #f0f7f0;
   border: 1px solid #c8e6c8;
   border-radius: 3px;
-  padding: 3px 6px;
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
+  padding: 0 4px;
+  line-height: 16px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.port-formula-display.is-error {
+  color: #a00;
+  background: #fff0f0;
+  border-color: #f5c0c0;
+}
+
+/* Formula input row inside the output port editor */
+.output-formula-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.output-formula-hint {
+  font-size: 9px;
+  color: #aaa;
+  margin-top: 2px;
+  font-family: monospace;
+}
+
+/* Variable rows inside PortEditor */
+.variable-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
 }
 
 .port-editor-wrapper {

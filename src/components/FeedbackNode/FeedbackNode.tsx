@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { Handle, Position, useReactFlow } from '@xyflow/react'
 import type { Node, NodeProps } from '@xyflow/react'
 import type { FeedbackNodeData } from '../../types/graph'
+import { evalFormula, buildScope } from '../../utils/formulaEval'
 import PortEditor from './PortEditor'
 import './FeedbackNode.css'
 
@@ -21,6 +22,9 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
   const inputs = nodeData.inputs ?? []
   const outputs = nodeData.outputs ?? []
+
+  // Build scope from node-level variables; input values are symbolic for now
+  const scope = buildScope(nodeData.variables ?? [], new Map())
 
   return (
     <div className={`feedback-node${selected ? ' selected' : ''}`}>
@@ -56,7 +60,10 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
             autoFocus
             onChange={e => setLabelDraft(e.target.value)}
             onBlur={commitLabel}
-            onKeyDown={e => { if (e.key === 'Enter') commitLabel(); if (e.key === 'Escape') { setLabelDraft(nodeData.label); setIsEditingLabel(false) } }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') commitLabel()
+              if (e.key === 'Escape') { setLabelDraft(nodeData.label); setIsEditingLabel(false) }
+            }}
             onMouseDown={e => e.stopPropagation()}
           />
         ) : (
@@ -87,24 +94,34 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
           {inputs.length === 0 && <span style={{ fontSize: 11, color: '#aaa' }}>no inputs</span>}
         </div>
         <div className="ports-column outputs">
-          {outputs.map(port => (
-            <div key={port.id} className="port-row">
-              <span className="port-label">{port.label}</span>
-            </div>
-          ))}
+          {outputs.map(port => {
+            const result = port.formula ? evalFormula(port.formula, scope) : null
+            return (
+              <div key={port.id} className="port-row">
+                <span className="port-label">{port.label}</span>
+                {result && (
+                  <span
+                    className={`port-formula-display${result.type === 'error' ? ' is-error' : ''}`}
+                    title={result.type === 'error' ? result.message : port.formula}
+                  >
+                    {result.type === 'number'
+                      ? `= ${+result.value.toPrecision(6)}`
+                      : result.type === 'error'
+                      ? '⚠'
+                      : `= ${port.formula}`}
+                  </span>
+                )}
+              </div>
+            )
+          })}
           {outputs.length === 0 && <span style={{ fontSize: 11, color: '#aaa' }}>no outputs</span>}
         </div>
       </div>
 
-      {/* Inline summary — shown when editor is closed and fields are set */}
-      {!showEditor && (nodeData.description || nodeData.formula) && (
+      {/* Description shown below body when editor is closed */}
+      {!showEditor && nodeData.description && (
         <div className="node-meta">
-          {nodeData.description && (
-            <p className="node-description">{nodeData.description}</p>
-          )}
-          {nodeData.formula && (
-            <pre className="node-formula">{nodeData.formula}</pre>
-          )}
+          <p className="node-description">{nodeData.description}</p>
         </div>
       )}
 
@@ -115,7 +132,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
             inputs={inputs}
             outputs={outputs}
             description={nodeData.description}
-            formula={nodeData.formula}
+            variables={nodeData.variables}
           />
         </div>
       )}

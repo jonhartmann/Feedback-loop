@@ -42,28 +42,46 @@ Double-click the node's title text. An inline text field appears. Type the new n
 
 ---
 
-## Description and Formula
+## Description
 
-Each node has two optional fields that document how it works.
+Each node has an optional free-text **Description** field explaining what it represents. When set, it is displayed below the port list when the editor panel is closed.
 
-### Description
+---
 
-A free-text note explaining what the node represents or does. Displayed in italic below the port list when set.
+## Output Formulas
 
-### Formula
+Each **output port** can have its own formula defining how it is computed from inputs and variables. Formulas are real expressions that the tool evaluates, not just documentation strings.
 
-A text expression describing how inputs are combined to produce outputs. Displayed in a monospace green block below the description when set. The tool does not evaluate the formula — it is documentation only. You can write it in any notation that makes sense for your model, for example:
+### Writing a Formula
 
-```
-output = demand * 0.8 + safety_stock
-stock_level = stock_level[t-1] + goods_received - shipments
-```
+Open the Edit panel on a node. Each output port shows a `=` prefix followed by a formula input (monospace). Type a mathematical expression using:
 
-### Editing
+- **Input port names** — written as their label with spaces replaced by underscores. For example, an input labelled `demand signal` is referenced as `demand_signal`.
+- **Named variables** — constants you define in the Variables section (see below).
+- **Operators** — `+`, `-`, `*`, `/`, `^` (power), and parentheses.
+- **Math functions** — `sqrt(x)`, `abs(x)`, `min(a, b)`, `max(a, b)`, `floor(x)`, `ceil(x)`, etc.
 
-Click **Edit** on any node to open the editor panel. The Description and Formula fields appear at the top. Type directly into the text areas — changes are applied immediately. Click **Done** to collapse the panel.
+Example: inputs `a` and `b`, formula `a / b * 5` → when `a` and `b` have values the output shows `= 2.5`.
 
-When the editor is closed, any non-empty description or formula appears as a summary inside the node body.
+A hint line below each formula input lists all currently available variable names.
+
+### Formula Display
+
+When the editor is closed, each output port row shows its formula inline as a small green pill:
+
+| Situation | Display |
+|-----------|---------|
+| All referenced variables have values | `= 3.14` (computed result) |
+| Some variables are symbolic (e.g. input port values unknown) | `= a / b * 5` (formula text) |
+| Syntax error in the expression | `⚠` (hover to see the error message) |
+
+### Variables
+
+The **Variables** section in the Edit panel lets you define named numeric constants for the node. For example, define `alpha = 0.8` and then write `demand_signal * alpha` as an output formula. All formulas on the node share the same variable definitions.
+
+Each variable needs:
+- A **name**: a valid identifier (letters, digits, underscores; must not start with a digit).
+- A **value**: a number.
 
 ---
 
@@ -71,9 +89,9 @@ When the editor is closed, any non-empty description or formula appears as a sum
 
 Ports are the named connection points on each node. **Input ports** appear on the left side; **output ports** appear on the right side.
 
-### Opening the Port Editor
+### Opening the Edit Panel
 
-Click the **Edit** button on any node. A small editor panel expands below the node body, containing the Description, Formula, and port management sections.
+Click the **Edit** button on any node. A panel expands below the node body containing: Description, Variables, Inputs, and Outputs (with per-port formula inputs).
 
 ### Adding a Port
 

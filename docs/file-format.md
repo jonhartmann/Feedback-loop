@@ -28,21 +28,42 @@ The `version` field exists for forward compatibility. A loader must reject (or w
   "data": {
     "label": "Production",      // Display name shown in the node header
     "inputs": [ ... ],          // Array of Port (left-side handles)
-    "outputs": [ ... ],         // Array of Port (right-side handles)
+    "outputs": [ ... ],         // Array of OutputPort (right-side handles; each may have a formula)
     "description": "…",         // Optional: free-text note about this node
-    "formula": "out = in * 0.8" // Optional: expression documenting how outputs are computed
+    "variables": [ ... ]        // Optional: array of NodeVariable (named numeric constants)
   }
 }
 ```
 
 ---
 
-## Port
+## Port (inputs)
 
 ```jsonc
 {
   "id": "in-<uuid>",            // Stable unique identifier — never changes even if label is renamed
   "label": "demand signal"      // User-visible name displayed inside the node
+}
+```
+
+## OutputPort (outputs)
+
+```jsonc
+{
+  "id": "out-<uuid>",
+  "label": "goods produced",
+  "formula": "demand_signal * alpha"   // Optional: evaluated expression
+}
+```
+
+Formulas reference input port labels (spaces → underscores) and `NodeVariable` names as variables. Standard math operators and `mathjs` built-ins (`sqrt`, `abs`, `min`, `max`, etc.) are supported.
+
+## NodeVariable
+
+```jsonc
+{
+  "name": "alpha",    // Valid identifier (letters, digits, underscores; no leading digit)
+  "value": 0.8        // Numeric constant
 }
 ```
 
@@ -78,13 +99,19 @@ An edge always goes from an **output** port to an **input** port. Both `sourceHa
       "data": {
         "label": "Production",
         "description": "Converts demand signal and inventory level into goods produced.",
-        "formula": "goods_produced = demand_signal * (1 - inventory_level / capacity)",
+        "variables": [
+          { "name": "capacity", "value": 1000 }
+        ],
         "inputs": [
           { "id": "a1b2c3d4-0000-0000-0000-000000000001", "label": "demand signal" },
           { "id": "a1b2c3d4-0000-0000-0000-000000000002", "label": "inventory level" }
         ],
         "outputs": [
-          { "id": "e5f6a7b8-0000-0000-0000-000000000001", "label": "goods produced" }
+          {
+            "id": "e5f6a7b8-0000-0000-0000-000000000001",
+            "label": "goods produced",
+            "formula": "demand_signal * (1 - inventory_level / capacity)"
+          }
         ]
       }
     },
@@ -127,9 +154,7 @@ This example encodes a simple feedback loop: Production → Inventory → (stock
 
 ## Optional Fields
 
-`description` and `formula` are both optional. Omit them (or set to `""`) when not needed — the serializer omits fields that are `undefined` or empty string.
-
-The `formula` field is treated as plain documentation. The tool does not parse or evaluate it.
+`description`, `variables`, and per-output `formula` are all optional. The serializer omits them when not set. Omitting `variables` or `formula` is equivalent to having no variables/formulas defined.
 
 ## Constraints
 

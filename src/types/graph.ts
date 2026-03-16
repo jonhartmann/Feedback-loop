@@ -3,12 +3,22 @@ export interface Port {
   label: string;
 }
 
+export interface OutputPort extends Port {
+  formula?: string;   // expression, e.g. "a / b * 5"
+}
+
+export interface NodeVariable {
+  name: string;       // valid JS identifier, e.g. "alpha"
+  value: number;
+}
+
 export interface FeedbackNodeData extends Record<string, unknown> {
   label: string;
   inputs: Port[];
-  outputs: Port[];
+  outputs: OutputPort[];
   description?: string;
-  formula?: string;
+  variables?: NodeVariable[];   // user-defined named constants
+  formula?: string;             // DEPRECATED — read-only for migration
 }
 
 export interface SerializedNode {
