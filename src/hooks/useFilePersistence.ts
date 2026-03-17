@@ -1,12 +1,23 @@
 import type { SerializedGraph } from '../types/graph'
 
-export function saveGraphToFile(graph: SerializedGraph): void {
+function slugify(name: string): string {
+  return (
+    name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  ) || 'feedback-loop'
+}
+
+export function saveGraphToFile(graph: SerializedGraph, name?: string): void {
+  const filename = `${slugify(name ?? graph.name ?? '')}.json`
   const json = JSON.stringify(graph, null, 2)
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'feedback-loop.json'
+  a.download = filename
   a.click()
   URL.revokeObjectURL(url)
 }

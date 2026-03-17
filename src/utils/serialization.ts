@@ -3,17 +3,24 @@ import type { FeedbackNodeData, SerializedGraph, SerializedNode, SerializedEdge 
 
 export function serializeGraph(
   nodes: Node<FeedbackNodeData>[],
-  edges: Edge[]
+  edges: Edge[],
+  name?: string,
 ): SerializedGraph {
   const serializedNodes: SerializedNode[] = nodes.map(n => ({
     id: n.id,
     position: { x: n.position.x, y: n.position.y },
     data: {
       label: n.data.label,
+      ...(n.data.variant && { variant: n.data.variant }),
       inputs: n.data.inputs,
-      outputs: n.data.outputs,   // OutputPort[] — each may carry formula
+      outputs: n.data.outputs,   // OutputPort[] — may carry formula, value, and/or unit
       ...(n.data.description !== undefined && { description: n.data.description }),
       ...(n.data.variables?.length && { variables: n.data.variables }),
+      ...(n.data.metricFormula !== undefined && { metricFormula: n.data.metricFormula }),
+      ...(n.data.metricUnit !== undefined && { metricUnit: n.data.metricUnit }),
+      ...(n.data.sourceUrl !== undefined && { sourceUrl: n.data.sourceUrl }),
+      ...(n.data.displayMode !== undefined && { displayMode: n.data.displayMode }),
+      ...(n.data.seriesChartType !== undefined && { seriesChartType: n.data.seriesChartType }),
       // legacy n.data.formula is intentionally not written
     },
   }))
@@ -26,7 +33,7 @@ export function serializeGraph(
     targetHandle: e.targetHandle ?? '',
   }))
 
-  return { version: 1, nodes: serializedNodes, edges: serializedEdges }
+  return { version: 1, ...(name ? { name } : {}), nodes: serializedNodes, edges: serializedEdges }
 }
 
 export function deserializeGraph(graph: SerializedGraph): {
@@ -37,12 +44,19 @@ export function deserializeGraph(graph: SerializedGraph): {
     id: n.id,
     type: 'feedbackNode',
     position: n.position,
+    dragHandle: '.node-header',
     data: {
       label: n.data.label,
+      ...(n.data.variant && { variant: n.data.variant }),
       inputs: n.data.inputs ?? [],
-      outputs: n.data.outputs ?? [],   // old Port[] satisfies OutputPort[] (formula is optional)
+      outputs: n.data.outputs ?? [],   // preserves formula and value fields
       ...(n.data.description !== undefined && { description: n.data.description }),
       ...(n.data.variables !== undefined && { variables: n.data.variables }),
+      ...(n.data.metricFormula !== undefined && { metricFormula: n.data.metricFormula }),
+      ...(n.data.metricUnit !== undefined && { metricUnit: n.data.metricUnit }),
+      ...(n.data.sourceUrl !== undefined && { sourceUrl: n.data.sourceUrl }),
+      ...(n.data.displayMode !== undefined && { displayMode: n.data.displayMode }),
+      ...(n.data.seriesChartType !== undefined && { seriesChartType: n.data.seriesChartType }),
       // legacy n.data.formula silently dropped
     },
   }))

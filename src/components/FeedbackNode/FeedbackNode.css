@@ -1,3 +1,154 @@
+/* ── Series mode ────────────────────────────────────────────────────────────── */
+
+.feedback-node.is-series {
+  min-width: 200px;
+  min-height: 104px; /* 34px header + 70px chart area */
+}
+
+.chart-type-row {
+  display: flex;
+  gap: 4px;
+  padding: 3px 8px 0;
+  justify-content: flex-end;
+}
+
+.chart-type-btn {
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  color: #888;
+}
+
+.chart-type-btn.active {
+  background: #ede8ff;
+  border-color: #9060cc;
+  color: #5030aa;
+  font-weight: 600;
+}
+
+.display-mode-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 13px;
+  color: #9060cc;
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+.display-mode-btn:hover {
+  opacity: 1;
+}
+
+.series-empty {
+  text-align: center;
+  font-size: 10px;
+  color: #bbb;
+  padding: 8px 0;
+}
+
+.node-summary-overlay.is-series-collapsed {
+  padding: 2px 4px;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.series-collapsed-value {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: monospace;
+  color: #333;
+  text-shadow: 0 0 4px #fff, 0 0 4px #fff;
+  pointer-events: none;
+}
+
+.series-collapsed-value.is-money   { color: #1a5a1a; }
+.series-collapsed-value.is-percent { color: #003090; }
+
+/* ── FormulaInput autocomplete ────────────────────────────────────────────── */
+
+.formula-input-wrapper {
+  position: relative;
+  min-width: 0;
+}
+
+.formula-input-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #c0a0f0;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  list-style: none;
+  margin: 0;
+  padding: 2px 0;
+  overflow: hidden;
+}
+
+.formula-input-suggestion {
+  font-size: 11px;
+  font-family: monospace;
+  padding: 3px 8px;
+  cursor: pointer;
+  color: #333;
+  white-space: nowrap;
+}
+
+.formula-input-suggestion.is-active,
+.formula-input-suggestion:hover {
+  background: #ede8ff;
+  color: #4a0099;
+}
+
+.port-drag-handle {
+  cursor: grab;
+  color: #ccc;
+  font-size: 13px;
+  padding: 0 2px;
+  flex-shrink: 0;
+  user-select: none;
+  line-height: 1;
+}
+
+.port-drag-handle:active {
+  cursor: grabbing;
+}
+
+.port-row.drag-over {
+  background: rgba(140, 80, 255, 0.07);
+  border-radius: 3px;
+  outline: 1px dashed #9060cc;
+}
+
+.formula-suggestion-name {
+  font-family: monospace;
+}
+
+.formula-suggestion-sig {
+  font-size: 10px;
+  color: #999;
+  margin-left: 8px;
+  font-family: monospace;
+}
+
+.formula-input-suggestion.is-active .formula-suggestion-sig,
+.formula-input-suggestion:hover .formula-suggestion-sig {
+  color: #8060cc;
+}
+
+/* ── Node ─────────────────────────────────────────────────────────────────── */
+
 .feedback-node {
   background: #ffffff;
   border: 2px solid #555;
@@ -8,6 +159,147 @@
   font-family: sans-serif;
   font-size: 13px;
 }
+
+/* ── Collapsed handle columns ─────────────────────────────────────────────
+   When the node is collapsed, these absolutely-positioned strips hold the
+   React Flow handles so edge endpoints remain measurable in the DOM.
+   Port-rows inside use the same .port-row class → same handle CSS offsets
+   as in the expanded view, so edges don't jump on expand/collapse.
+────────────────────────────────────────────────────────────────────────── */
+
+/* ── Extended hover halo ──────────────────────────────────────────────────
+   The ::before pseudo-element extends 1em beyond the visual node boundary.
+   Mouse events over it are dispatched to the host element, so
+   onMouseEnter/onMouseLeave fire in the full halo zone.
+────────────────────────────────────────────────────────────────────────── */
+
+.feedback-node::before {
+  content: '';
+  position: absolute;
+  inset: -1em;
+  z-index: -1; /* behind node content so it never intercepts clicks */
+  border-radius: 20px;
+  pointer-events: auto;
+}
+
+/* ── Collapsed summary overlay ────────────────────────────────────────────
+   When the node is collapsed this div is absolutely positioned over the
+   body area, showing the current value(s). The body itself (with its
+   handles) is always rendered beneath so handles stay at their natural
+   DOM positions. Handles are raised above the overlay via z-index so
+   they remain visible and interactive.
+────────────────────────────────────────────────────────────────────────── */
+
+.node-summary-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 34px; /* flush below header */
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 16px 10px;
+  pointer-events: none; /* let clicks pass through to handles */
+  z-index: 1;
+  background: #fff;
+  border-radius: 0 0 6px 6px;
+}
+
+/* Multi-output regular nodes left-align rows */
+.node-summary-overlay.is-rows {
+  align-items: stretch;
+  padding: 6px 10px 10px;
+}
+
+/* Handles must be above the overlay so they're visible and draggable */
+.port-row .react-flow__handle {
+  z-index: 2;
+}
+
+/* Variant overlay backgrounds match node body colour */
+.feedback-node.variant-constant .node-summary-overlay { background: #fff; }
+.feedback-node.variant-measure  .node-summary-overlay { background: #fff; }
+.feedback-node.variant-metric   .node-summary-overlay { background: #fff; }
+
+/* When collapsed, body port-rows shrink to just their handle height so
+   the node is compact. The overlay covers the minimal body. */
+.feedback-node:not(:hover) .node-body {
+  /* keep in document flow but row content hidden — height from handles */
+}
+.port-row:empty,
+.port-row:has(> .react-flow__handle:only-child) {
+  min-height: 16px;
+}
+
+/* ── Summary panel ────────────────────────────────────────────────────────── */
+
+.node-summary {
+  padding: 6px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.node-summary.is-centered {
+  align-items: center;
+  padding: 4px 16px 12px;
+}
+
+/* Large value for Constant / Measure / Metric */
+.summary-value {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: monospace;
+  color: #222;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.summary-value.is-money  { color: #1a5a1a; }
+.summary-value.is-percent { color: #003090; }
+.summary-value.is-empty  { font-size: 14px; font-weight: 400; color: #bbb; }
+
+.summary-value-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.summary-value-label {
+  font-size: 10px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Output rows for regular nodes */
+.summary-output-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 18px;
+}
+
+.summary-output-label {
+  font-size: 11px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.summary-output-value {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: monospace;
+  color: #333;
+  white-space: nowrap;
+}
+
+.summary-output-value.is-money   { color: #1a5a1a; }
+.summary-output-value.is-percent { color: #003090; }
 
 .feedback-node.selected {
   border-color: #0070f3;
@@ -69,6 +361,42 @@
   background: #e8e8e8;
 }
 
+.save-library-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 13px;
+  line-height: 1;
+  color: #aaa;
+  opacity: 0.55;
+  transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.save-library-btn:hover {
+  opacity: 1;
+  color: #e8a800;
+}
+
+.delete-node-btn {
+  font-size: 11px;
+  padding: 2px 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: #aaa;
+}
+
+.delete-node-btn:hover {
+  background: #fff0f0;
+  border-color: #d00;
+  color: #d00;
+}
+
 .node-body {
   display: flex;
   padding: 8px 0;
@@ -94,7 +422,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  position: relative;
+  position: relative; /* handles inside port-rows are positioned relative to this */
   min-height: 20px;
 }
 
@@ -106,6 +434,20 @@
   border-radius: 3px;
   padding: 1px 5px;
   line-height: 18px;
+  cursor: text;
+}
+
+.port-label-input {
+  font-size: 11px;
+  color: #333;
+  border: 1px solid #0070f3;
+  border-radius: 3px;
+  padding: 1px 5px;
+  line-height: 18px;
+  outline: none;
+  background: #fff;
+  width: 80px;
+  min-width: 0;
 }
 
 .node-meta {
@@ -177,8 +519,291 @@
   border-radius: 0 0 6px 6px;
 }
 
-/* React Flow handle overrides */
-.feedback-node .react-flow__handle {
+/* ── Variant type selector ─────────────────────────────────────────────── */
+
+.variant-select {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  cursor: pointer;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.variant-select.variant-constant {
+  background: #f5d67a;
+  color: #7a5500;
+  border-color: #c89020;
+}
+
+.variant-select.variant-measure {
+  background: #a8d4f5;
+  color: #00367a;
+  border-color: #1a6bb5;
+}
+
+.variant-select.variant-metric {
+  background: #ddd0ff;
+  color: #4a0099;
+  border-color: #7c3aed;
+}
+
+/* ── Unit cycle button ─────────────────────────────────────────────────── */
+
+.unit-cycle-btn {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 3px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: #f5f5f5;
+  cursor: pointer;
+  color: #888;
+  line-height: 16px;
+  min-width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.unit-cycle-btn:hover {
+  background: #e8e8e8;
+  border-color: #888;
+  color: #444;
+}
+
+.unit-cycle-btn.is-money {
+  border-color: #2a7a2a;
+  color: #1a5a1a;
+  background: #f0f7f0;
+}
+
+.unit-cycle-btn.is-percent {
+  border-color: #0050c0;
+  color: #003090;
+  background: #f0f4ff;
+}
+
+/* ── Variant node theming ──────────────────────────────────────────────── */
+
+.feedback-node.variant-constant {
+  border-color: #c89020;
+}
+.feedback-node.variant-constant .node-header {
+  background: #fff9e6;
+}
+.feedback-node.variant-constant.selected {
+  border-color: #c89020;
+  box-shadow: 0 0 0 3px rgba(200,144,32,0.25);
+}
+
+.feedback-node.variant-measure {
+  border-color: #1a6bb5;
+}
+.feedback-node.variant-measure .node-header {
+  background: #eef5ff;
+}
+.feedback-node.variant-measure.selected {
+  border-color: #1a6bb5;
+  box-shadow: 0 0 0 3px rgba(26,107,181,0.2);
+}
+
+.feedback-node.variant-metric {
+  border-color: #7c3aed;
+}
+.feedback-node.variant-metric .node-header {
+  background: #f5f0ff;
+}
+.feedback-node.variant-metric.selected {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.2);
+}
+
+/* ── Metric body ─────────────────────────────────────────────────────────── */
+
+.metric-body {
+  display: flex;
+}
+
+.metric-formula-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border-left: 1px dashed #d0b0f0;
+  min-width: 120px;
+}
+
+.metric-formula-input {
+  font-size: 11px;
+  font-family: monospace;
+  border: 1px solid #c0a0f0;
+  border-radius: 3px;
+  padding: 2px 5px;
+  outline: none;
+  background: #faf8ff;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.metric-formula-input:focus {
+  border-color: #7c3aed;
+}
+
+.metric-result {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: monospace;
+  color: #7c3aed;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-result.is-error {
+  color: #a00;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+/* Value-node body: single column of output rows */
+.value-node-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+}
+
+/* Separator glyph between label and value input */
+.port-value-eq {
+  font-size: 11px;
+  color: #888;
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* Numeric value input for constant/measure outputs */
+.port-value-input {
+  width: 72px;
+  font-size: 11px;
+  font-family: monospace;
+  padding: 1px 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  text-align: right;
+  background: #fafafa;
+  min-width: 0;
+}
+
+.variant-constant .port-value-input {
+  border-color: #c89020;
+  background: #fffbf0;
+}
+.variant-measure .port-value-input {
+  border-color: #1a6bb5;
+  background: #f0f5ff;
+}
+
+/* Constant port label variant */
+.port-label.is-constant {
+  background: #fffbf0;
+  border-color: #e8c84a;
+  color: #6e5000;
+}
+
+/* Value badge next to a constant port */
+.port-constant-badge {
+  font-size: 10px;
+  font-family: monospace;
+  color: #6e5000;
+  background: #fffbf0;
+  border: 1px solid #e8c84a;
+  border-radius: 3px;
+  padding: 0 4px;
+  line-height: 16px;
+}
+
+/* Quick-add button row at bottom of each ports column */
+.quick-add-row {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.port-quick-add-btn {
+  font-size: 10px;
+  padding: 1px 5px;
+  border: 1px dashed #ccc;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  color: #999;
+  line-height: 16px;
+}
+
+.port-quick-add-btn:hover {
+  background: #f5f5f5;
+  border-color: #888;
+  color: #555;
+}
+
+.port-quick-add-btn.is-constant {
+  border-color: #e8c84a;
+  color: #a88c00;
+}
+
+.port-quick-add-btn.is-constant:hover {
+  background: #fffbf0;
+}
+
+/* Floating computed value label, shown outside the node aligned with output handle */
+.port-value-float {
+  position: absolute;
+  left: calc(100% + 22px); /* 16px handle offset + 6px gap */
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-size: 11px;
+  font-family: monospace;
+  font-weight: 600;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 2px 8px;
+  color: #444;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  pointer-events: none;
+}
+
+.port-value-float.is-money {
+  color: #1a5a1a;
+  border-color: #b0d8b0;
+  background: #f4fbf4;
+}
+
+.port-value-float.is-percent {
+  color: #003090;
+  border-color: #b0c4f0;
+  background: #f2f6ff;
+}
+
+/* React Flow handle overrides
+   Handles are rendered INSIDE .port-row (position:relative).
+   The port-row sits inside .ports-column which has padding: 0 8px,
+   so the row's left/right edges are 8px inside the node edge.
+   To place the handle at the same visual position as before (-6px from node edge):
+     left from port-row = -6 - 8 - 2(border) = -16px  (same for right side)
+*/
+.port-row .react-flow__handle {
   width: 10px;
   height: 10px;
   background: #555;
@@ -186,15 +811,15 @@
   border-radius: 50%;
 }
 
-.feedback-node .react-flow__handle-left {
-  left: -6px;
+.port-row .react-flow__handle-left {
+  left: -16px;
 }
 
-.feedback-node .react-flow__handle-right {
-  right: -6px;
+.port-row .react-flow__handle-right {
+  right: -16px;
 }
 
-.feedback-node .react-flow__handle:hover {
+.port-row .react-flow__handle:hover {
   background: #0070f3;
-  transform: scale(1.3);
+  transform: translate(0, -50%) scale(1.3);
 }

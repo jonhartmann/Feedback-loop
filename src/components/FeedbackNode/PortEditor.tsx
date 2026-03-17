@@ -1,6 +1,7 @@
 import { useReactFlow } from '@xyflow/react'
 import type { Port, OutputPort, NodeVariable, FeedbackNodeData } from '../../types/graph'
-import { labelToVarName } from '../../utils/formulaEval'
+import { labelToVarName, FORMULA_BUILTINS } from '../../utils/formulaEval'
+import FormulaInput from './FormulaInput'
 
 interface PortEditorProps {
   nodeId: string;
@@ -102,9 +103,18 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
         />
       </div>
 
-      {/* Variables / Constants */}
+      {/* Inputs */}
+      <PortSection
+        title="Inputs"
+        ports={inputs}
+        onAdd={() => addPort('input')}
+        onRemove={(id) => removePort('input', id)}
+        onRename={(id, label) => renamePort('input', id, label)}
+      />
+
+      {/* Constants (Variables) — shown alongside inputs */}
       <div style={{ marginBottom: 10 }}>
-        <div style={{ fontWeight: 600, marginBottom: 4, color: '#444' }}>Variables</div>
+        <div style={{ fontWeight: 600, marginBottom: 4, color: '#6e5000' }}>Constants</div>
         {vars.map((v, i) => {
           const nameValid = v.name === '' || VAR_NAME_RE.test(v.name)
           return (
@@ -115,8 +125,9 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
                 placeholder="name"
                 style={{
                   width: 90, fontSize: 11, padding: '1px 4px',
-                  border: `1px solid ${nameValid ? '#ccc' : '#e55'}`,
+                  border: `1px solid ${nameValid ? '#e8c84a' : '#e55'}`,
                   borderRadius: 3, fontFamily: 'monospace',
+                  background: nameValid ? '#fffbf0' : undefined,
                 }}
                 onMouseDown={e => e.stopPropagation()}
               />
@@ -125,7 +136,7 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
                 type="number"
                 value={v.value}
                 onChange={e => updateVariable(i, { value: parseFloat(e.target.value) || 0 })}
-                style={{ width: 70, fontSize: 11, padding: '1px 4px', border: '1px solid #ccc', borderRadius: 3 }}
+                style={{ width: 70, fontSize: 11, padding: '1px 4px', border: '1px solid #e8c84a', borderRadius: 3, background: '#fffbf0' }}
                 onMouseDown={e => e.stopPropagation()}
               />
               <button
@@ -137,20 +148,11 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
         })}
         <button
           onClick={addVariable}
-          style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #ccc', borderRadius: 3, cursor: 'pointer', background: '#fff', marginTop: 2 }}
+          style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #e8c84a', borderRadius: 3, cursor: 'pointer', background: '#fffbf0', color: '#6e5000', marginTop: 2 }}
         >
-          + Add Variable
+          + Add Constant
         </button>
       </div>
-
-      {/* Inputs */}
-      <PortSection
-        title="Inputs"
-        ports={inputs}
-        onAdd={() => addPort('input')}
-        onRemove={(id) => removePort('input', id)}
-        onRename={(id, label) => renamePort('input', id, label)}
-      />
 
       {/* Outputs — with per-port formula */}
       <div style={{ marginBottom: 8 }}>
@@ -171,11 +173,14 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
             </div>
             <div className="output-formula-row">
               <span style={{ fontSize: 11, color: '#888', fontFamily: 'monospace', flexShrink: 0 }}>=</span>
-              <input
+              <FormulaInput
                 value={port.formula ?? ''}
-                onChange={e => updateOutputFormula(port.id, e.target.value)}
+                onChange={v => updateOutputFormula(port.id, v)}
+                variables={availableVars}
+                builtins={FORMULA_BUILTINS}
                 placeholder={`e.g. ${inputs[0] ? labelToVarName(inputs[0].label) : 'a'} / ${inputs[1] ? labelToVarName(inputs[1].label) : 'b'} * 5`}
-                style={{ flex: 1, fontSize: 11, padding: '1px 4px', border: '1px solid #ccc', borderRadius: 3, fontFamily: 'monospace' }}
+                wrapperStyle={{ flex: 1 }}
+                inputStyle={{ fontSize: 11, padding: '1px 4px', border: '1px solid #ccc', borderRadius: 3, fontFamily: 'monospace' }}
                 onMouseDown={e => e.stopPropagation()}
               />
             </div>

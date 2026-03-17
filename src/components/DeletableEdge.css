@@ -1,0 +1,21 @@
+.edge-delete-btn {
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border: 1px solid #bbb;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  color: #888;
+}
+
+.edge-delete-btn:hover {
+  background: #fff0f0;
+  border-color: #d00;
+  color: #d00;
+}
