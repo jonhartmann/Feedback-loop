@@ -2,12 +2,19 @@ import { useEffect } from 'react'
 import type { SerializedGraph } from '../types/graph'
 
 // ── Starter graph: Compounding Interest Calculator ────────────────────────────
-// Shows how Constants feed into a Metric node formula.
-// Formula: principal * (1 + rate/n)^(n*t)  → ~$20,097 at defaults
+// Breaks the formula into two intermediate Expression nodes so the flow
+// reads left-to-right as a comprehensible calculation:
+//
+//   Constants  →  Period Rate (rate/n)    ──┐
+//             →  Total Periods (n*years)  ──┤──►  Final Amount
+//             →  Principal               ──┘       principal * (1+periodRate)^totalPeriods
+//
+// At defaults (~$20,097): $10k @ 7% compounded monthly for 10 years.
 const COMPOUNDING_INTEREST: SerializedGraph = {
   version: 1,
   name: 'Compounding Interest Calculator',
   nodes: [
+    // ── Left column: raw inputs ───────────────────────────────────────────
     {
       id: 'ci-n1',
       position: { x: 40, y: 60 },
@@ -20,29 +27,29 @@ const COMPOUNDING_INTEREST: SerializedGraph = {
     },
     {
       id: 'ci-n2',
-      position: { x: 40, y: 180 },
+      position: { x: 40, y: 190 },
       data: {
         label: 'Annual Rate',
         variant: 'constant',
         inputs: [],
-        // 0.07 = 7% — displayed as percent, used as a decimal in the formula
+        // 0.07 = 7% — stored as a decimal, formula uses it as-is
         outputs: [{ id: 'ci-r-out', label: 'value', value: 0.07, unit: 'percent' }],
       },
     },
     {
       id: 'ci-n3',
-      position: { x: 40, y: 300 },
+      position: { x: 40, y: 320 },
       data: {
         label: 'Compounds / yr',
         variant: 'constant',
         inputs: [],
-        // 12 = monthly compounding
+        // 12 = monthly compounding; feeds both intermediate expressions
         outputs: [{ id: 'ci-n-out', label: 'value', value: 12 }],
       },
     },
     {
       id: 'ci-n4',
-      position: { x: 40, y: 410 },
+      position: { x: 40, y: 440 },
       data: {
         label: 'Years',
         variant: 'constant',
@@ -50,30 +57,62 @@ const COMPOUNDING_INTEREST: SerializedGraph = {
         outputs: [{ id: 'ci-t-out', label: 'value', value: 10 }],
       },
     },
+    // ── Middle column: intermediate calculations ──────────────────────────
     {
       id: 'ci-n5',
-      position: { x: 360, y: 200 },
+      position: { x: 320, y: 130 },
+      data: {
+        label: 'Period Rate',
+        // rate per compounding period, e.g. 7%/12 ≈ 0.5833% per month
+        inputs: [
+          { id: 'ci-pr-in-r', label: 'rate' },
+          { id: 'ci-pr-in-n', label: 'n' },
+        ],
+        outputs: [{ id: 'ci-pr-out', label: 'periodRate', formula: 'rate / n' }],
+      },
+    },
+    {
+      id: 'ci-n6',
+      position: { x: 320, y: 360 },
+      data: {
+        label: 'Total Periods',
+        // total number of compounding periods, e.g. 12 × 10 = 120 months
+        inputs: [
+          { id: 'ci-tp-in-n', label: 'n' },
+          { id: 'ci-tp-in-y', label: 'years' },
+        ],
+        outputs: [{ id: 'ci-tp-out', label: 'totalPeriods', formula: 'n * years' }],
+      },
+    },
+    // ── Right column: final KPI ───────────────────────────────────────────
+    {
+      id: 'ci-n7',
+      position: { x: 600, y: 240 },
       data: {
         label: 'Final Amount',
         variant: 'metric',
-        // Input labels become the variable names in the formula scope
         inputs: [
-          { id: 'ci-in-p', label: 'principal' },
-          { id: 'ci-in-r', label: 'rate' },
-          { id: 'ci-in-n', label: 'n' },
-          { id: 'ci-in-t', label: 'years' },
+          { id: 'ci-fa-in-p',  label: 'principal' },
+          { id: 'ci-fa-in-pr', label: 'periodRate' },
+          { id: 'ci-fa-in-tp', label: 'totalPeriods' },
         ],
         outputs: [],
-        metricFormula: 'principal * (1 + rate / n) ^ (n * years)',
+        metricFormula: 'principal * (1 + periodRate) ^ totalPeriods',
         metricUnit: 'money',
       },
     },
   ],
   edges: [
-    { id: 'ci-e1', source: 'ci-n1', sourceHandle: 'ci-p-out', target: 'ci-n5', targetHandle: 'ci-in-p' },
-    { id: 'ci-e2', source: 'ci-n2', sourceHandle: 'ci-r-out', target: 'ci-n5', targetHandle: 'ci-in-r' },
-    { id: 'ci-e3', source: 'ci-n3', sourceHandle: 'ci-n-out', target: 'ci-n5', targetHandle: 'ci-in-n' },
-    { id: 'ci-e4', source: 'ci-n4', sourceHandle: 'ci-t-out', target: 'ci-n5', targetHandle: 'ci-in-t' },
+    // Constants → Period Rate
+    { id: 'ci-e1', source: 'ci-n2', sourceHandle: 'ci-r-out',   target: 'ci-n5', targetHandle: 'ci-pr-in-r' },
+    { id: 'ci-e2', source: 'ci-n3', sourceHandle: 'ci-n-out',   target: 'ci-n5', targetHandle: 'ci-pr-in-n' },
+    // Constants → Total Periods
+    { id: 'ci-e3', source: 'ci-n3', sourceHandle: 'ci-n-out',   target: 'ci-n6', targetHandle: 'ci-tp-in-n' },
+    { id: 'ci-e4', source: 'ci-n4', sourceHandle: 'ci-t-out',   target: 'ci-n6', targetHandle: 'ci-tp-in-y' },
+    // Intermediates + Principal → Final Amount
+    { id: 'ci-e5', source: 'ci-n1', sourceHandle: 'ci-p-out',   target: 'ci-n7', targetHandle: 'ci-fa-in-p'  },
+    { id: 'ci-e6', source: 'ci-n5', sourceHandle: 'ci-pr-out',  target: 'ci-n7', targetHandle: 'ci-fa-in-pr' },
+    { id: 'ci-e7', source: 'ci-n6', sourceHandle: 'ci-tp-out',  target: 'ci-n7', targetHandle: 'ci-fa-in-tp' },
   ],
 }
 
