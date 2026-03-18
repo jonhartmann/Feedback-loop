@@ -226,6 +226,167 @@ const WEBSITE_METRICS: SerializedGraph = {
   ],
 }
 
+// ── Starter graph: Business KPI Relationships ─────────────────────────────────
+// Models the classic LTV:CAC ratio — the single most-watched health metric for
+// subscription and e-commerce businesses.
+//
+//   Order Value × Frequency  →  Annual Revenue / Customer  ──┐
+//   Annual Revenue × Margin × Lifespan                    →  LTV  ──┐
+//                                                                    ├──►  LTV:CAC Ratio
+//   Mktg Spend / New Customers                            →  CAC  ──┘
+//
+// At defaults: LTV ≈ $367, CAC = $75, ratio ≈ 4.9 (healthy = > 3).
+const BUSINESS_KPIS: SerializedGraph = {
+  version: 1,
+  name: 'Business KPI Relationships',
+  nodes: [
+    // ── Left column: raw business inputs (Constants) ──────────────────────
+    {
+      id: 'kpi-n1',
+      position: { x: 40, y: 60 },
+      data: {
+        label: 'Avg Order Value',
+        variant: 'constant',
+        inputs: [],
+        outputs: [{ id: 'kpi-aov-out', label: 'value', value: 85, unit: 'money' }],
+      },
+    },
+    {
+      id: 'kpi-n2',
+      position: { x: 40, y: 190 },
+      data: {
+        label: 'Purchase Frequency',
+        variant: 'constant',
+        inputs: [],
+        // purchases per year per customer
+        outputs: [{ id: 'kpi-freq-out', label: 'value', value: 3.2 }],
+      },
+    },
+    {
+      id: 'kpi-n3',
+      position: { x: 40, y: 330 },
+      data: {
+        label: 'Gross Margin',
+        variant: 'constant',
+        inputs: [],
+        // 0.45 = 45% — the portion of revenue that becomes gross profit
+        outputs: [{ id: 'kpi-margin-out', label: 'value', value: 0.45, unit: 'percent' }],
+      },
+    },
+    {
+      id: 'kpi-n4',
+      position: { x: 40, y: 460 },
+      data: {
+        label: 'Customer Lifespan',
+        variant: 'constant',
+        inputs: [],
+        // average years a customer stays before churning
+        outputs: [{ id: 'kpi-life-out', label: 'value', value: 3 }],
+      },
+    },
+    {
+      id: 'kpi-n5',
+      position: { x: 40, y: 620 },
+      data: {
+        label: 'Mktg Spend / mo',
+        variant: 'constant',
+        inputs: [],
+        outputs: [{ id: 'kpi-spend-out', label: 'value', value: 15000, unit: 'money' }],
+      },
+    },
+    {
+      id: 'kpi-n6',
+      position: { x: 40, y: 750 },
+      data: {
+        label: 'New Customers / mo',
+        variant: 'constant',
+        inputs: [],
+        outputs: [{ id: 'kpi-acq-out', label: 'value', value: 200 }],
+      },
+    },
+    // ── Middle column: intermediate KPIs (Expressions) ────────────────────
+    {
+      id: 'kpi-n7',
+      position: { x: 330, y: 100 },
+      data: {
+        label: 'Annual Rev / Customer',
+        inputs: [
+          { id: 'kpi-ar-in1', label: 'orderValue' },
+          { id: 'kpi-ar-in2', label: 'frequency' },
+        ],
+        outputs: [
+          // e.g. $85 × 3.2 = $272/yr
+          { id: 'kpi-ar-out', label: 'annualRevenue', formula: 'orderValue * frequency', unit: 'money' },
+        ],
+      },
+    },
+    {
+      id: 'kpi-n8',
+      position: { x: 330, y: 310 },
+      data: {
+        label: 'Customer LTV',
+        // Lifetime Value = annual revenue × margin × avg years retained
+        inputs: [
+          { id: 'kpi-ltv-in1', label: 'annualRevenue' },
+          { id: 'kpi-ltv-in2', label: 'margin' },
+          { id: 'kpi-ltv-in3', label: 'lifespan' },
+        ],
+        outputs: [
+          // e.g. $272 × 0.45 × 3 = $367.20
+          { id: 'kpi-ltv-out', label: 'ltv', formula: 'annualRevenue * margin * lifespan', unit: 'money' },
+        ],
+      },
+    },
+    {
+      id: 'kpi-n9',
+      position: { x: 330, y: 650 },
+      data: {
+        label: 'CAC',
+        // Customer Acquisition Cost = total spend ÷ customers acquired
+        inputs: [
+          { id: 'kpi-cac-in1', label: 'spend' },
+          { id: 'kpi-cac-in2', label: 'acquired' },
+        ],
+        outputs: [
+          // e.g. $15,000 ÷ 200 = $75
+          { id: 'kpi-cac-out', label: 'cac', formula: 'spend / acquired', unit: 'money' },
+        ],
+      },
+    },
+    // ── Right column: headline ratio (Metric) ─────────────────────────────
+    {
+      id: 'kpi-n10',
+      position: { x: 630, y: 400 },
+      data: {
+        label: 'LTV : CAC Ratio',
+        variant: 'metric',
+        // Rule of thumb: > 3 = healthy, < 1 = burning money on acquisition
+        inputs: [
+          { id: 'kpi-r-in1', label: 'ltv' },
+          { id: 'kpi-r-in2', label: 'cac' },
+        ],
+        outputs: [],
+        metricFormula: 'ltv / cac',
+      },
+    },
+  ],
+  edges: [
+    // Inputs → Annual Revenue / Customer
+    { id: 'kpi-e1', source: 'kpi-n1', sourceHandle: 'kpi-aov-out',   target: 'kpi-n7', targetHandle: 'kpi-ar-in1'  },
+    { id: 'kpi-e2', source: 'kpi-n2', sourceHandle: 'kpi-freq-out',  target: 'kpi-n7', targetHandle: 'kpi-ar-in2'  },
+    // Annual Revenue + Margin + Lifespan → Customer LTV
+    { id: 'kpi-e3', source: 'kpi-n7', sourceHandle: 'kpi-ar-out',    target: 'kpi-n8', targetHandle: 'kpi-ltv-in1' },
+    { id: 'kpi-e4', source: 'kpi-n3', sourceHandle: 'kpi-margin-out',target: 'kpi-n8', targetHandle: 'kpi-ltv-in2' },
+    { id: 'kpi-e5', source: 'kpi-n4', sourceHandle: 'kpi-life-out',  target: 'kpi-n8', targetHandle: 'kpi-ltv-in3' },
+    // Spend + New Customers → CAC
+    { id: 'kpi-e6', source: 'kpi-n5', sourceHandle: 'kpi-spend-out', target: 'kpi-n9', targetHandle: 'kpi-cac-in1' },
+    { id: 'kpi-e7', source: 'kpi-n6', sourceHandle: 'kpi-acq-out',   target: 'kpi-n9', targetHandle: 'kpi-cac-in2' },
+    // LTV + CAC → Ratio
+    { id: 'kpi-e8', source: 'kpi-n8', sourceHandle: 'kpi-ltv-out',   target: 'kpi-n10', targetHandle: 'kpi-r-in1' },
+    { id: 'kpi-e9', source: 'kpi-n9', sourceHandle: 'kpi-cac-out',   target: 'kpi-n10', targetHandle: 'kpi-r-in2' },
+  ],
+}
+
 // ── Card definitions ──────────────────────────────────────────────────────────
 
 interface Starter {
@@ -257,6 +418,13 @@ const STARTERS: Starter[] = [
     description: 'Model a conversion funnel from raw visitor count to monthly revenue, with bounce rate and average order value as levers.',
     accent: '#7c3aed',
     graph: WEBSITE_METRICS,
+  },
+  {
+    title: 'Business KPI Relationships',
+    icon: '💼',
+    description: 'Map the LTV:CAC ratio — the key health metric for any growth business. Adjust marketing spend, margins, or churn and see the ratio respond.',
+    accent: '#1a7a3a',
+    graph: BUSINESS_KPIS,
   },
 ]
 
@@ -294,7 +462,7 @@ export default function WelcomeOverlay({ onSelect }: { onSelect: (graph?: Serial
           background: '#fff',
           borderRadius: 12,
           boxShadow: '0 16px 48px rgba(0,0,0,0.28)',
-          maxWidth: 720,
+          maxWidth: 760,
           width: '100%',
           padding: '32px 32px 28px',
           fontFamily: 'sans-serif',
@@ -308,13 +476,13 @@ export default function WelcomeOverlay({ onSelect }: { onSelect: (graph?: Serial
           and formulas into live-updating models. Pick a starting point:
         </p>
 
-        {/* Card grid */}
-        <div style={{ display: 'flex', gap: 16 }}>
+        {/* Card grid — 2×2 wrap */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
           {STARTERS.map(s => (
             <div
               key={s.title}
               style={{
-                flex: 1,
+                flex: '0 0 calc(50% - 8px)',
                 border: `2px solid ${s.accent}`,
                 borderRadius: 10,
                 padding: '20px 18px 18px',
