@@ -8,7 +8,8 @@ import { GraphEvalProvider } from './context/GraphEvalContext'
 import FlowCanvas from './components/FlowCanvas'
 import Toolbar from './components/Toolbar'
 import Drawer from './components/Drawer'
-import type { FeedbackNodeData } from './types/graph'
+import WelcomeOverlay from './components/WelcomeOverlay'
+import type { FeedbackNodeData, SerializedGraph } from './types/graph'
 
 const DRAWER_WIDTH = 260
 
@@ -16,6 +17,17 @@ function AppInner() {
   const { nodes, edges, onNodesChange, onEdgesChange, setEdges, setNodes, addNode, getSerializedGraph, loadGraph, docName, setDocName } = useGraphState()
   const library = useLibrary()
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Show welcome overlay on first visit; flag persists in localStorage
+  const [showWelcome, setShowWelcome] = useState(
+    () => !localStorage.getItem('feedback-loop-welcomed')
+  )
+
+  function handleWelcomeSelect(graph?: SerializedGraph) {
+    if (graph) loadGraph(graph)
+    localStorage.setItem('feedback-loop-welcomed', '1')
+    setShowWelcome(false)
+  }
 
   useDataRefresh(3000)
 
@@ -67,6 +79,7 @@ function AppInner() {
             />
           </GraphEvalProvider>
           {drawerOpen && <Drawer onClose={() => setDrawerOpen(false)} addNode={addNode} />}
+          {showWelcome && <WelcomeOverlay onSelect={handleWelcomeSelect} />}
         </div>
       </div>
     </LibraryContext.Provider>
