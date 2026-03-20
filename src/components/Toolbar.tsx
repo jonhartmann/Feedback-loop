@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { useReactFlow } from '@xyflow/react'
 import type { NodeVariant, SerializedGraph } from '../types/graph'
 import { saveGraphToFile, loadGraphFromFile } from '../hooks/useFilePersistence'
+import { useSimContext } from '../context/SimContext'
 
 interface ToolbarProps {
   onAddNode: (position: { x: number; y: number }, variant?: NodeVariant) => void;
@@ -11,11 +12,13 @@ interface ToolbarProps {
   onDocNameChange: (name: string) => void;
   drawerOpen: boolean;
   onToggleDrawer: () => void;
+  onShowTemplates: () => void;
 }
 
-export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameChange, drawerOpen, onToggleDrawer }: ToolbarProps) {
+export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameChange, drawerOpen, onToggleDrawer, onShowTemplates }: ToolbarProps) {
   const { screenToFlowPosition } = useReactFlow()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { simMode, toggleSimMode } = useSimContext()
 
   function handleAddNode(variant?: NodeVariant) {
     const position = screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 })
@@ -87,7 +90,12 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
       <Button onClick={() => handleAddNode('metric')} violet>+ Metric</Button>
       <Button onClick={onToggleDrawer} primary={drawerOpen}>Library</Button>
 
+      <div style={{ width: 1, background: '#444', alignSelf: 'stretch', margin: '8px 4px' }} />
+
+      <Button onClick={toggleSimMode} primary={simMode}>Experiment</Button>
+
       <div style={{ flex: 1 }} />
+      <Button onClick={onShowTemplates}>Templates</Button>
       <Button onClick={handleSave} primary>Save</Button>
       <Button onClick={handleLoad}>Load</Button>
       <input

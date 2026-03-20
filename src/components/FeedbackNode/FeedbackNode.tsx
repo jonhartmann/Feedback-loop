@@ -4,6 +4,7 @@ import type { Node, NodeProps } from '@xyflow/react'
 import type { FeedbackNodeData, NodeVariant, OutputPort, Unit } from '../../types/graph'
 import { evalFormula, buildScope, toCamelCase, labelToVarName, formatValue, FORMULA_BUILTINS } from '../../utils/formulaEval'
 import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
+import { useSimContext } from '../../context/SimContext'
 import { useLibraryContext } from '../../context/LibraryContext'
 import PortEditor from './PortEditor'
 import FormulaInput from './FormulaInput'
@@ -64,6 +65,224 @@ function ValueInput({
 }
 
 
+// ── Experiment mode slider panel ──────────────────────────────────────────────
+
+/** Compact formatter for sim mode — uses K/M/B suffixes for large numbers */
+function formatSimValue(value: number, unit: Unit | undefined): string {
+  if (!isFinite(value)) return '—'
+  const raw = unit === 'percent' ? value * 100 : value
+  const abs = Math.abs(raw)
+  const prefix = unit === 'money' ? '$' : ''
+  const suffix = unit === 'percent' ? '%' : ''
+  if (abs >= 1e12) return `${prefix}${(raw / 1e12).toFixed(2)}T${suffix}`
+  if (abs >= 1e9)  return `${prefix}${(raw / 1e9).toFixed(2)}B${suffix}`
+  if (abs >= 1e6)  return `${prefix}${(raw / 1e6).toFixed(2)}M${suffix}`
+  return formatValue(value, unit)
+}
+
+function LockIcon({ locked }: { locked: boolean }) {
+  return (
+    <svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden>
+      <rect x="1.5" y="5.5" width="8" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
+      {locked
+        ? <path d="M3 5.5V4a2.5 2.5 0 015 0v1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        : <path d="M3 5.5V4a2.5 2.5 0 015 0" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeDasharray="2.5 2" />
+      }
+    </svg>
+  )
+}
+
+interface SimSliderRowProps {
+  nodeKey: string
+  label: string
+  unit: Unit | undefined
+  baseVal: number
+  showLabel: boolean
+  /** If true, slider uses back-propagation (formula/metric nodes) instead of direct override */
+  useBackProp: boolean
+  simOverlay: Map<string, number>
+  setSimValue: (key: string, value: number) => void
+  removeSimValue: (key: string) => void
+}
+
+function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBackProp, simOverlay, setSimValue, removeSimValue }: SimSliderRowProps) {
+  const { simEvalMap, backPropagate, lockedKeys, toggleLock } = useSimContext()
+  const isLocked = lockedKeys.has(nodeKey)
+
+  // simOverlay stores fractional adjustments (0.20 = +20%), not absolute values.
+  // Compute simVal = liveBase * (1 + fixedPct) so it tracks series data while
+  // keeping the percentage stable.
+  const directPctFraction = simOverlay.get(nodeKey)              // undefined if not adjusted
+  const propagatedVal = simEvalMap.get(nodeKey)                   // absolute, from forward pass
+  const isAffectedOnly = directPctFraction === undefined && propagatedVal !== undefined && Math.abs((propagatedVal - baseVal)) > 1e-10
+
+  // Displayed value and percentage:
+  let simVal: number
+  let rawPct: number
+  if (directPctFraction !== undefined) {
+    simVal = baseVal * (1 + directPctFraction)   // live base × fixed fraction
+    rawPct = directPctFraction * 100             // stable — never drifts
+  } else if (isAffectedOnly) {
+    simVal = propagatedVal!
+    rawPct = baseVal !== 0 ? ((simVal - baseVal) / Math.abs(baseVal)) * 100 : 0
+  } else {
+    simVal = baseVal
+    rawPct = 0
+  }
+
+  const sliderPct = Math.max(-80, Math.min(400, rawPct))
+
+  const [draft, setDraft] = useState('')
+  const [draftFocused, setDraftFocused] = useState(false)
+
+  function applyPct(pct: number) {
+    if (isLocked) return
+    if (useBackProp) {
+      backPropagate(nodeKey, pct)
+    } else {
+      setSimValue(nodeKey, pct / 100)
+    }
+  }
+
+  const displayPct = Math.round(rawPct * 10) / 10
+  const isPositive = rawPct > 0.05
+  const isNegative = rawPct < -0.05
+
+  return (
+    <div className={`sim-slider-row${isAffectedOnly ? ' is-propagated' : ''}${isLocked ? ' is-locked' : ''}`}>
+      {/* Prominent value display — matches summary-value size */}
+      <div className="sim-value-display">
+        {showLabel && <span className="sim-slider-label">{label}</span>}
+        <span className={`sim-current-value${unit === 'money' ? ' is-money' : unit === 'percent' ? ' is-percent' : ''}`}>
+          {formatSimValue(simVal, unit)}
+        </span>
+        {/* Delta badge shown on propagated nodes so the impact is always visible */}
+        {rawPct !== 0 && (
+          <span className={`sim-delta-badge${isPositive ? ' positive' : isNegative ? ' negative' : ''}`}>
+            {isPositive ? '+' : ''}{Math.round(rawPct * 10) / 10}%
+          </span>
+        )}
+        {/* Lock button — on all node types */}
+        <button
+          className={`sim-lock-btn${isLocked ? ' locked' : ''}`}
+          title={isLocked
+            ? 'Locked — back-propagation stops here. Click to unlock.'
+            : useBackProp
+              ? 'Lock — back-propagation will not traverse through this node'
+              : 'Lock — prevent back-propagation from changing this value'}
+          onMouseDown={e => e.stopPropagation()}
+          onClick={() => toggleLock(nodeKey)}
+        >
+          <LockIcon locked={isLocked} />
+        </button>
+      </div>
+      {/* Control row: slider + manual % input — disabled when locked */}
+      <div className="sim-control-row" onMouseDown={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+        <input
+          type="range"
+          min={-80}
+          max={400}
+          step={1}
+          value={sliderPct}
+          disabled={isLocked}
+          title={useBackProp ? 'Drag to back-propagate: scales upstream inputs to hit this target' : isLocked ? 'Unlock to adjust' : undefined}
+          onChange={e => applyPct(Number(e.target.value))}
+        />
+        <input
+          type="number"
+          className={`sim-pct-input${isPositive ? ' positive' : isNegative ? ' negative' : ''}`}
+          value={draftFocused ? draft : displayPct}
+          disabled={isLocked}
+          onChange={e => setDraft(e.target.value)}
+          onFocus={() => { setDraftFocused(true); setDraft(String(displayPct)) }}
+          onBlur={() => {
+            setDraftFocused(false)
+            const n = parseFloat(draft)
+            if (isFinite(n)) applyPct(n)
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              const n = parseFloat(draft)
+              if (isFinite(n)) applyPct(n)
+              ;(e.target as HTMLInputElement).blur()
+            }
+            if (e.key === 'Escape') {
+              setDraftFocused(false)
+              ;(e.target as HTMLInputElement).blur()
+            }
+          }}
+        />
+        <span className="sim-pct-unit">%</span>
+        {/* Reset button — only shown when this node has been directly overridden */}
+        {directPctFraction !== undefined && !isLocked && (
+          <button
+            className="sim-reset-btn"
+            title="Reset to formula-computed value"
+            onMouseDown={e => e.stopPropagation()}
+            onClick={() => removeSimValue(nodeKey)}
+          >↺</button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+interface SimSlidersProps {
+  nodeId: string
+  isValueNode: boolean
+  isMetric: boolean
+  outputs: OutputPort[]
+  simOverlay: Map<string, number>
+  baseEvalMap: Map<string, number>
+  unitMap: Map<string, Unit>
+  setSimValue: (key: string, value: number) => void
+  removeSimValue: (key: string) => void
+}
+
+function SimSliders({ nodeId, isValueNode, outputs, simOverlay, baseEvalMap, unitMap, setSimValue, removeSimValue, isMetric }: SimSlidersProps) {
+  type SliderDef = { portId: string; label: string; unit: Unit | undefined; baseVal: number }
+  const sliders: SliderDef[] = []
+
+  if (isValueNode) {
+    for (const port of outputs) {
+      sliders.push({ portId: port.id, label: port.label, unit: port.unit, baseVal: baseEvalMap.get(`${nodeId}:${port.id}`) ?? port.value ?? 0 })
+    }
+  } else if (isMetric) {
+    const baseVal = baseEvalMap.get(`${nodeId}:__metric`)
+    if (baseVal !== undefined) {
+      sliders.push({ portId: '__metric', label: 'value', unit: unitMap.get(`${nodeId}:__metric`), baseVal })
+    }
+  } else {
+    for (const port of outputs) {
+      const baseVal = baseEvalMap.get(`${nodeId}:${port.id}`)
+      if (baseVal !== undefined) {
+        sliders.push({ portId: port.id, label: port.label, unit: unitMap.get(`${nodeId}:${port.id}`) ?? port.unit, baseVal })
+      }
+    }
+  }
+
+  if (sliders.length === 0) return null
+
+  return (
+    <div className="sim-sliders">
+      {sliders.map(({ portId, label, unit, baseVal }) => (
+        <SimSliderRow
+          key={portId}
+          nodeKey={`${nodeId}:${portId}`}
+          label={label}
+          unit={unit}
+          baseVal={baseVal}
+          showLabel={sliders.length > 1}
+          useBackProp={!isValueNode}
+          simOverlay={simOverlay}
+          setSimValue={setSimValue}
+          removeSimValue={removeSimValue}
+        />
+      ))}
+    </div>
+  )
+}
+
 export default function FeedbackNode({ id, data, selected }: NodeProps<Node<FeedbackNodeData>>) {
   const nodeData = data as FeedbackNodeData
   const variant = nodeData.variant
@@ -83,7 +302,12 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
   const { updateNodeData, deleteElements } = useReactFlow()
   const evalMap = useEvalMap()
   const unitMap = useUnitMap()
+  const { simMode, simOverlay, setSimValue, removeSimValue } = useSimContext()
   const { addItem } = useLibraryContext()
+
+  const { simEvalMap } = useSimContext()
+  // In sim mode, read displayed values from simEvalMap instead of evalMap
+  const activeEvalMap = simMode ? simEvalMap : evalMap
 
   // ── Series mode ───────────────────────────────────────────────────────────
 
@@ -143,8 +367,8 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
   const seriesChartType = nodeData.seriesChartType ?? 'line'
 
   const primaryPortId = isMetric ? '__metric' : (outputs[0]?.id ?? '')
-  const primaryValue  = evalMap.get(`${id as string}:${primaryPortId}`)
-    ?? (isValueNode ? outputs[0]?.value : undefined)
+  const primaryValue  = activeEvalMap.get(`${id as string}:${primaryPortId}`)
+    ?? (isValueNode ? (simMode && simOverlay.has(`${id as string}:${primaryPortId}`) ? simOverlay.get(`${id as string}:${primaryPortId}`) : outputs[0]?.value) : undefined)
   const primaryUnit   = unitMap.get(`${id as string}:${primaryPortId}`) ?? outputs[0]?.unit
 
   const [seriesHistory, setSeriesHistory] = useState<number[]>([])
@@ -321,7 +545,8 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
   // ── Expand / collapse ─────────────────────────────────────────────────────
 
   const isPinned = showEditor || isEditingLabel || editingPortId !== null
-  const showExpanded = isHovered || isPinned || isFocused
+  // In experiment mode nodes are always collapsed and non-editable
+  const showExpanded = !simMode && (isHovered || isPinned || isFocused)
   const isSingleOutputRegular = !isValueNode && !isMetric && outputs.length === 1
 
   const nodeClass = [
@@ -329,6 +554,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
     variant ? `variant-${variant}` : '',
     selected ? 'selected' : '',
     displayMode === 'series' ? 'is-series' : '',
+    simMode ? 'sim-mode' : '',
   ].filter(Boolean).join(' ')
 
   const variantOptions = [
@@ -340,7 +566,8 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
   // ── Summary overlay content ───────────────────────────────────────────────
 
-  const summaryOverlay = !showExpanded && (
+  // In sim mode the summary overlay is replaced by SimSliders which shows the value + slider
+  const summaryOverlay = !showExpanded && !simMode && (
     <div className={`node-summary-overlay${displayMode === 'series' ? ' is-series-collapsed' : ''}`}>
       {displayMode === 'series' && (
         <div style={{ position: 'relative', width: '100%' }}>
@@ -371,7 +598,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
         {isMetric && (() => {
           const metricKey = `${id as string}:__metric`
-          const metricVal = evalMap.get(metricKey)
+          const metricVal = activeEvalMap.get(metricKey)
           const metricUnit = unitMap.get(metricKey) ?? nodeData.metricUnit
           return (
             <span className={`summary-value${metricUnit === 'money' ? ' is-money' : metricUnit === 'percent' ? ' is-percent' : ''}`}>
@@ -385,7 +612,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
             (() => {
               const port = outputs[0]
               if (!port) return <span className="summary-value is-empty">no outputs</span>
-              const val = evalMap.get(`${id as string}:${port.id}`)
+              const val = activeEvalMap.get(`${id as string}:${port.id}`)
               const unit = unitMap.get(`${id as string}:${port.id}`) ?? port.unit
               return (
                 <span className={`summary-value${unit === 'money' ? ' is-money' : unit === 'percent' ? ' is-percent' : ''}`}>
@@ -397,7 +624,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
             <span className="summary-value is-empty">no outputs</span>
           ) : (
             outputs.map(port => {
-              const val = evalMap.get(`${id as string}:${port.id}`)
+              const val = activeEvalMap.get(`${id as string}:${port.id}`)
               const unit = unitMap.get(`${id as string}:${port.id}`) ?? port.unit
               return (
                 <div key={port.id} className="summary-output-row">
@@ -518,6 +745,19 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
       {/* ── Collapsed summary overlay (sits above body, behind handles) ── */}
       {summaryOverlay}
 
+      {/* ── Experiment mode sliders ── */}
+      {simMode && <SimSliders
+        nodeId={id as string}
+        isValueNode={isValueNode}
+        isMetric={isMetric}
+        outputs={outputs}
+        simOverlay={simOverlay}
+        baseEvalMap={evalMap}
+        unitMap={unitMap}
+        setSimValue={setSimValue}
+        removeSimValue={removeSimValue}
+      />}
+
       {/* ── Body: Constant / Measure ──────────────────────────────────────────
           Always rendered so handles stay in the DOM at their natural positions.
           Text content is hidden when collapsed; handles are raised above the
@@ -603,7 +843,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
       {/* ── Body: Metric ── */}
       {isMetric && (() => {
         const metricKey = `${id as string}:__metric`
-        const metricGraphValue = evalMap.get(metricKey)
+        const metricGraphValue = activeEvalMap.get(metricKey)
         const metricResolvedUnit = unitMap.get(metricKey) ?? nodeData.metricUnit
         const metricLocalResult = nodeData.metricFormula
           ? evalFormula(nodeData.metricFormula, localScope)
@@ -759,7 +999,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
           <div className="ports-column outputs">
             {outputs.map(port => {
-              const graphValue = evalMap.get(`${id as string}:${port.id}`)
+              const graphValue = activeEvalMap.get(`${id as string}:${port.id}`)
               const resolvedUnit = unitMap.get(`${id as string}:${port.id}`) ?? port.unit
 
               let computedValue: number | undefined

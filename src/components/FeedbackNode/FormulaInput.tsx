@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { FormulaBuiltin } from '../../utils/formulaEval'
 
 interface FormulaInputProps {
@@ -68,6 +68,16 @@ export default function FormulaInput({
   const [activeIndex, setActiveIndex] = useState(0)
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
 
+  // Buffer the displayed value locally so the controlled input never has its
+  // cursor position reset by parent re-renders caused by updateNodeData.
+  const [localValue, setLocalValue] = useState(value)
+  const focusedRef = useRef(false)
+
+  // Sync from prop only when the input is not focused (e.g. load-graph)
+  useEffect(() => {
+    if (!focusedRef.current) setLocalValue(value)
+  }, [value])
+
   function updateSuggestions(text: string, pos: number) {
     const { fragment } = wordAtCursor(text, pos)
     if (!fragment) { setOpen(false); return }
@@ -78,16 +88,19 @@ export default function FormulaInput({
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    onChange(e.target.value)
-    updateSuggestions(e.target.value, e.target.selectionStart ?? e.target.value.length)
+    const v = e.target.value
+    setLocalValue(v)   // update local first — cursor stays in place
+    onChange(v)        // propagate to parent (triggers re-render, but localValue controls the input)
+    updateSuggestions(v, e.target.selectionStart ?? v.length)
   }
 
   function insertCompletion(suggestion: Suggestion) {
     const input = inputRef.current
     if (!input) return
-    const pos = input.selectionStart ?? value.length
-    const { start } = wordAtCursor(value, pos)
-    const patched = value.slice(0, start) + suggestion.insert + value.slice(pos)
+    const pos = input.selectionStart ?? localValue.length
+    const { start } = wordAtCursor(localValue, pos)
+    const patched = localValue.slice(0, start) + suggestion.insert + localValue.slice(pos)
+    setLocalValue(patched)
     onChange(patched)
     setOpen(false)
     setSuggestions([])
@@ -122,12 +135,13 @@ export default function FormulaInput({
       <input
         ref={inputRef}
         className={className}
-        value={value}
+        value={localValue}
         placeholder={placeholder}
         style={{ width: '100%', minWidth: 0, boxSizing: 'border-box', ...inputStyle }}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        onBlur={() => setOpen(false)}
+        onFocus={() => { focusedRef.current = true }}
+        onBlur={() => { focusedRef.current = false; setOpen(false) }}
         onMouseDown={onMouseDown}
       />
       {open && (
