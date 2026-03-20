@@ -823,3 +823,188 @@
   background: #0070f3;
   transform: translate(0, -50%) scale(1.3);
 }
+
+/* ── Experiment / Sim mode ───────────────────────────────────────────────────── */
+
+/* Prevent hover-expand in sim mode; lock width to avoid layout shifts */
+.feedback-node.sim-mode {
+  cursor: default;
+  max-width: 240px;
+  min-width: 200px;
+}
+
+/*
+  In sim mode, remove node bodies from normal flow so the node height is
+  determined solely by header + sim-sliders. The body is absolutely positioned
+  so port handles remain at their natural positions for edge connections.
+  Handles are kept visible and interactive even though the body is hidden.
+*/
+.feedback-node.sim-mode .node-body {
+  position: absolute;
+  top: 34px;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.feedback-node.sim-mode .node-body .react-flow__handle {
+  visibility: visible;
+  pointer-events: all;
+}
+
+/* Slider panel — sits above node body in the stacking order */
+.sim-sliders {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 10px 6px;
+  border-top: 1px solid #e8e8f0;
+  background: #f8f8ff;
+  overflow: hidden;
+}
+
+.sim-slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Prominent value — same font style as .summary-value */
+.sim-value-display {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.sim-slider-label {
+  font-size: 10px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.sim-current-value {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: monospace;
+  color: #222;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.sim-current-value.is-money  { color: #1a5a1a; }
+.sim-current-value.is-percent { color: #003090; }
+
+/* Delta badge — shown alongside the value on propagated (downstream-affected) nodes */
+.sim-delta-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #f0f0f0;
+  color: #888;
+  flex-shrink: 0;
+}
+.sim-delta-badge.positive { background: #f0fdf4; color: #16a34a; }
+.sim-delta-badge.negative { background: #fef2f2; color: #dc2626; }
+
+/* Propagated rows: slider accent is grey to signal "driven by upstream" */
+.sim-slider-row.is-propagated .sim-control-row input[type=range] {
+  accent-color: #aaa;
+}
+
+/* Control row: slider + number input + % label */
+.sim-control-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sim-control-row input[type=range] {
+  flex: 1;
+  min-width: 0;
+  accent-color: #7c3aed;
+  height: 14px;
+  cursor: pointer;
+}
+
+.sim-pct-input {
+  width: 46px;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: right;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 1px 3px;
+  background: #fff;
+  color: #444;
+  flex-shrink: 0;
+  /* hide spinner arrows */
+  -moz-appearance: textfield;
+}
+.sim-pct-input::-webkit-inner-spin-button,
+.sim-pct-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.sim-pct-input.positive { color: #16a34a; border-color: #86efac; }
+.sim-pct-input.negative { color: #dc2626; border-color: #fca5a5; }
+
+.sim-pct-unit {
+  font-size: 11px;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.sim-reset-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+.sim-reset-btn:hover { color: #7c3aed; background: #f3f0ff; }
+
+/* Lock button — sits inline with value display */
+.sim-lock-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #aaa;
+  padding: 1px 2px;
+  border-radius: 3px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  opacity: 0.5;
+  transition: opacity 0.15s, color 0.15s;
+}
+.sim-lock-btn:hover { opacity: 1; color: #7c3aed; }
+.sim-lock-btn.locked { color: #d97706; opacity: 1; }
+.sim-lock-btn.locked:hover { color: #b45309; }
+
+/* Locked row: dim controls, tint background */
+.sim-slider-row.is-locked {
+  background: rgba(217, 119, 6, 0.06);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+.sim-slider-row.is-locked .sim-control-row input[type=range] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.sim-slider-row.is-locked .sim-pct-input {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

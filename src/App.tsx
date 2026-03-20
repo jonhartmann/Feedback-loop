@@ -5,6 +5,7 @@ import { useDataRefresh } from './hooks/useDataRefresh'
 import { useLibrary } from './hooks/useLibrary'
 import { LibraryContext } from './context/LibraryContext'
 import { GraphEvalProvider } from './context/GraphEvalContext'
+import { SimProvider } from './context/SimContext'
 import FlowCanvas from './components/FlowCanvas'
 import Toolbar from './components/Toolbar'
 import Drawer from './components/Drawer'
@@ -53,35 +54,38 @@ function AppInner() {
 
   return (
     <LibraryContext.Provider value={library}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw' }}>
-        <Toolbar
-          onAddNode={addNode}
-          onSave={getSerializedGraph}
-          onLoad={loadGraph}
-          docName={docName}
-          onDocNameChange={setDocName}
-          drawerOpen={drawerOpen}
-          onToggleDrawer={() => setDrawerOpen(o => !o)}
-        />
-        <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
-          <GraphEvalProvider>
-            <FlowCanvas
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              setEdges={setEdges}
-              setNodes={setNodes}
-              addNode={addNode}
+      <GraphEvalProvider>
+        <SimProvider>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw' }}>
+            <Toolbar
+              onAddNode={addNode}
+              onSave={getSerializedGraph}
+              onLoad={loadGraph}
+              docName={docName}
+              onDocNameChange={setDocName}
               drawerOpen={drawerOpen}
-              drawerWidth={DRAWER_WIDTH}
-              onSaveNodeToLibrary={handleSaveNodeToLibrary}
+              onToggleDrawer={() => setDrawerOpen(o => !o)}
+              onShowTemplates={() => setShowWelcome(true)}
             />
-          </GraphEvalProvider>
-          {drawerOpen && <Drawer onClose={() => setDrawerOpen(false)} addNode={addNode} />}
-          {showWelcome && <WelcomeOverlay onSelect={handleWelcomeSelect} />}
-        </div>
-      </div>
+            <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+              <FlowCanvas
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                setEdges={setEdges}
+                setNodes={setNodes}
+                addNode={addNode}
+                drawerOpen={drawerOpen}
+                drawerWidth={DRAWER_WIDTH}
+                onSaveNodeToLibrary={handleSaveNodeToLibrary}
+              />
+              {drawerOpen && <Drawer onClose={() => setDrawerOpen(false)} addNode={addNode} />}
+              {showWelcome && <WelcomeOverlay onSelect={handleWelcomeSelect} />}
+            </div>
+          </div>
+        </SimProvider>
+      </GraphEvalProvider>
     </LibraryContext.Provider>
   )
 }

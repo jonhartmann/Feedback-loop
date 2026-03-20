@@ -142,34 +142,38 @@ function resolveUnit(
   )
 }
 
+// ── Exported pure evaluation function (reused by SimContext) ─────────────────
+
+export function buildEvalMaps(
+  nodes: Node<FeedbackNodeData>[],
+  edges: Edge[],
+): GraphEvalMaps {
+  const evalMap = new Map<string, number>()
+  const unitMap = new Map<string, Unit>()
+
+  for (const node of nodes) {
+    for (const port of node.data.outputs ?? []) {
+      const val = resolveOutputValue(node.id, port.id, nodes, edges, new Set())
+      if (val !== undefined) evalMap.set(`${node.id}:${port.id}`, val)
+      unitMap.set(`${node.id}:${port.id}`, resolveUnit(node.id, port.id, nodes, edges, new Set()))
+    }
+    if (node.data.variant === 'metric') {
+      const val = resolveOutputValue(node.id, '__metric', nodes, edges, new Set())
+      if (val !== undefined) evalMap.set(`${node.id}:__metric`, val)
+      unitMap.set(`${node.id}:__metric`, resolveUnit(node.id, '__metric', nodes, edges, new Set()))
+    }
+  }
+
+  return { evalMap, unitMap }
+}
+
 // ── Provider ─────────────────────────────────────────────────────────────────
 
 export function GraphEvalProvider({ children }: { children: React.ReactNode }) {
   const nodes = useNodes() as Node<FeedbackNodeData>[]
   const edges = useEdges()
 
-  const maps = useMemo<GraphEvalMaps>(() => {
-    const evalMap = new Map<string, number>()
-    const unitMap = new Map<string, Unit>()
-
-    for (const node of nodes) {
-      // Regular output ports
-      for (const port of node.data.outputs ?? []) {
-        const val = resolveOutputValue(node.id, port.id, nodes, edges, new Set())
-        if (val !== undefined) evalMap.set(`${node.id}:${port.id}`, val)
-        unitMap.set(`${node.id}:${port.id}`, resolveUnit(node.id, port.id, nodes, edges, new Set()))
-      }
-
-      // Metric formula result (no output handles, but still needs an evaluated value)
-      if (node.data.variant === 'metric') {
-        const val = resolveOutputValue(node.id, '__metric', nodes, edges, new Set())
-        if (val !== undefined) evalMap.set(`${node.id}:__metric`, val)
-        unitMap.set(`${node.id}:__metric`, resolveUnit(node.id, '__metric', nodes, edges, new Set()))
-      }
-    }
-
-    return { evalMap, unitMap }
-  }, [nodes, edges])
+  const maps = useMemo<GraphEvalMaps>(() => buildEvalMaps(nodes, edges), [nodes, edges])
 
   return (
     <GraphEvalContext.Provider value={maps}>
