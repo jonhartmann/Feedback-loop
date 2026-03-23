@@ -103,9 +103,21 @@ function computePopoverStyle(
   const spotRight = rect.x + rect.width + PAD
   const spotBottom = rect.y + rect.height + PAD
 
+  const isLargeTarget = rect.height > vh * 0.5
   const side = (!placement || placement === 'auto')
-    ? (spotBottom < vh * 0.6 ? 'below' : 'above')
+    ? (isLargeTarget ? 'center' : spotBottom < vh * 0.6 ? 'below' : 'above')
     : placement
+
+  // Center the popover over the target rect
+  if (side === 'center') {
+    return {
+      position: 'fixed',
+      top: Math.min(Math.max(rect.y + rect.height / 2 - 110, 12), vh - 220),
+      left: Math.min(Math.max(rect.x + rect.width / 2 - POPOVER_WIDTH / 2, 12), vw - POPOVER_WIDTH - 12),
+      width: POPOVER_WIDTH,
+      zIndex: 2001,
+    }
+  }
 
   let top: number, left: number
 
@@ -113,7 +125,7 @@ function computePopoverStyle(
     top = spotBottom + POPOVER_GAP
     left = Math.min(Math.max(spotLeft, 12), vw - POPOVER_WIDTH - 12)
   } else if (side === 'above') {
-    top = spotTop - POPOVER_GAP - 180
+    top = Math.max(spotTop - POPOVER_GAP - 180, 12)
     left = Math.min(Math.max(spotLeft, 12), vw - POPOVER_WIDTH - 12)
   } else if (side === 'right') {
     top = Math.min(Math.max(spotTop, 12), vh - 220)
