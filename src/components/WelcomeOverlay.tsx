@@ -4,7 +4,7 @@ import { useEscapeKey } from '../hooks/useEscapeKey'
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function WelcomeOverlay({ onSelect }: { onSelect: (graph?: SerializedGraph) => void }) {
+export default function WelcomeOverlay({ onSelect, onStartTour }: { onSelect: (graph?: SerializedGraph) => void; onStartTour: () => void }) {
   useEscapeKey(() => onSelect(undefined))
 
   return (
@@ -100,9 +100,29 @@ export default function WelcomeOverlay({ onSelect }: { onSelect: (graph?: Serial
           ))}
         </div>
 
-        <p style={{ margin: '20px 0 0', fontSize: 11, color: '#aaa', textAlign: 'center' }}>
-          Press Esc or click outside to start with a blank canvas
-        </p>
+        <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <p style={{ margin: 0, fontSize: 11, color: '#aaa' }}>
+            Press Esc or click outside to start with a blank canvas
+          </p>
+          <button
+            onClick={onStartTour}
+            style={{
+              background: 'none',
+              border: '1px solid #c0c0d8',
+              borderRadius: 6,
+              padding: '6px 14px',
+              fontSize: 12,
+              fontWeight: 600,
+              color: '#5566aa',
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#5566aa' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = '#c0c0d8' }}
+          >
+            Take a tour →
+          </button>
+        </div>
       </div>
     </div>
   )

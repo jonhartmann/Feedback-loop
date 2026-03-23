@@ -13,7 +13,7 @@ export function useGraphState() {
   const addNode = useCallback((position: XYPosition, variantOrTemplate?: NodeVariant | NodeTemplate) => {
     const isTemplate = !!variantOrTemplate && typeof variantOrTemplate === 'object'
     const template = isTemplate ? variantOrTemplate as NodeTemplate : undefined
-    const variant = isTemplate ? template!.variant : variantOrTemplate as NodeVariant | undefined
+    const variant: NodeVariant = (isTemplate ? template!.variant : variantOrTemplate as NodeVariant | undefined) ?? 'expression'
 
     const defaultLabel = template?.label
       ?? (variant === 'constant' ? 'Constant'
@@ -44,7 +44,7 @@ export function useGraphState() {
         dragHandle: '.node-header',
         data: {
           label: defaultLabel,
-          ...(variant && { variant }),
+          variant,
           inputs,
           outputs,
           variables: template?.variables ?? [],

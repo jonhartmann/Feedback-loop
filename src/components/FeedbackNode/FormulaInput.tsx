@@ -1,5 +1,8 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import type { FormulaBuiltin } from '../../utils/formulaEval'
+import { useDraftValue } from '../../hooks/useDraftValue'
+import { SuggestionList, wordAtCursor, buildSuggestions } from './SuggestionList'
+import type { Suggestion } from './SuggestionList'
 
 interface FormulaInputProps {
   value: string
@@ -15,50 +18,6 @@ interface FormulaInputProps {
   onMouseDown?: (e: React.MouseEvent) => void
 }
 
-interface Suggestion {
-  /** Text shown in the dropdown (e.g. "min(" or "revenue") */
-  label: string
-  /** Text inserted into the input */
-  insert: string
-  /** Secondary hint shown to the right (e.g. "min(a, b)") */
-  secondary?: string
-}
-
-/** Returns the identifier fragment immediately left of `pos` and its start index. */
-function wordAtCursor(text: string, pos: number): { fragment: string; start: number } {
-  let start = pos
-  while (start > 0 && /\w/.test(text[start - 1])) start--
-  const fragment = text.slice(start, pos)
-  // Only treat it as a variable fragment if it starts with a letter or underscore
-  if (fragment && !/^[a-zA-Z_]/.test(fragment)) return { fragment: '', start: pos }
-  return { fragment, start }
-}
-
-function buildSuggestions(
-  fragment: string,
-  variables: string[],
-  builtins: FormulaBuiltin[],
-): Suggestion[] {
-  if (!fragment) return []
-
-  const varMatches: Suggestion[] = variables
-    .filter(v => v.startsWith(fragment) && v !== fragment)
-    .slice(0, 5)
-    .map(v => ({ label: v, insert: v }))
-
-  const builtinMatches: Suggestion[] = builtins
-    .filter(b => b.name.startsWith(fragment) && b.name !== fragment)
-    .slice(0, 5)
-    .map(b => ({
-      label: b.isConstant ? b.name : `${b.name}(`,
-      insert: b.isConstant ? b.name : `${b.name}(`,
-      secondary: b.display,
-    }))
-
-  // Variables first, then builtins; cap total at 10
-  return [...varMatches, ...builtinMatches].slice(0, 10)
-}
-
 export default function FormulaInput({
   value, onChange, variables, builtins = [],
   placeholder, className, wrapperStyle, inputStyle, onMouseDown,
@@ -68,15 +27,7 @@ export default function FormulaInput({
   const [activeIndex, setActiveIndex] = useState(0)
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
 
-  // Buffer the displayed value locally so the controlled input never has its
-  // cursor position reset by parent re-renders caused by updateNodeData.
-  const [localValue, setLocalValue] = useState(value)
-  const focusedRef = useRef(false)
-
-  // Sync from prop only when the input is not focused (e.g. load-graph)
-  useEffect(() => {
-    if (!focusedRef.current) setLocalValue(value)
-  }, [value])
+  const { draft: localValue, setDraft: setLocalValue, focusedRef } = useDraftValue(value)
 
   function updateSuggestions(text: string, pos: number) {
     const { fragment } = wordAtCursor(text, pos)
@@ -89,8 +40,8 @@ export default function FormulaInput({
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value
-    setLocalValue(v)   // update local first — cursor stays in place
-    onChange(v)        // propagate to parent (triggers re-render, but localValue controls the input)
+    setLocalValue(v)
+    onChange(v)
     updateSuggestions(v, e.target.selectionStart ?? v.length)
   }
 
@@ -145,19 +96,11 @@ export default function FormulaInput({
         onMouseDown={onMouseDown}
       />
       {open && (
-        <ul className="formula-input-dropdown">
-          {suggestions.map((s, i) => (
-            <li
-              key={s.insert + i}
-              className={`formula-input-suggestion${i === activeIndex ? ' is-active' : ''}`}
-              onMouseDown={e => e.preventDefault()}
-              onClick={() => insertCompletion(s)}
-            >
-              <span className="formula-suggestion-name">{s.label}</span>
-              {s.secondary && <span className="formula-suggestion-sig">{s.secondary}</span>}
-            </li>
-          ))}
-        </ul>
+        <SuggestionList
+          suggestions={suggestions}
+          activeIndex={activeIndex}
+          onSelect={insertCompletion}
+        />
       )}
     </div>
   )

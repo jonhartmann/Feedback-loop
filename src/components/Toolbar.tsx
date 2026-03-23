@@ -85,21 +85,25 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
 
       <div style={{ width: 1, background: '#444', alignSelf: 'stretch', margin: '8px 4px' }} />
 
-      <Button onClick={() => handleAddNode('constant')} amber>+ Constant</Button>
-      <Button onClick={() => handleAddNode('measure')} teal>+ Measure</Button>
-      <Button onClick={() => handleAddNode()}>+ Expression</Button>
-      <Button onClick={() => handleAddNode('metric')} violet>+ Metric</Button>
-      <Button onClick={onToggleDrawer} primary={drawerOpen}>Library</Button>
+      <div data-tour="node-buttons" style={{ display: 'flex', gap: 8 }}>
+        <Button onClick={() => handleAddNode('constant')} amber>+ Constant</Button>
+        <Button onClick={() => handleAddNode('measure')} teal>+ Measure</Button>
+        <Button onClick={() => handleAddNode()}>+ Expression</Button>
+        <Button onClick={() => handleAddNode('metric')} violet>+ Metric</Button>
+      </div>
+      <span data-tour="library-btn"><Button onClick={onToggleDrawer} primary={drawerOpen}>Library</Button></span>
 
       <div style={{ width: 1, background: '#444', alignSelf: 'stretch', margin: '8px 4px' }} />
 
-      <Button onClick={toggleSimMode} primary={simMode}>Experiment</Button>
+      <span data-tour="experiment-btn"><Button onClick={toggleSimMode} primary={simMode}>Experiment</Button></span>
 
       <div style={{ flex: 1 }} />
       <Button onClick={onShowTemplates}>Templates</Button>
       <Button onClick={onShowHelp}>Help</Button>
-      <Button onClick={handleSave} primary>Save</Button>
-      <Button onClick={handleLoad}>Load</Button>
+      <div data-tour="save-load" style={{ display: 'flex', gap: 8 }}>
+        <Button onClick={handleSave} primary>Save</Button>
+        <Button onClick={handleLoad}>Load</Button>
+      </div>
       <input
         ref={fileInputRef}
         type="file"

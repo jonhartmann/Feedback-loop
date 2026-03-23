@@ -6,22 +6,28 @@ import { useLibrary } from './hooks/useLibrary'
 import { LibraryContext } from './context/LibraryContext'
 import { GraphEvalProvider } from './context/GraphEvalContext'
 import { SimProvider } from './context/SimContext'
+import { TourProvider, useTour } from './context/TourContext'
 import FlowCanvas from './components/FlowCanvas'
 import Toolbar from './components/Toolbar'
 import Drawer from './components/Drawer'
 import WelcomeOverlay from './components/WelcomeOverlay'
 import HelpModal from './components/HelpModal'
+import Tour from './components/Tour'
 import type { FeedbackNodeData, SerializedGraph } from './types/graph'
 import { nodeDataToTemplate } from './utils/nodeTemplate'
+import { STARTERS } from './data/starterGraphs'
 
 const DRAWER_WIDTH = 260
+
+// The Website Metrics starter is a clear, mid-size graph good for the tour
+const TOUR_DEMO_GRAPH = STARTERS.find(s => s.title === 'Website Metrics Flow')?.graph
 
 function AppInner() {
   const { nodes, edges, onNodesChange, onEdgesChange, setEdges, setNodes, addNode, getSerializedGraph, loadGraph, docName, setDocName } = useGraphState()
   const library = useLibrary()
+  const { startTour } = useTour()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  // Show welcome overlay on first visit; flag persists in localStorage
   const [showWelcome, setShowWelcome] = useState(
     () => !localStorage.getItem('feedback-loop-welcomed')
   )
@@ -31,6 +37,14 @@ function AppInner() {
     if (graph) loadGraph(graph)
     localStorage.setItem('feedback-loop-welcomed', '1')
     setShowWelcome(false)
+  }
+
+  function handleStartTour() {
+    if (TOUR_DEMO_GRAPH) loadGraph(TOUR_DEMO_GRAPH)
+    localStorage.setItem('feedback-loop-welcomed', '1')
+    setShowWelcome(false)
+    setShowHelp(false)
+    startTour()
   }
 
   useDataRefresh(3000)
@@ -69,8 +83,9 @@ function AppInner() {
                 onSaveNodeToLibrary={handleSaveNodeToLibrary}
               />
               {drawerOpen && <Drawer onClose={() => setDrawerOpen(false)} addNode={addNode} />}
-              {showWelcome && <WelcomeOverlay onSelect={handleWelcomeSelect} />}
-              {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+              {showWelcome && <WelcomeOverlay onSelect={handleWelcomeSelect} onStartTour={handleStartTour} />}
+              {showHelp && <HelpModal onClose={() => setShowHelp(false)} onStartTour={handleStartTour} />}
+              <Tour />
             </div>
           </div>
         </SimProvider>
@@ -82,7 +97,9 @@ function AppInner() {
 export default function App() {
   return (
     <ReactFlowProvider>
-      <AppInner />
+      <TourProvider>
+        <AppInner />
+      </TourProvider>
     </ReactFlowProvider>
   )
 }

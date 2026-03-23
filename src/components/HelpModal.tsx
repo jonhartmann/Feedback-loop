@@ -15,21 +15,22 @@ const SECTIONS = [
 
 type Section = typeof SECTIONS[number]
 
-const SECTION_COMPONENTS: Record<Section, React.ReactNode> = {
-  'Overview': <SectionOverview />,
-  'Node Types': <SectionNodeTypes />,
-  'Connections & Formulas': <SectionFormulas />,
-  'Units': <SectionUnits />,
-  'Editing Ports': <SectionEditingPorts />,
-  'Experiment Mode': <SectionExperiment />,
-  'Series Mode': <SectionSeries />,
-  'Library & Files': <SectionLibrary />,
-  'Keyboard Shortcuts': <SectionKeyboard />,
-}
 
-export default function HelpModal({ onClose }: { onClose: () => void }) {
+export default function HelpModal({ onClose, onStartTour }: { onClose: () => void; onStartTour: () => void }) {
   const [active, setActive] = useState<Section>('Overview')
   useEscapeKey(onClose)
+
+  const sectionComponents: Record<Section, React.ReactNode> = {
+    'Overview': <SectionOverview onStartTour={onStartTour} />,
+    'Node Types': <SectionNodeTypes />,
+    'Connections & Formulas': <SectionFormulas />,
+    'Units': <SectionUnits />,
+    'Editing Ports': <SectionEditingPorts />,
+    'Experiment Mode': <SectionExperiment />,
+    'Series Mode': <SectionSeries />,
+    'Library & Files': <SectionLibrary />,
+    'Keyboard Shortcuts': <SectionKeyboard />,
+  }
 
   return (
     <div
@@ -123,7 +124,7 @@ export default function HelpModal({ onClose }: { onClose: () => void }) {
           </div>
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '24px 32px' }}>
-            {SECTION_COMPONENTS[active]}
+            {sectionComponents[active]}
           </div>
         </div>
       </div>
@@ -225,7 +226,7 @@ function NodeTypeCard({ badge, color, label, children }: { badge: string; color:
 
 // ── Sections ────────────────────────────────────────────────────────────────────
 
-function SectionOverview() {
+function SectionOverview({ onStartTour }: { onStartTour: () => void }) {
   return (
     <>
       <Heading>What is Feedback Loop?</Heading>
@@ -238,6 +239,31 @@ function SectionOverview() {
         Use it to model marketing funnels, financial projections, business KPIs, or any
         domain where values feed into each other through formulas.
       </P>
+
+      <div style={{ margin: '0 0 20px', padding: '14px 16px', background: '#f4f4ff', borderRadius: 8, border: '1px solid #d0d0f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#2244aa', marginBottom: 3 }}>New here? Take the interactive tour</div>
+          <div style={{ fontSize: 12, color: '#666' }}>A guided walkthrough of all the key features — takes about 2 minutes.</div>
+        </div>
+        <button
+          onClick={onStartTour}
+          style={{
+            padding: '8px 18px',
+            fontSize: 13,
+            fontWeight: 600,
+            background: '#2255aa',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+            flexShrink: 0,
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '0.85' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = '1' }}
+        >
+          Start tour →
+        </button>
+      </div>
 
       <Heading>Quick start</Heading>
       <ol style={{ fontSize: 13, color: '#444', lineHeight: 2, paddingLeft: 20, margin: '0 0 16px' }}>
