@@ -26,10 +26,9 @@ const STEPS: Step[] = [
     placement: 'below',
   },
   {
-    target: 'canvas',
+    target: null,
     title: 'The canvas',
-    body: 'Arrange nodes anywhere on the canvas. Scroll to zoom, click-and-drag empty space to pan. Select a node or edge and press Delete to remove it.',
-    placement: 'auto',
+    body: 'The canvas below is your workspace. Drag nodes to arrange them, scroll to zoom, and click-drag empty space to pan. Select any node or edge and press Delete to remove it.',
   },
   {
     target: 'first-node',
@@ -103,21 +102,9 @@ function computePopoverStyle(
   const spotRight = rect.x + rect.width + PAD
   const spotBottom = rect.y + rect.height + PAD
 
-  const isLargeTarget = rect.height > vh * 0.5
   const side = (!placement || placement === 'auto')
-    ? (isLargeTarget ? 'center' : spotBottom < vh * 0.6 ? 'below' : 'above')
+    ? (spotBottom < vh * 0.6 ? 'below' : 'above')
     : placement
-
-  // Center the popover over the target rect
-  if (side === 'center') {
-    return {
-      position: 'fixed',
-      top: Math.min(Math.max(rect.y + rect.height / 2 - 110, 12), vh - 220),
-      left: Math.min(Math.max(rect.x + rect.width / 2 - POPOVER_WIDTH / 2, 12), vw - POPOVER_WIDTH - 12),
-      width: POPOVER_WIDTH,
-      zIndex: 2001,
-    }
-  }
 
   let top: number, left: number
 
