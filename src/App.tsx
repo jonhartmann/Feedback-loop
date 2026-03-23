@@ -10,7 +10,9 @@ import FlowCanvas from './components/FlowCanvas'
 import Toolbar from './components/Toolbar'
 import Drawer from './components/Drawer'
 import WelcomeOverlay from './components/WelcomeOverlay'
+import HelpModal from './components/HelpModal'
 import type { FeedbackNodeData, SerializedGraph } from './types/graph'
+import { nodeDataToTemplate } from './utils/nodeTemplate'
 
 const DRAWER_WIDTH = 260
 
@@ -23,6 +25,7 @@ function AppInner() {
   const [showWelcome, setShowWelcome] = useState(
     () => !localStorage.getItem('feedback-loop-welcomed')
   )
+  const [showHelp, setShowHelp] = useState(false)
 
   function handleWelcomeSelect(graph?: SerializedGraph) {
     if (graph) loadGraph(graph)
@@ -33,23 +36,7 @@ function AppInner() {
   useDataRefresh(3000)
 
   function handleSaveNodeToLibrary(nodeData: FeedbackNodeData) {
-    library.addItem({
-      label: nodeData.label,
-      category: 'Custom',
-      template: {
-        label: nodeData.label,
-        variant: nodeData.variant,
-        value: nodeData.outputs[0]?.value,
-        unit: nodeData.outputs[0]?.unit ?? nodeData.metricUnit,
-        sourceUrl: nodeData.sourceUrl,
-        inputs: nodeData.inputs,
-        outputs: nodeData.outputs,
-        variables: nodeData.variables,
-        metricFormula: nodeData.metricFormula,
-        metricUnit: nodeData.metricUnit,
-        description: nodeData.description,
-      },
-    })
+    library.addItem({ label: nodeData.label, category: 'Custom', template: nodeDataToTemplate(nodeData) })
   }
 
   return (
@@ -66,6 +53,7 @@ function AppInner() {
               drawerOpen={drawerOpen}
               onToggleDrawer={() => setDrawerOpen(o => !o)}
               onShowTemplates={() => setShowWelcome(true)}
+              onShowHelp={() => setShowHelp(true)}
             />
             <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
               <FlowCanvas
@@ -82,6 +70,7 @@ function AppInner() {
               />
               {drawerOpen && <Drawer onClose={() => setDrawerOpen(false)} addNode={addNode} />}
               {showWelcome && <WelcomeOverlay onSelect={handleWelcomeSelect} />}
+              {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
             </div>
           </div>
         </SimProvider>
