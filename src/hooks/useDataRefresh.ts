@@ -4,7 +4,7 @@ import type { Node } from '@xyflow/react'
 import type { FeedbackNodeData } from '../types/graph'
 
 export function useDataRefresh(intervalMs = 3000) {
-  const { getNodes, updateNodeData } = useReactFlow()
+  const { getNodes, setNodes } = useReactFlow()
 
   useEffect(() => {
     async function refresh() {
@@ -17,15 +17,21 @@ export function useDataRefresh(intervalMs = 3000) {
             .then((j: { value: number }) => ({ id: n.id, value: j.value }))
         )
       )
+
+      // Collect all successful updates keyed by node id
+      const updates = new Map<string, number>()
       for (const result of results) {
-        if (result.status === 'fulfilled') {
-          const { id, value } = result.value
-          const node = (getNodes() as Node<FeedbackNodeData>[]).find(n => n.id === id)
-          if (!node?.data.outputs?.[0]) continue
-          const outputs = node.data.outputs.map((p, i) => i === 0 ? { ...p, value } : p)
-          updateNodeData(id, { outputs })
-        }
+        if (result.status === 'fulfilled') updates.set(result.value.id, result.value.value)
       }
+      if (updates.size === 0) return
+
+      // Apply all updates in a single setNodes call → single state update → single graph re-evaluation
+      setNodes(prev => (prev as Node<FeedbackNodeData>[]).map(node => {
+        const newValue = updates.get(node.id)
+        if (newValue === undefined || !node.data.outputs?.[0]) return node
+        const outputs = node.data.outputs.map((p, i) => i === 0 ? { ...p, value: newValue } : p)
+        return { ...node, data: { ...node.data, outputs } }
+      }))
     }
 
     const timer = setInterval(refresh, intervalMs)

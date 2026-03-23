@@ -1,5 +1,8 @@
-export type NodeVariant = 'constant' | 'measure' | 'metric'
+export type NodeVariant = 'constant' | 'measure' | 'metric' | 'expression'
 export type Unit = 'number' | 'money' | 'percent'
+
+/** Sentinel port ID used for metric nodes in evalMap / simOverlay keys. */
+export const METRIC_PORT_ID = '__metric' as const
 
 export interface Port {
   id: string;
@@ -19,7 +22,7 @@ export interface NodeVariable {
 
 export interface FeedbackNodeData extends Record<string, unknown> {
   label: string;
-  variant?: NodeVariant;        // undefined = regular node
+  variant?: NodeVariant;        // undefined only in legacy/unmigrayed data; normalized to 'expression' on load
   inputs: Port[];
   outputs: OutputPort[];
   description?: string;

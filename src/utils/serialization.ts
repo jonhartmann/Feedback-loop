@@ -1,5 +1,5 @@
 import type { Node, Edge } from '@xyflow/react'
-import type { FeedbackNodeData, SerializedGraph, SerializedNode, SerializedEdge } from '../types/graph'
+import type { FeedbackNodeData, SerializedGraph, SerializedNode, SerializedEdge, NodeVariant } from '../types/graph'
 
 export function serializeGraph(
   nodes: Node<FeedbackNodeData>[],
@@ -47,7 +47,7 @@ export function deserializeGraph(graph: SerializedGraph): {
     dragHandle: '.node-header',
     data: {
       label: n.data.label,
-      ...(n.data.variant && { variant: n.data.variant }),
+      variant: (n.data.variant ?? 'expression') as NodeVariant,
       inputs: n.data.inputs ?? [],
       outputs: n.data.outputs ?? [],   // preserves formula and value fields
       ...(n.data.description !== undefined && { description: n.data.description }),
