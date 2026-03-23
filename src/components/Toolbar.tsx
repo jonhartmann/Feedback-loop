@@ -13,9 +13,10 @@ interface ToolbarProps {
   drawerOpen: boolean;
   onToggleDrawer: () => void;
   onShowTemplates: () => void;
+  onShowHelp: () => void;
 }
 
-export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameChange, drawerOpen, onToggleDrawer, onShowTemplates }: ToolbarProps) {
+export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameChange, drawerOpen, onToggleDrawer, onShowTemplates, onShowHelp }: ToolbarProps) {
   const { screenToFlowPosition } = useReactFlow()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { simMode, toggleSimMode } = useSimContext()
@@ -96,6 +97,7 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
 
       <div style={{ flex: 1 }} />
       <Button onClick={onShowTemplates}>Templates</Button>
+      <Button onClick={onShowHelp}>Help</Button>
       <Button onClick={handleSave} primary>Save</Button>
       <Button onClick={handleLoad}>Load</Button>
       <input
