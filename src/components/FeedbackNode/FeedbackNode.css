@@ -590,6 +590,50 @@
   background: #f0f4ff;
 }
 
+/* ── Unit dropdown ─────────────────────────────────────────────────────── */
+
+.unit-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 2px);
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  list-style: none;
+  margin: 0;
+  padding: 2px 0;
+  min-width: 110px;
+}
+
+.unit-dropdown-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #333;
+  white-space: nowrap;
+}
+
+.unit-dropdown-option:hover {
+  background: #f0f0f0;
+}
+
+.unit-dropdown-option.is-active {
+  background: #ede8ff;
+  color: #4a0099;
+}
+
+.unit-dropdown-symbol {
+  font-weight: 700;
+  font-size: 10px;
+  min-width: 10px;
+  text-align: center;
+}
+
 /* ── Variant node theming ──────────────────────────────────────────────── */
 
 .feedback-node.variant-constant {
@@ -642,11 +686,11 @@
 }
 
 .metric-formula-input {
-  font-size: 11px;
+  font-size: 12px;
   font-family: monospace;
   border: 1px solid #c0a0f0;
   border-radius: 3px;
-  padding: 2px 5px;
+  padding: 4px 6px;
   outline: none;
   background: #faf8ff;
   width: 100%;
@@ -826,26 +870,27 @@
 
 /* ── Experiment / Sim mode ───────────────────────────────────────────────────── */
 
-/* Prevent hover-expand in sim mode; lock width to avoid layout shifts */
+/* In sim mode, cursor changes but node size is unchanged (body stays in-flow). */
 .feedback-node.sim-mode {
   cursor: default;
-  max-width: 240px;
-  min-width: 200px;
 }
 
 /*
-  In sim mode, remove node bodies from normal flow so the node height is
-  determined solely by header + sim-sliders. The body is absolutely positioned
-  so port handles remain at their natural positions for edge connections.
-  Handles are kept visible and interactive even though the body is hidden.
+  In sim mode, the body stays in-flow so it continues to set the node dimensions.
+  It is hidden (but not removed from layout) and non-interactive.
+  Handles are revealed individually so edge endpoints remain accessible.
 */
 .feedback-node.sim-mode .node-body {
-  position: absolute;
-  top: 34px;
-  left: 0;
-  right: 0;
   pointer-events: none;
   visibility: hidden;
+}
+
+/* Constant/measure nodes have a minimal body (~36px) which is too short for
+   the sim slider content (value display + range + % input ≈ 80px).
+   Give them a minimum height so the absolutely-positioned sim panel fits. */
+.feedback-node.sim-mode.variant-constant .node-body,
+.feedback-node.sim-mode.variant-measure .node-body {
+  min-height: 80px;
 }
 
 .feedback-node.sim-mode .node-body .react-flow__handle {
@@ -853,9 +898,16 @@
   pointer-events: all;
 }
 
-/* Slider panel — sits above node body in the stacking order */
+/*
+  Slider panel is absolutely positioned over the (hidden) body so it doesn't
+  affect node dimensions. The body underneath still provides the stable size.
+*/
 .sim-sliders {
-  position: relative;
+  position: absolute;
+  top: 34px; /* flush below header */
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 3;
   display: flex;
   flex-direction: column;
@@ -863,7 +915,8 @@
   padding: 4px 10px 6px;
   border-top: 1px solid #e8e8f0;
   background: #f8f8ff;
-  overflow: hidden;
+  border-radius: 0 0 6px 6px;
+  overflow-y: auto;
 }
 
 .sim-slider-row {

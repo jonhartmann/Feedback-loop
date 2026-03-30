@@ -89,6 +89,9 @@ export default function FormulaInput({
         value={localValue}
         placeholder={placeholder}
         style={{ width: '100%', minWidth: 0, boxSizing: 'border-box', ...inputStyle }}
+        spellCheck={false}
+        autoCorrect="off"
+        autoCapitalize="off"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={() => { focusedRef.current = true }}

@@ -1,8 +1,7 @@
 import { Handle, Position } from '@xyflow/react'
 import { useDraftValue } from '../../hooks/useDraftValue'
-import { useUnitMap } from '../../context/GraphEvalContext'
 import { SeriesModePanel } from './SeriesModePanel'
-import { unitClass, unitLabel } from './nodeFormatting'
+import { UnitDropdown } from './UnitDropdown'
 import { useNodeContext } from './NodeContext'
 
 /**
@@ -38,46 +37,29 @@ function ValueInput({ value, onChange }: { value: number; onChange: (v: number) 
 
 export function ValueNodeBody() {
   const {
-    nodeId, nodeData, variant, showExpanded, displayMode,
+    nodeData, variant, showExpanded, displayMode,
     outputs, seriesHistory, seriesChartType, primaryUnit,
-    portLabelField, getPortRowDragProps, getDragHandleProps,
-    updateOutputValue, cycleOutputUnit, addQuickOutput,
+    updateOutputValue, setOutputUnit,
     onChartTypeChange, onSourceUrlChange,
   } = useNodeContext()
-  const unitMap = useUnitMap()
 
   return (
     <div className="node-body value-node-body">
       <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} />
       {outputs.map(port => {
-        const resolvedUnit = unitMap.get(`${nodeId}:${port.id}`) ?? port.unit
-        return (
-          <div key={port.id} {...getPortRowDragProps(port.id, 'output')}>
-            <Handle id={port.id} type="source" position={Position.Right} title={port.label} />
-            {showExpanded && <span className="port-drag-handle" {...getDragHandleProps(port.id, 'output')}>⠿</span>}
-            {showExpanded && portLabelField(port.id, 'output', port.label)}
-            {showExpanded && <span className="port-value-eq">=</span>}
-            {showExpanded && (
-              <ValueInput value={port.value ?? 0} onChange={v => updateOutputValue(port.id, v)} />
-            )}
-            {showExpanded && (
-              <button
-                className={`unit-cycle-btn${unitClass(port.unit)}`}
-                onMouseDown={e => e.stopPropagation()}
-                onClick={e => { e.stopPropagation(); cycleOutputUnit(port.id) }}
-                title={`Unit: ${resolvedUnit ?? 'number'} — click to cycle`}
-              >
-                {unitLabel(port.unit)}
-              </button>
-            )}
-          </div>
-        )
+        if (variant === 'constant' || variant === 'measure') {
+          return (
+            <div key={port.id} className="port-row" style={showExpanded ? { justifyContent: 'flex-end' } : undefined}>
+              <Handle id={port.id} type="source" position={Position.Right} title={port.label} />
+              {showExpanded && <ValueInput value={port.value ?? 0} onChange={v => updateOutputValue(port.id, v)} />}
+              {showExpanded && (
+                <UnitDropdown unit={port.unit} onChange={u => setOutputUnit(port.id, u)} />
+              )}
+            </div>
+          )
+        }
       })}
-      {showExpanded && (
-        <div className="quick-add-row" style={{ justifyContent: 'flex-end' }}>
-          <button className="port-quick-add-btn" onMouseDown={e => e.stopPropagation()} onClick={addQuickOutput} title="Add output">+ out</button>
-        </div>
-      )}
+
       {showExpanded && variant === 'measure' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 4px 4px' }}>
           <span style={{ fontSize: 10, color: '#888', flexShrink: 0 }}>URL</span>

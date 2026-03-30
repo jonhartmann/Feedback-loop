@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -r react-flow__node /c/Users/jonha/Desktop/projects/Feedback-loop/src --include=*.tsx --include=*.ts --include=*.css)"
+      "Bash(grep -r react-flow__node /c/Users/jonha/Desktop/projects/Feedback-loop/src --include=*.tsx --include=*.ts --include=*.css)",
+      "Bash(grep -n outputs.*[] c:UsersjonhaDesktopprojectsFeedback-loopsrcApp.tsx)",
+      "Bash(grep -rn \"function addNode\\\\|addNode.*=\" src/ --include=*.ts --include=*.tsx)"
     ]
   }
 }

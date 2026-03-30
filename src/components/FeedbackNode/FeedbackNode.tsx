@@ -9,8 +9,6 @@ import { SimSliders } from './SimSliders'
 import { useDragDropPort } from './useDragDropPort'
 import { usePortEditing } from './usePortEditing'
 import { NodeContext } from './NodeContext'
-import { useNodeDisplayMode } from './useNodeDisplayMode'
-import { NodeSummaryOverlay } from './NodeSummaryOverlay'
 import { ValueNodeBody } from './ValueNodeBody'
 import { MetricNodeBody } from './MetricNodeBody'
 import { ExpressionNodeBody } from './ExpressionNodeBody'
@@ -18,12 +16,6 @@ import { NodeHeader } from './NodeHeader'
 import { useNodeActions } from './useNodeActions'
 import './FeedbackNode.css'
 
-const variantOptions = [
-  { value: 'expression', label: 'Expression' },
-  { value: 'constant',   label: 'Constant' },
-  { value: 'measure',    label: 'Measure' },
-  { value: 'metric',     label: 'Metric' },
-]
 
 export default function FeedbackNode({ id, data, selected }: NodeProps<Node<FeedbackNodeData>>) {
   const nodeData = data as FeedbackNodeData
@@ -33,9 +25,6 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
   const [isEditingLabel, setIsEditingLabel] = useState(false)
   const [labelDraft, setLabelDraft] = useState(nodeData.label)
-  const [showEditor, setShowEditor] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
-  const [isFocused, setIsFocused] = useState(false)
 
   const { updateNodeData } = useReactFlow()
   const evalMap = useEvalMap()
@@ -76,7 +65,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
   const { getPortRowDragProps, getDragHandleProps } = useDragDropPort(reorderPorts)
 
-  const { editingPortId, portLabelField } = usePortEditing({
+  const { portLabelField } = usePortEditing({
     nodeId: id as string,
     inputs,
     outputs,
@@ -86,9 +75,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
   const actions = useNodeActions({ id: id as string, nodeData })
 
-  const isPinned = showEditor || isEditingLabel || editingPortId !== null
-  const nodeDisplayMode = useNodeDisplayMode(simMode, isHovered, isFocused, isPinned)
-  const showExpanded = nodeDisplayMode === 'expanded'
+  const showExpanded = true
   const isSingleOutputRegular = !isValueNode && !isMetric && outputs.length === 1
 
   const nodeClass = [
@@ -119,27 +106,20 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
     getPortRowDragProps,
     getDragHandleProps,
     updateOutputValue: actions.updateOutputValue,
-    cycleOutputUnit: actions.cycleOutputUnit,
-    cycleMetricUnit: actions.cycleMetricUnit,
+    setOutputUnit: actions.setOutputUnit,
+    setMetricUnit: actions.setMetricUnit,
     addQuickInput: actions.addQuickInput,
     addQuickConstant: actions.addQuickConstant,
     addQuickOutput: actions.addQuickOutput,
     onChartTypeChange: (t: import('./SeriesModePanel').ChartType) => updateNodeData(id as string, { seriesChartType: t } as Partial<FeedbackNodeData>),
     onSourceUrlChange: (url: string | undefined) => updateNodeData(id as string, { sourceUrl: url } as Partial<FeedbackNodeData>),
     onMetricFormulaChange: (v: string | undefined) => updateNodeData(id as string, { metricFormula: v } as Partial<FeedbackNodeData>),
+    onOutputFormulaChange: (portId: string, formula: string | undefined) => updateNodeData(id as string, { outputs: outputs.map(p => p.id === portId ? { ...p, formula } : p) } as Partial<FeedbackNodeData>),
   }
 
   return (
     <NodeContext.Provider value={nodeCtx}>
-    <div
-      className={nodeClass}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onFocus={() => setIsFocused(true)}
-      onBlur={e => {
-        if (!e.currentTarget.contains(e.relatedTarget as HTMLElement)) setIsFocused(false)
-      }}
-    >
+    <div className={nodeClass}>
       <NodeHeader
         id={id as string}
         nodeData={nodeData}
@@ -147,21 +127,15 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
         isEditingLabel={isEditingLabel}
         labelDraft={labelDraft}
         showExpanded={showExpanded}
-        showEditor={showEditor}
         displayMode={displayMode}
-        variantOptions={variantOptions}
         setLabelDraft={setLabelDraft}
         setIsEditingLabel={setIsEditingLabel}
-        setShowEditor={setShowEditor}
         commitLabel={() => actions.commitLabel(labelDraft, trimmed => { setLabelDraft(trimmed); setIsEditingLabel(false) })}
-        changeVariant={actions.changeVariant}
         saveToLibrary={actions.saveToLibrary}
         deleteNode={actions.deleteNode}
       />
 
-      {nodeDisplayMode === 'collapsed' && <NodeSummaryOverlay />}
-
-      {nodeDisplayMode === 'sim' && <SimSliders
+      {simMode && <SimSliders
         nodeId={id as string}
         isValueNode={isValueNode}
         isMetric={isMetric}
@@ -175,7 +149,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
       {isValueNode && <ValueNodeBody />}
       {isMetric && <MetricNodeBody />}
-      {!isValueNode && !isMetric && <ExpressionNodeBody showEditor={showEditor} />}
+      {!isValueNode && !isMetric && <ExpressionNodeBody />}
     </div>
     </NodeContext.Provider>
   )

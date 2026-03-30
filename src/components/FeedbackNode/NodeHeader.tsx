@@ -8,26 +8,20 @@ interface NodeHeaderProps {
   isEditingLabel: boolean
   labelDraft: string
   showExpanded: boolean
-  showEditor: boolean
   displayMode: string
-  variantOptions: { value: string; label: string }[]
   setLabelDraft: (v: string) => void
   setIsEditingLabel: (v: boolean) => void
-  setShowEditor: (fn: (v: boolean) => boolean) => void
   commitLabel: () => void
-  changeVariant: (v: NodeVariant | undefined) => void
   saveToLibrary: (e: React.MouseEvent) => void
   deleteNode: (e: React.MouseEvent) => void
 }
 
 export function NodeHeader({
-  id, nodeData, variant, isEditingLabel, labelDraft, showExpanded, showEditor,
-  displayMode, variantOptions, setLabelDraft, setIsEditingLabel, setShowEditor,
-  commitLabel, changeVariant, saveToLibrary, deleteNode,
+  id, nodeData, variant, isEditingLabel, labelDraft, showExpanded,
+  displayMode, setLabelDraft, setIsEditingLabel,
+  commitLabel, saveToLibrary, deleteNode,
 }: NodeHeaderProps) {
   const { updateNodeData } = useReactFlow()
-  const isValueNode = variant === 'constant' || variant === 'measure'
-  const isMetric = variant === 'metric'
 
   return (
     <div className="node-header">
@@ -54,19 +48,6 @@ export function NodeHeader({
         </span>
       )}
 
-      {showExpanded && (
-        <select
-          className={`variant-select${variant ? ` variant-${variant}` : ''}`}
-          value={variant ?? 'expression'}
-          onMouseDown={e => e.stopPropagation()}
-          onChange={e => changeVariant(e.target.value as NodeVariant)}
-        >
-          {variantOptions.map(o => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-      )}
-
       {showExpanded && variant !== 'constant' && (
         <button
           className="display-mode-btn"
@@ -80,17 +61,6 @@ export function NodeHeader({
           title={displayMode === 'series' ? 'Switch to current value' : 'Switch to series view'}
         >
           {displayMode === 'series' ? '⊟' : '∿'}
-        </button>
-      )}
-
-      {showExpanded && !isValueNode && !isMetric && (
-        <button
-          className="edit-ports-btn"
-          onMouseDown={e => e.stopPropagation()}
-          onClick={() => setShowEditor(v => !v)}
-          title="Edit node details"
-        >
-          {showEditor ? 'Done' : 'Edit'}
         </button>
       )}
 

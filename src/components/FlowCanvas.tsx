@@ -33,7 +33,7 @@ export default function FlowCanvas({ nodes, edges, onNodesChange, onEdgesChange,
   const nodeTypes = useMemo(() => ({ feedbackNode: FeedbackNode }), [])
   const edgeTypes = useMemo(() => ({ default: DeletableEdge }), [])
 
-  const { onConnect, onConnectEnd, onReconnect, onReconnectStart, onReconnectEnd } =
+  const { onConnect, onConnectStart, onConnectEnd, onReconnect, onReconnectStart, onReconnectEnd, isValidConnection } =
     useCanvasConnections({ setEdges, setNodes })
 
   const { onNodeDragStart, onNodeDragStop, handleDrop } =
@@ -53,7 +53,9 @@ export default function FlowCanvas({ nodes, edges, onNodesChange, onEdgesChange,
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onConnectStart={onConnectStart}
         onConnectEnd={onConnectEnd}
+        isValidConnection={isValidConnection}
         onReconnect={onReconnect}
         onReconnectStart={onReconnectStart}
         onReconnectEnd={onReconnectEnd}

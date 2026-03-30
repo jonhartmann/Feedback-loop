@@ -4,14 +4,14 @@ import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
 import FormulaInput from './FormulaInput'
 import { SeriesModePanel } from './SeriesModePanel'
 import { InputsColumn } from './InputsColumn'
-import { unitClass, unitLabel } from './nodeFormatting'
+import { UnitDropdown } from './UnitDropdown'
 import { useNodeContext } from './NodeContext'
 
 export function MetricNodeBody() {
   const {
     nodeId, nodeData, showExpanded, displayMode,
     inputs, variables, seriesHistory, seriesChartType, primaryUnit,
-    cycleMetricUnit, onMetricFormulaChange, onChartTypeChange,
+    setMetricUnit, onMetricFormulaChange, onChartTypeChange,
   } = useNodeContext()
   const activeEvalMap = useEvalMap()
   const unitMap = useUnitMap()
@@ -59,15 +59,11 @@ export function MetricNodeBody() {
               {metricDisplay.text}
             </span>
           )}
-          <button
-            className={`unit-cycle-btn${unitClass(metricUnit)}`}
-            onMouseDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); cycleMetricUnit() }}
-            title={`Unit: ${metricResolvedUnit ?? 'number'} — click to cycle`}
+          <UnitDropdown
+            unit={metricUnit}
+            onChange={setMetricUnit}
             style={{ alignSelf: 'flex-end' }}
-          >
-            {unitLabel(metricUnit)}
-          </button>
+          />
         </div>
       )}
     </div>
