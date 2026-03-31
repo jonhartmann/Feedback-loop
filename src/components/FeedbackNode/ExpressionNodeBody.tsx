@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { Handle, Position } from '@xyflow/react'
 import { evalFormula, buildScope, formatValue, labelToVarName, FORMULA_BUILTINS } from '../../utils/formulaEval'
 import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
@@ -58,7 +59,7 @@ export function ExpressionNodeBody() {
                   />
                 )}
                 {showExpanded && display && (
-                  <span className={`feedback-node__formula-result${display.isError ? ' feedback-node__formula-result--error' : ''}`}>{display.text}</span>
+                  <span className={clsx('feedback-node__formula-result', { 'feedback-node__formula-result--error': display.isError })}>{display.text}</span>
                 )}
                 {showExpanded && (
                   <UnitDropdown

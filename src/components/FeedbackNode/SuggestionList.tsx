@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import type { FormulaBuiltin } from '../../utils/formulaEval'
 
 export interface Suggestion {
@@ -52,16 +53,16 @@ export function SuggestionList({
   onSelect: (s: Suggestion) => void
 }) {
   return (
-    <ul className="formula-input-dropdown">
+    <ul className="formula-input__dropdown">
       {suggestions.map((s, i) => (
         <li
           key={s.insert + i}
-          className={`formula-input-suggestion${i === activeIndex ? ' is-active' : ''}`}
+          className={clsx('formula-input__suggestion', { 'formula-input__suggestion--active': i === activeIndex })}
           onMouseDown={e => e.preventDefault()}
           onClick={() => onSelect(s)}
         >
-          <span className="formula-suggestion-name">{s.label}</span>
-          {s.secondary && <span className="formula-suggestion-sig">{s.secondary}</span>}
+          <span className="formula-input__suggestion-name">{s.label}</span>
+          {s.secondary && <span className="formula-input__suggestion-sig">{s.secondary}</span>}
         </li>
       ))}
     </ul>

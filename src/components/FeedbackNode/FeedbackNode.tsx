@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import clsx from 'clsx'
 import type { Node, NodeProps } from '@xyflow/react'
 import { useReactFlow } from '@xyflow/react'
 import type { FeedbackNodeData } from '../../types/graph'
@@ -78,13 +79,12 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
   const showExpanded = true
   const isSingleOutputRegular = !isValueNode && !isMetric && outputs.length === 1
 
-  const nodeClass = [
-    'feedback-node',
-    variant ? `feedback-node--variant-${variant}` : '',
-    selected ? 'feedback-node--selected' : '',
-    displayMode === 'series' ? 'feedback-node--series' : '',
-    simMode ? 'feedback-node--sim-mode' : '',
-  ].filter(Boolean).join(' ')
+  const nodeClass = clsx('feedback-node', {
+    [`feedback-node--variant-${variant}`]: !!variant,
+    'feedback-node--selected':             !!selected,
+    'feedback-node--series':               displayMode === 'series',
+    'feedback-node--sim-mode':             !!simMode,
+  })
 
   const nodeCtx = {
     nodeId: id as string,

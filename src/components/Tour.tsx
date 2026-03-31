@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
+import clsx from 'clsx'
 import { useTour } from '../context/TourContext'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import './Tour.css'
@@ -243,7 +244,10 @@ export default function Tour() {
           {STEPS.map((_, i) => (
             <div
               key={i}
-              className={`tour-popover__dot${i === step ? ' tour-popover__dot--active' : i < step ? ' tour-popover__dot--done' : ''}`}
+              className={clsx('tour-popover__dot', {
+                'tour-popover__dot--active': i === step,
+                'tour-popover__dot--done':   i < step,
+              })}
             />
           ))}
         </div>

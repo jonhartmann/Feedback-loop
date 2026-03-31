@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import type { Unit } from '../../types/graph'
 import { formatValue } from '../../utils/formulaEval'
 import { useSimContext } from '../../context/SimContext'
@@ -85,17 +86,15 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
     }
   }
 
-  const rowClass = [
-    'sim-panel__row',
-    isAffectedOnly ? 'sim-panel__row--propagated' : '',
-    isLocked       ? 'sim-panel__row--locked'     : '',
-  ].filter(Boolean).join(' ')
+  const rowClass = clsx('sim-panel__row', {
+    'sim-panel__row--propagated': isAffectedOnly,
+    'sim-panel__row--locked':     isLocked,
+  })
 
-  const valueClass = [
-    'sim-panel__value',
-    unit === 'money'   ? 'sim-panel__value--money'   : '',
-    unit === 'percent' ? 'sim-panel__value--percent' : '',
-  ].filter(Boolean).join(' ')
+  const valueClass = clsx('sim-panel__value', {
+    'sim-panel__value--money':   unit === 'money',
+    'sim-panel__value--percent': unit === 'percent',
+  })
 
   return (
     <div className={rowClass}>
@@ -105,12 +104,15 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
           {formatSimValue(simVal, unit)}
         </span>
         {rawPct !== 0 && (
-          <span className={`sim-panel__delta${isPositive ? ' sim-panel__delta--positive' : isNegative ? ' sim-panel__delta--negative' : ''}`}>
+          <span className={clsx('sim-panel__delta', {
+            'sim-panel__delta--positive': isPositive,
+            'sim-panel__delta--negative': isNegative,
+          })}>
             {isPositive ? '+' : ''}{Math.round(rawPct * 10) / 10}%
           </span>
         )}
         <button
-          className={`sim-panel__lock${isLocked ? ' sim-panel__lock--locked' : ''}`}
+          className={clsx('sim-panel__lock', { 'sim-panel__lock--locked': isLocked })}
           title={isLocked
             ? 'Locked — back-propagation stops here. Click to unlock.'
             : useBackProp
@@ -135,7 +137,10 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
         />
         <input
           type="number"
-          className={`sim-panel__pct-input${isPositive ? ' sim-panel__pct-input--positive' : isNegative ? ' sim-panel__pct-input--negative' : ''}`}
+          className={clsx('sim-panel__pct-input', {
+            'sim-panel__pct-input--positive': isPositive,
+            'sim-panel__pct-input--negative': isNegative,
+          })}
           value={draft}
           disabled={isLocked}
           onChange={e => setDraft(e.target.value)}

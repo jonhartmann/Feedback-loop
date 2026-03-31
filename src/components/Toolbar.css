@@ -76,23 +76,23 @@
 
   &:hover { opacity: 0.8; }
 
-  /* Variant modifiers — no border when colored */
-  &.toolbar__btn--primary {
-    background: var(--c-g4);
-    border: none;
+  /* Node-type variant modifiers */
+  &.toolbar__btn--expression {
+    background: var(--c-g3);
   }
 
-  &.toolbar__btn--amber {
+  &.toolbar__btn--constant {
     background: var(--c-g5);
     border: none;
   }
 
-  &.toolbar__btn--teal {
+  &.toolbar__btn--measure {
     background: var(--c-measure-border);
     border: none;
   }
 
-  &.toolbar__btn--violet {
+  &.toolbar__btn--metric,
+  &.toolbar__btn--active {
     background: var(--c-g4);
     border: none;
   }

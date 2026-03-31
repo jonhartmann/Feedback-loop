@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { METRIC_PORT_ID } from '../../types/graph'
 import { evalFormula, buildScope, labelToVarName, formatValue, FORMULA_BUILTINS } from '../../utils/formulaEval'
 import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
@@ -37,7 +38,7 @@ export function MetricNodeBody() {
 
   return (
     <div className="feedback-node__body feedback-node__body--metric">
-      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} />
+      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} gridSpan />
       <InputsColumn />
 
       {showExpanded && (
@@ -55,7 +56,7 @@ export function MetricNodeBody() {
             onMouseDown={e => e.stopPropagation()}
           />
           {metricDisplay && (
-            <span className={`feedback-node__formula-result${metricDisplay.isError ? ' feedback-node__formula-result--error' : ''}`}>
+            <span className={clsx('feedback-node__formula-result', { 'feedback-node__formula-result--error': metricDisplay.isError })}>
               {metricDisplay.text}
             </span>
           )}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import clsx from 'clsx'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import './HelpModal.css'
 
@@ -54,7 +55,7 @@ export default function HelpModal({ onClose, onStartTour }: { onClose: () => voi
               <button
                 key={s}
                 onClick={() => setActive(s)}
-                className={`help-modal__nav-btn${active === s ? ' help-modal__nav-btn--active' : ''}`}
+                className={clsx('help-modal__nav-btn', { 'help-modal__nav-btn--active': active === s })}
               >
                 {s}
               </button>

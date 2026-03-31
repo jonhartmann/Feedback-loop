@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import clsx from 'clsx'
 import { useReactFlow } from '@xyflow/react'
 import type { NodeVariant, SerializedGraph } from '../types/graph'
 import { saveGraphToFile, loadGraphFromFile } from '../hooks/useFilePersistence'
@@ -61,22 +62,22 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
       <div className="toolbar__divider" />
 
       <div className="toolbar__btn-group" data-tour="node-buttons">
-        <Button onClick={() => handleAddNode('constant')} amber>+ Constant</Button>
-        <Button onClick={() => handleAddNode('measure')} teal>+ Measure</Button>
-        <Button onClick={() => handleAddNode()}>+ Expression</Button>
-        <Button onClick={() => handleAddNode('metric')} violet>+ Metric</Button>
+        <Button onClick={() => handleAddNode('constant')} variant="constant">+ Constant</Button>
+        <Button onClick={() => handleAddNode('measure')} variant="measure">+ Measure</Button>
+        <Button onClick={() => handleAddNode()} variant="expression">+ Expression</Button>
+        <Button onClick={() => handleAddNode('metric')} variant="metric">+ Metric</Button>
       </div>
-      <span data-tour="library-btn"><Button onClick={onToggleDrawer} primary={drawerOpen}>Library</Button></span>
+      <span data-tour="library-btn"><Button onClick={onToggleDrawer} active={drawerOpen}>Library</Button></span>
 
       <div className="toolbar__divider" />
 
-      <span data-tour="experiment-btn"><Button onClick={toggleSimMode} primary={simMode}>Experiment</Button></span>
+      <span data-tour="experiment-btn"><Button onClick={toggleSimMode} active={simMode}>Experiment</Button></span>
 
       <div className="toolbar__spacer" />
       <Button onClick={onShowTemplates}>Templates</Button>
       <Button onClick={onShowHelp}>Help</Button>
       <div className="toolbar__btn-group" data-tour="save-load">
-        <Button onClick={handleSave} primary>Save</Button>
+        <Button onClick={handleSave} active>Save</Button>
         <Button onClick={handleLoad}>Load</Button>
       </div>
       <input
@@ -93,20 +94,15 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
 interface ButtonProps {
   onClick: () => void;
   children: React.ReactNode;
-  primary?: boolean;
-  amber?: boolean;
-  teal?: boolean;
-  violet?: boolean;
+  variant?: 'constant' | 'measure' | 'metric' | 'expression';
+  active?: boolean;
 }
 
-function Button({ onClick, children, primary, amber, teal, violet }: ButtonProps) {
-  const cls = [
-    'toolbar__btn',
-    primary ? 'toolbar__btn--primary' : '',
-    amber   ? 'toolbar__btn--amber'   : '',
-    teal    ? 'toolbar__btn--teal'    : '',
-    violet  ? 'toolbar__btn--violet'  : '',
-  ].filter(Boolean).join(' ')
+function Button({ onClick, children, variant, active }: ButtonProps) {
+  const cls = clsx('toolbar__btn', {
+    [`toolbar__btn--${variant}`]: !!variant,
+    'toolbar__btn--active':       !!active,
+  })
 
   return (
     <button className={cls} onClick={onClick}>

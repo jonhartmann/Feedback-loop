@@ -16,7 +16,8 @@
       "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/InputsColumn.tsx)",
       "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/PortEditor.tsx)",
       "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/NodeSummaryOverlay.tsx /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/SimSliderRow.tsx)",
-      "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/Drawer.tsx)"
+      "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/Drawer.tsx)",
+      "Bash(node -e \"require\\(''clsx''\\); console.log\\(''ok''\\)\")"
     ]
   }
 }

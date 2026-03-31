@@ -1,6 +1,8 @@
 import type { Unit } from '../../types/graph'
 import SeriesChart from './SeriesChart'
 
+import clsx from 'clsx'
+
 export type ChartType = 'line' | 'area' | 'bar'
 
 const CHART_ICONS: Record<ChartType, string> = { line: '∿', area: '◿', bar: '▮▮' }
@@ -13,7 +15,7 @@ export function ChartTypeSelector({ current, onChange, wrapperStyle }: {
   return (
     <div className="feedback-node__chart-row" style={wrapperStyle}>
       {(['line', 'area', 'bar'] as const).map(t => (
-        <button key={t} className={`feedback-node__chart-btn${current === t ? ' feedback-node__chart-btn--active' : ''}`}
+        <button key={t} className={clsx('feedback-node__chart-btn', { 'feedback-node__chart-btn--active': current === t })}
           onMouseDown={e => e.stopPropagation()}
           onClick={e => { e.stopPropagation(); onChange(t) }}
           title={t}

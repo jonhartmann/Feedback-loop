@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { METRIC_PORT_ID } from '../../types/graph'
 import { formatValue } from '../../utils/formulaEval'
 import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
@@ -5,10 +6,11 @@ import SeriesChart from './SeriesChart'
 import { useNodeContext } from './NodeContext'
 import type { Unit } from '../../types/graph'
 
-function unitMod(block: string, u: Unit | undefined): string {
-  if (u === 'money')   return ` ${block}--money`
-  if (u === 'percent') return ` ${block}--percent`
-  return ''
+function unitMod(block: string, u: Unit | undefined) {
+  return {
+    [`${block}--money`]:   u === 'money',
+    [`${block}--percent`]: u === 'percent',
+  }
 }
 
 export function NodeSummaryOverlay() {
@@ -21,11 +23,10 @@ export function NodeSummaryOverlay() {
 
   const hasMultipleRows = !isValueNode && !isMetric && outputs.length > 1
 
-  const overlayClass = [
-    'node-summary',
-    displayMode === 'series'  ? 'node-summary--series' : '',
-    hasMultipleRows           ? 'node-summary--rows'   : '',
-  ].filter(Boolean).join(' ')
+  const overlayClass = clsx('node-summary', {
+    'node-summary--series': displayMode === 'series',
+    'node-summary--rows':   hasMultipleRows,
+  })
 
   return (
     <div className={overlayClass}>
@@ -36,7 +37,7 @@ export function NodeSummaryOverlay() {
             : <div className="feedback-node__series-empty" style={{ height: 66 }}>—</div>
           }
           {primaryValue !== undefined && (
-            <span className={`node-summary__series-value${unitMod('node-summary__series-value', primaryUnit)}`}>
+            <span className={clsx('node-summary__series-value', unitMod('node-summary__series-value', primaryUnit))}>
               {formatValue(primaryValue, primaryUnit)}
             </span>
           )}
@@ -49,7 +50,7 @@ export function NodeSummaryOverlay() {
             : outputs.map(port => (
                 <div key={port.id} className="node-summary__value-block">
                   {outputs.length > 1 && <span className="node-summary__value-label">{port.label}</span>}
-                  <span className={`node-summary__value${unitMod('node-summary__value', port.unit)}`}>
+                  <span className={clsx('node-summary__value', unitMod('node-summary__value', port.unit))}>
                     {port.value !== undefined ? formatValue(port.value, port.unit) : '—'}
                   </span>
                 </div>
@@ -61,7 +62,7 @@ export function NodeSummaryOverlay() {
           const metricVal = activeEvalMap.get(metricKey)
           const resolvedUnit = unitMap.get(metricKey) ?? nodeData.metricUnit
           return (
-            <span className={`node-summary__value${unitMod('node-summary__value', resolvedUnit)}`}>
+            <span className={clsx('node-summary__value', unitMod('node-summary__value', resolvedUnit))}>
               {metricVal !== undefined ? formatValue(metricVal, resolvedUnit) : nodeData.metricFormula ? '…' : '—'}
             </span>
           )
@@ -75,7 +76,7 @@ export function NodeSummaryOverlay() {
               const val = activeEvalMap.get(`${nodeId}:${port.id}`)
               const unit = unitMap.get(`${nodeId}:${port.id}`) ?? port.unit
               return (
-                <span className={`node-summary__value${unitMod('node-summary__value', unit)}`}>
+                <span className={clsx('node-summary__value', unitMod('node-summary__value', unit))}>
                   {val !== undefined ? formatValue(val, unit) : '—'}
                 </span>
               )
@@ -89,7 +90,7 @@ export function NodeSummaryOverlay() {
               return (
                 <div key={port.id} className="node-summary__row">
                   <span className="node-summary__row-label">{port.label}</span>
-                  <span className={`node-summary__row-value${unitMod('node-summary__row-value', unit)}`}>
+                  <span className={clsx('node-summary__row-value', unitMod('node-summary__row-value', unit))}>
                     {val !== undefined ? formatValue(val, unit) : '—'}
                   </span>
                 </div>

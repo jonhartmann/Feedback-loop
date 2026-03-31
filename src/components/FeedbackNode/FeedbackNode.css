@@ -226,18 +226,21 @@
 }
 
 .feedback-node__body {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   padding: 8px 0;
 
-  &.feedback-node__body--metric {
-    /* Metric body is just a flex row — column layout handled by children */
-  }
-
   &.feedback-node__body--value {
+    display: flex;
     flex-direction: column;
     gap: 4px;
     padding: 8px;
   }
+}
+
+.feedback-node__chart-row,
+.feedback-node__series-empty {
+  grid-column: 1 / -1;
 }
 
 .feedback-node__column {
@@ -769,13 +772,13 @@
     color: var(--c-g3);
   }
 
-  &.is-money {
+  &.unit-dropdown__trigger--money {
     border-color: var(--c-money-border);
     color: var(--c-money);
     background: var(--c-money-bg);
   }
 
-  &.is-percent {
+  &.unit-dropdown__trigger--percent {
     border-color: #1E3A6A;
     color: var(--c-percent);
     background: var(--c-percent-bg);

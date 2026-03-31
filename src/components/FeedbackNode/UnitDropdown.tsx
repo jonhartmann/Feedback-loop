@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import clsx from 'clsx'
 import type { Unit } from '../../types/graph'
-import { unitClass, unitLabel } from './nodeFormatting'
+import { unitLabel } from './nodeFormatting'
 
 interface UnitDropdownProps {
   unit: Unit | undefined
@@ -20,7 +21,10 @@ export function UnitDropdown({ unit, onChange, style }: UnitDropdownProps) {
   return (
     <div style={{ position: 'relative', ...style }}>
       <button
-        className={`unit-dropdown__trigger${unitClass(unit)}`}
+        className={clsx('unit-dropdown__trigger', {
+          'unit-dropdown__trigger--money':   unit === 'money',
+          'unit-dropdown__trigger--percent': unit === 'percent',
+        })}
         onMouseDown={e => e.stopPropagation()}
         onClick={e => { e.stopPropagation(); setOpen(o => !o) }}
         title="Select unit type"
@@ -41,7 +45,7 @@ export function UnitDropdown({ unit, onChange, style }: UnitDropdownProps) {
               return (
                 <li
                   key={opt.name}
-                  className={`unit-dropdown__option${active ? ' unit-dropdown__option--active' : ''}`}
+                  className={clsx('unit-dropdown__option', { 'unit-dropdown__option--active': active })}
                   onMouseDown={e => e.stopPropagation()}
                   onClick={e => { e.stopPropagation(); onChange(opt.value); setOpen(false) }}
                 >
