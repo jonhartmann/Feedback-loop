@@ -35,13 +35,13 @@ export function useGraphState() {
         ? (template.outputs.map(p => ({ ...p, id: newId() })) as OutputPort[])
         : (isValue
             ? [{ id: newId(), label: 'value', value: template?.value ?? 0, ...(template?.unit ? { unit: template.unit } : {}) }]
-            : [])
+            : [{ id: newId(), label: 'out1' }])
 
       const newNode: Node<FeedbackNodeData> = {
         id: newId(),
         type: 'feedbackNode',
         position: freePos,
-        dragHandle: '.node-header',
+        dragHandle: '.feedback-node__header',
         data: {
           label: defaultLabel,
           variant,

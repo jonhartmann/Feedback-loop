@@ -1,18 +1,18 @@
+import clsx from 'clsx'
 import { Handle, Position } from '@xyflow/react'
-import { evalFormula, buildScope, formatValue } from '../../utils/formulaEval'
+import { evalFormula, buildScope, formatValue, labelToVarName, FORMULA_BUILTINS } from '../../utils/formulaEval'
 import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
-import PortEditor from './PortEditor'
+import FormulaInput from './FormulaInput'
 import { SeriesModePanel } from './SeriesModePanel'
 import { InputsColumn } from './InputsColumn'
-import { unitClass, unitLabel } from './nodeFormatting'
+import { UnitDropdown } from './UnitDropdown'
 import { useNodeContext } from './NodeContext'
 
-export function ExpressionNodeBody({ showEditor }: { showEditor: boolean }) {
+export function ExpressionNodeBody() {
   const {
     nodeId, nodeData, showExpanded, displayMode,
     inputs, outputs, variables, seriesHistory, seriesChartType, primaryUnit,
-    portLabelField, getPortRowDragProps, getDragHandleProps,
-    addQuickOutput, cycleOutputUnit, onChartTypeChange,
+    setOutputUnit, onChartTypeChange, onOutputFormulaChange,
   } = useNodeContext()
   const activeEvalMap = useEvalMap()
   const unitMap = useUnitMap()
@@ -20,76 +20,64 @@ export function ExpressionNodeBody({ showEditor }: { showEditor: boolean }) {
 
   return (
     <>
-      <div className="node-body">
+      <div className="feedback-node__body">
         <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} gridSpan />
         <InputsColumn />
 
-        <div className="ports-column outputs">
+        <div className="feedback-node__column feedback-node__column--outputs">
           {outputs.map(port => {
             const graphValue = activeEvalMap.get(`${nodeId}:${port.id}`)
             const resolvedUnit = unitMap.get(`${nodeId}:${port.id}`) ?? port.unit
+            const localResult = port.formula ? evalFormula(port.formula, localScope) : null
 
-            let computedValue: number | undefined
-            let formulaError: string | undefined
+            let display: { text: string; isError: boolean } | null = null
             if (port.formula) {
               if (graphValue !== undefined) {
-                computedValue = graphValue
+                display = { text: `= ${formatValue(graphValue, resolvedUnit)}`, isError: false }
+              } else if (localResult?.type === 'error') {
+                display = { text: '⚠ ' + localResult.message, isError: true }
               } else {
-                const local = evalFormula(port.formula, localScope)
-                if (local.type === 'error') formulaError = local.message
+                display = { text: `= ${port.formula}`, isError: false }
               }
             }
 
             return (
-              <div key={port.id} {...getPortRowDragProps(port.id, 'output')}>
+              <div key={port.id} className="port__row feedback-node__formula-panel">
                 <Handle id={port.id} type="source" position={Position.Right} title={port.label} />
-                {showExpanded && <span className="port-drag-handle" {...getDragHandleProps(port.id, 'output')}>⠿</span>}
-                {showExpanded && portLabelField(port.id, 'output', port.label)}
-                {showExpanded && formulaError && (
-                  <span className="port-formula-display is-error" title={formulaError}>⚠</span>
+                {showExpanded && (
+                  <FormulaInput
+                    className="feedback-node__formula-input"
+                    placeholder="formula…"
+                    value={port.formula ?? ''}
+                    onChange={v => onOutputFormulaChange(port.id, v || undefined)}
+                    variables={[
+                      ...inputs.map(i => labelToVarName(i.label)),
+                      ...variables.filter(v => /^[a-zA-Z_]\w*$/.test(v.name)).map(v => v.name),
+                    ].filter(Boolean)}
+                    builtins={FORMULA_BUILTINS}
+                    onMouseDown={e => e.stopPropagation()}
+                  />
+                )}
+                {showExpanded && display && (
+                  <span className={clsx('feedback-node__formula-result', { 'feedback-node__formula-result--error': display.isError })}>{display.text}</span>
                 )}
                 {showExpanded && (
-                  <button
-                    className={`unit-cycle-btn${unitClass(port.unit)}`}
-                    onMouseDown={e => e.stopPropagation()}
-                    onClick={e => { e.stopPropagation(); cycleOutputUnit(port.id) }}
-                    title={`Unit: ${resolvedUnit ?? 'number'} — click to cycle`}
-                  >
-                    {unitLabel(port.unit)}
-                  </button>
-                )}
-                {showExpanded && computedValue !== undefined && (
-                  <div className={`port-value-float${unitClass(resolvedUnit)}`}>
-                    {formatValue(computedValue, resolvedUnit)}
-                  </div>
+                  <UnitDropdown
+                    unit={port.unit}
+                    onChange={u => setOutputUnit(port.id, u)}
+                    style={{ alignSelf: 'flex-end' }}
+                  />
                 )}
               </div>
             )
           })}
-          {showExpanded && outputs.length === 0 && <span style={{ fontSize: 11, color: '#aaa' }}>no outputs</span>}
-          {showExpanded && (
-            <div className="quick-add-row" style={{ justifyContent: 'flex-end' }}>
-              <button className="port-quick-add-btn" onMouseDown={e => e.stopPropagation()} onClick={addQuickOutput} title="Add output">+ out</button>
-            </div>
-          )}
+          {showExpanded && outputs.length === 0 && <span className="feedback-node__empty-note">no outputs</span>}
         </div>
       </div>
 
-      {showExpanded && !showEditor && nodeData.description && (
-        <div className="node-meta">
-          <p className="node-description">{nodeData.description}</p>
-        </div>
-      )}
-
-      {showExpanded && showEditor && (
-        <div className="port-editor-wrapper">
-          <PortEditor
-            nodeId={nodeId}
-            inputs={inputs}
-            outputs={outputs}
-            description={nodeData.description}
-            variables={variables}
-          />
+      {showExpanded && nodeData.description && (
+        <div className="feedback-node__meta">
+          <p className="feedback-node__description">{nodeData.description}</p>
         </div>
       )}
     </>

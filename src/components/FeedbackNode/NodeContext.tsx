@@ -22,14 +22,15 @@ interface NodeContextValue {
   getPortRowDragProps: (portId: string, type: 'input' | 'output') => React.HTMLAttributes<HTMLDivElement> & { className: string }
   getDragHandleProps: (portId: string, type: 'input' | 'output') => { draggable: true; onDragStart: React.DragEventHandler; onDragEnd: React.DragEventHandler }
   updateOutputValue: (portId: string, value: number) => void
-  cycleOutputUnit: (portId: string) => void
-  cycleMetricUnit: () => void
+  setOutputUnit: (portId: string, unit: Unit | undefined) => void
+  setMetricUnit: (unit: Unit | undefined) => void
   addQuickInput: (e: React.MouseEvent) => void
   addQuickConstant: (e: React.MouseEvent) => void
   addQuickOutput: (e: React.MouseEvent) => void
   onChartTypeChange: (t: ChartType) => void
   onSourceUrlChange: (url: string | undefined) => void
   onMetricFormulaChange: (v: string | undefined) => void
+  onOutputFormulaChange: (portId: string, formula: string | undefined) => void
 }
 
 const NodeContext = createContext<NodeContextValue | null>(null)

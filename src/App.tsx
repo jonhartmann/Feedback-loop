@@ -69,7 +69,7 @@ function AppInner() {
               onShowTemplates={() => setShowWelcome(true)}
               onShowHelp={() => setShowHelp(true)}
             />
-            <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+            <div style={{ flex: 1, overflow: 'hidden', position: 'relative', background: '#F6F8F9' }}>
               <FlowCanvas
                 nodes={nodes}
                 edges={edges}

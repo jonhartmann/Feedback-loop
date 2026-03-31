@@ -88,17 +88,17 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
   const hintText = availableVars.length > 0 ? `Vars: ${availableVars.join(', ')}` : 'No variables defined yet'
 
   return (
-    <div style={{ fontSize: 12 }}>
+    <div className="port-editor">
 
       {/* Description */}
       <div style={{ marginBottom: 10 }}>
-        <div style={{ fontWeight: 600, marginBottom: 4, color: '#444' }}>Description</div>
+        <div style={{ fontWeight: 600, marginBottom: 4, color: '#263640' }}>Description</div>
         <textarea
           value={description ?? ''}
           onChange={e => updateData({ description: e.target.value || undefined })}
           placeholder="Optional description of this node…"
           rows={3}
-          style={{ width: '100%', fontSize: 11, padding: '4px 6px', border: '1px solid #ccc', borderRadius: 3, resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }}
+          style={{ width: '100%', fontSize: 11, padding: '4px 6px', border: '1px solid #CCD7DC', borderRadius: 3, resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }}
           onMouseDown={e => e.stopPropagation()}
         />
       </div>
@@ -114,41 +114,41 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
 
       {/* Constants (Variables) — shown alongside inputs */}
       <div style={{ marginBottom: 10 }}>
-        <div style={{ fontWeight: 600, marginBottom: 4, color: '#6e5000' }}>Constants</div>
+        <div style={{ fontWeight: 600, marginBottom: 4, color: '#263640' }}>Constants</div>
         {vars.map((v, i) => {
           const nameValid = v.name === '' || VAR_NAME_RE.test(v.name)
           return (
-            <div key={i} className="variable-row">
+            <div key={i} className="port-editor__variable-row">
               <input
                 value={v.name}
                 onChange={e => updateVariable(i, { name: e.target.value })}
                 placeholder="name"
                 style={{
                   width: 90, fontSize: 11, padding: '1px 4px',
-                  border: `1px solid ${nameValid ? '#e8c84a' : '#e55'}`,
-                  borderRadius: 3, fontFamily: 'monospace',
-                  background: nameValid ? '#fffbf0' : undefined,
+                  border: `1px solid ${nameValid ? '#733917' : '#C0350A'}`,
+                  borderRadius: 3, fontFamily: "'Fira Mono', monospace",
+                  background: nameValid ? '#F1EBE8' : undefined,
                 }}
                 onMouseDown={e => e.stopPropagation()}
               />
-              <span style={{ fontSize: 11, color: '#888' }}>=</span>
+              <span style={{ fontSize: 11, color: '#65768C' }}>=</span>
               <input
                 type="number"
                 value={v.value}
                 onChange={e => updateVariable(i, { value: parseFloat(e.target.value) || 0 })}
-                style={{ width: 70, fontSize: 11, padding: '1px 4px', border: '1px solid #e8c84a', borderRadius: 3, background: '#fffbf0' }}
+                style={{ width: 70, fontSize: 11, padding: '1px 4px', border: '1px solid #733917', borderRadius: 3, background: '#F1EBE8', fontFamily: "'Fira Mono', monospace" }}
                 onMouseDown={e => e.stopPropagation()}
               />
               <button
                 onClick={() => removeVariable(i)}
-                style={{ fontSize: 10, padding: '1px 5px', border: '1px solid #ccc', borderRadius: 3, cursor: 'pointer', background: '#fff', color: '#c00' }}
+                style={{ fontSize: 10, padding: '1px 5px', border: '1px solid #CCD7DC', borderRadius: 3, cursor: 'pointer', background: '#fff', color: '#C0350A' }}
               >✕</button>
             </div>
           )
         })}
         <button
           onClick={addVariable}
-          style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #e8c84a', borderRadius: 3, cursor: 'pointer', background: '#fffbf0', color: '#6e5000', marginTop: 2 }}
+          style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #733917', borderRadius: 3, cursor: 'pointer', background: '#F1EBE8', color: '#263640', marginTop: 2 }}
         >
           + Add Constant
         </button>
@@ -156,23 +156,23 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
 
       {/* Outputs — with per-port formula */}
       <div style={{ marginBottom: 8 }}>
-        <div style={{ fontWeight: 600, marginBottom: 4, color: '#444' }}>Outputs</div>
+        <div style={{ fontWeight: 600, marginBottom: 4, color: '#263640' }}>Outputs</div>
         {outputs.map(port => (
-          <div key={port.id} style={{ marginBottom: 6, border: '1px solid #e8e8e8', borderRadius: 4, padding: '4px 6px', background: '#fff' }}>
+          <div key={port.id} style={{ marginBottom: 6, border: '1px solid #D7DCE3', borderRadius: 4, padding: '4px 6px', background: '#fff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <input
                 value={port.label}
                 onChange={e => renamePort('output', port.id, e.target.value)}
-                style={{ flex: 1, fontSize: 11, padding: '1px 4px', border: '1px solid #ccc', borderRadius: 3 }}
+                style={{ flex: 1, fontSize: 11, padding: '1px 4px', border: '1px solid #CCD7DC', borderRadius: 3 }}
                 onMouseDown={e => e.stopPropagation()}
               />
               <button
                 onClick={() => removePort('output', port.id)}
-                style={{ fontSize: 10, padding: '1px 5px', border: '1px solid #ccc', borderRadius: 3, cursor: 'pointer', background: '#fff', color: '#c00' }}
+                style={{ fontSize: 10, padding: '1px 5px', border: '1px solid #CCD7DC', borderRadius: 3, cursor: 'pointer', background: '#fff', color: '#C0350A' }}
               >✕</button>
             </div>
-            <div className="output-formula-row">
-              <span style={{ fontSize: 11, color: '#888', fontFamily: 'monospace', flexShrink: 0 }}>=</span>
+            <div className="port-editor__formula-row">
+              <span style={{ fontSize: 11, color: '#65768C', fontFamily: "'Fira Mono', monospace", flexShrink: 0 }}>=</span>
               <FormulaInput
                 value={port.formula ?? ''}
                 onChange={v => updateOutputFormula(port.id, v)}
@@ -180,16 +180,16 @@ export default function PortEditor({ nodeId, inputs, outputs, description, varia
                 builtins={FORMULA_BUILTINS}
                 placeholder={`e.g. ${inputs[0] ? labelToVarName(inputs[0].label) : 'a'} / ${inputs[1] ? labelToVarName(inputs[1].label) : 'b'} * 5`}
                 wrapperStyle={{ flex: 1 }}
-                inputStyle={{ fontSize: 11, padding: '1px 4px', border: '1px solid #ccc', borderRadius: 3, fontFamily: 'monospace' }}
+                inputStyle={{ fontSize: 11, padding: '1px 4px', border: '1px solid #CCD7DC', borderRadius: 3, fontFamily: "'Fira Mono', monospace" }}
                 onMouseDown={e => e.stopPropagation()}
               />
             </div>
-            <div className="output-formula-hint">{hintText}</div>
+            <div className="port-editor__formula-hint">{hintText}</div>
           </div>
         ))}
         <button
           onClick={() => addPort('output')}
-          style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #ccc', borderRadius: 3, cursor: 'pointer', background: '#fff', marginTop: 2 }}
+          style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #CCD7DC', borderRadius: 3, cursor: 'pointer', background: '#fff', marginTop: 2 }}
         >
           + Add
         </button>
@@ -211,24 +211,24 @@ interface PortSectionProps {
 function PortSection({ title, ports, onAdd, onRemove, onRename }: PortSectionProps) {
   return (
     <div style={{ marginBottom: 8 }}>
-      <div style={{ fontWeight: 600, marginBottom: 4, color: '#444' }}>{title}</div>
+      <div style={{ fontWeight: 600, marginBottom: 4, color: '#263640' }}>{title}</div>
       {ports.map(port => (
         <div key={port.id} style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
           <input
             value={port.label}
             onChange={e => onRename(port.id, e.target.value)}
-            style={{ flex: 1, fontSize: 11, padding: '1px 4px', border: '1px solid #ccc', borderRadius: 3 }}
+            style={{ flex: 1, fontSize: 11, padding: '1px 4px', border: '1px solid #CCD7DC', borderRadius: 3 }}
             onMouseDown={e => e.stopPropagation()}
           />
           <button
             onClick={() => onRemove(port.id)}
-            style={{ fontSize: 10, padding: '1px 5px', border: '1px solid #ccc', borderRadius: 3, cursor: 'pointer', background: '#fff', color: '#c00' }}
+            style={{ fontSize: 10, padding: '1px 5px', border: '1px solid #CCD7DC', borderRadius: 3, cursor: 'pointer', background: '#fff', color: '#C0350A' }}
           >✕</button>
         </div>
       ))}
       <button
         onClick={onAdd}
-        style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #ccc', borderRadius: 3, cursor: 'pointer', background: '#fff', marginTop: 2 }}
+        style={{ fontSize: 11, padding: '2px 8px', border: '1px solid #CCD7DC', borderRadius: 3, cursor: 'pointer', background: '#fff', marginTop: 2 }}
       >
         + Add
       </button>

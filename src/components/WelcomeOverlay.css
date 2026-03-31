@@ -1,0 +1,131 @@
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 13, 0.65);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.welcome-overlay__panel {
+  background: var(--c-surface);
+  border-radius: var(--r-3xl);
+  box-shadow: var(--shadow-xl);
+  max-width: 760px;
+  width: 100%;
+  padding: 32px 32px 28px;
+  font-family: var(--font-body);
+}
+
+.welcome-overlay__title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--c-g1);
+  font-family: var(--font-heading);
+}
+
+.welcome-overlay__subtitle {
+  margin: 0 0 28px;
+  font-size: 14px;
+  color: var(--c-g2);
+  line-height: 1.5;
+}
+
+.welcome-overlay__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.welcome-overlay__card {
+  flex: 0 0 calc(50% - 8px);
+  border: 2px solid var(--card-accent);
+  border-radius: var(--r-2xl);
+  padding: 20px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--c-g3-5);
+  transition: box-shadow 0.15s, background 0.15s;
+  cursor: default;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    background: var(--c-surface);
+  }
+}
+
+.welcome-overlay__card-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.welcome-overlay__card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-g1);
+  font-family: var(--font-heading);
+  letter-spacing: 0.03em;
+}
+
+.welcome-overlay__card-desc {
+  margin: 0;
+  font-size: 13px;
+  color: var(--c-g2);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.welcome-overlay__card-btn {
+  margin-top: 6px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: var(--r-lg);
+  background: var(--card-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  opacity: 0.92;
+  transition: opacity 0.15s;
+  font-family: var(--font-body);
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.welcome-overlay__footer {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.welcome-overlay__hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--c-g2-40);
+}
+
+.welcome-overlay__tour-btn {
+  background: none;
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-lg);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-g3);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+  transition: border-color 0.15s;
+
+  &:hover {
+    border-color: var(--c-g3);
+  }
+}

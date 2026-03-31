@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import type { Unit } from '../../types/graph'
 import { formatValue } from '../../utils/formulaEval'
 import { useSimContext } from '../../context/SimContext'
@@ -16,10 +17,6 @@ export function formatSimValue(value: number, unit: Unit | undefined): string {
   if (abs >= 1e9)  return `${prefix}${(raw / 1e9).toFixed(2)}B${suffix}`
   if (abs >= 1e6)  return `${prefix}${(raw / 1e6).toFixed(2)}M${suffix}`
   return formatValue(value, unit)
-}
-
-function unitClass(u: Unit | undefined): string {
-  return u === 'money' ? ' is-money' : u === 'percent' ? ' is-percent' : ''
 }
 
 function LockIcon({ locked }: { locked: boolean }) {
@@ -89,20 +86,33 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
     }
   }
 
+  const rowClass = clsx('sim-panel__row', {
+    'sim-panel__row--propagated': isAffectedOnly,
+    'sim-panel__row--locked':     isLocked,
+  })
+
+  const valueClass = clsx('sim-panel__value', {
+    'sim-panel__value--money':   unit === 'money',
+    'sim-panel__value--percent': unit === 'percent',
+  })
+
   return (
-    <div className={`sim-slider-row${isAffectedOnly ? ' is-propagated' : ''}${isLocked ? ' is-locked' : ''}`}>
-      <div className="sim-value-display">
-        {showLabel && <span className="sim-slider-label">{label}</span>}
-        <span className={`sim-current-value${unitClass(unit)}`}>
+    <div className={rowClass}>
+      <div className="sim-panel__value-display">
+        {showLabel && <span className="sim-panel__label">{label}</span>}
+        <span className={valueClass}>
           {formatSimValue(simVal, unit)}
         </span>
         {rawPct !== 0 && (
-          <span className={`sim-delta-badge${isPositive ? ' positive' : isNegative ? ' negative' : ''}`}>
+          <span className={clsx('sim-panel__delta', {
+            'sim-panel__delta--positive': isPositive,
+            'sim-panel__delta--negative': isNegative,
+          })}>
             {isPositive ? '+' : ''}{Math.round(rawPct * 10) / 10}%
           </span>
         )}
         <button
-          className={`sim-lock-btn${isLocked ? ' locked' : ''}`}
+          className={clsx('sim-panel__lock', { 'sim-panel__lock--locked': isLocked })}
           title={isLocked
             ? 'Locked — back-propagation stops here. Click to unlock.'
             : useBackProp
@@ -114,7 +124,7 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
           <LockIcon locked={isLocked} />
         </button>
       </div>
-      <div className="sim-control-row" onMouseDown={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+      <div className="sim-panel__control" onMouseDown={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
         <input
           type="range"
           min={-80}
@@ -127,7 +137,10 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
         />
         <input
           type="number"
-          className={`sim-pct-input${isPositive ? ' positive' : isNegative ? ' negative' : ''}`}
+          className={clsx('sim-panel__pct-input', {
+            'sim-panel__pct-input--positive': isPositive,
+            'sim-panel__pct-input--negative': isNegative,
+          })}
           value={draft}
           disabled={isLocked}
           onChange={e => setDraft(e.target.value)}
@@ -148,10 +161,10 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
             }
           }}
         />
-        <span className="sim-pct-unit">%</span>
+        <span className="sim-panel__pct-unit">%</span>
         {directPctFraction !== undefined && !isLocked && (
           <button
-            className="sim-reset-btn"
+            className="sim-panel__reset"
             title="Reset to formula-computed value"
             onMouseDown={e => e.stopPropagation()}
             onClick={() => removeSimValue(nodeKey)}
@@ -161,4 +174,3 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
     </div>
   )
 }
-

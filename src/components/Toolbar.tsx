@@ -1,8 +1,10 @@
 import { useRef } from 'react'
+import clsx from 'clsx'
 import { useReactFlow } from '@xyflow/react'
 import type { NodeVariant, SerializedGraph } from '../types/graph'
 import { saveGraphToFile, loadGraphFromFile } from '../hooks/useFilePersistence'
 import { useSimContext } from '../context/SimContext'
+import './Toolbar.css'
 
 interface ToolbarProps {
   onAddNode: (position: { x: number; y: number }, variant?: NodeVariant) => void;
@@ -44,64 +46,38 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 8,
-      padding: '0 16px',
-      height: 48,
-      background: '#1a1a2e',
-      borderBottom: '1px solid #333',
-      flexShrink: 0,
-    }}>
-      <span style={{ fontWeight: 700, fontSize: 15, color: '#e0e0ff', flexShrink: 0 }}>
-        Feedback Loop
-      </span>
-
-      <span style={{ color: '#555', fontSize: 14, flexShrink: 0 }}>›</span>
+    <div className="toolbar">
+      <span className="toolbar__title">Feedback Loop</span>
+      <span className="toolbar__chevron">›</span>
 
       <input
+        className="toolbar__doc-name"
         value={docName}
         onChange={e => onDocNameChange(e.target.value)}
         placeholder="Untitled"
-        style={{
-          background: 'transparent',
-          border: 'none',
-          borderBottom: '1px solid transparent',
-          color: '#c0c0e0',
-          fontSize: 14,
-          fontWeight: 500,
-          padding: '1px 4px',
-          outline: 'none',
-          minWidth: 80,
-          maxWidth: 240,
-          width: `${Math.max(80, (docName || 'Untitled').length * 8.5)}px`,
-          transition: 'border-color 0.15s',
-        }}
-        onFocus={e => (e.currentTarget.style.borderBottomColor = '#666')}
-        onBlur={e => (e.currentTarget.style.borderBottomColor = 'transparent')}
+        style={{ width: `${Math.max(80, (docName || 'Untitled').length * 8.5)}px` }}
         title="Document name (used as filename when saving)"
       />
 
-      <div style={{ width: 1, background: '#444', alignSelf: 'stretch', margin: '8px 4px' }} />
+      <div className="toolbar__divider" />
 
-      <div data-tour="node-buttons" style={{ display: 'flex', gap: 8 }}>
-        <Button onClick={() => handleAddNode('constant')} amber>+ Constant</Button>
-        <Button onClick={() => handleAddNode('measure')} teal>+ Measure</Button>
-        <Button onClick={() => handleAddNode()}>+ Expression</Button>
-        <Button onClick={() => handleAddNode('metric')} violet>+ Metric</Button>
+      <div className="toolbar__btn-group" data-tour="node-buttons">
+        <Button onClick={() => handleAddNode('constant')} variant="constant">+ Constant</Button>
+        <Button onClick={() => handleAddNode('measure')} variant="measure">+ Measure</Button>
+        <Button onClick={() => handleAddNode()} variant="expression">+ Expression</Button>
+        <Button onClick={() => handleAddNode('metric')} variant="metric">+ Metric</Button>
       </div>
-      <span data-tour="library-btn"><Button onClick={onToggleDrawer} primary={drawerOpen}>Library</Button></span>
+      <span data-tour="library-btn"><Button onClick={onToggleDrawer} active={drawerOpen}>Library</Button></span>
 
-      <div style={{ width: 1, background: '#444', alignSelf: 'stretch', margin: '8px 4px' }} />
+      <div className="toolbar__divider" />
 
-      <span data-tour="experiment-btn"><Button onClick={toggleSimMode} primary={simMode}>Experiment</Button></span>
+      <span data-tour="experiment-btn"><Button onClick={toggleSimMode} active={simMode}>Experiment</Button></span>
 
-      <div style={{ flex: 1 }} />
+      <div className="toolbar__spacer" />
       <Button onClick={onShowTemplates}>Templates</Button>
       <Button onClick={onShowHelp}>Help</Button>
-      <div data-tour="save-load" style={{ display: 'flex', gap: 8 }}>
-        <Button onClick={handleSave} primary>Save</Button>
+      <div className="toolbar__btn-group" data-tour="save-load">
+        <Button onClick={handleSave} active>Save</Button>
         <Button onClick={handleLoad}>Load</Button>
       </div>
       <input
@@ -118,32 +94,18 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
 interface ButtonProps {
   onClick: () => void;
   children: React.ReactNode;
-  primary?: boolean;
-  amber?: boolean;
-  teal?: boolean;
-  violet?: boolean;
+  variant?: 'constant' | 'measure' | 'metric' | 'expression';
+  active?: boolean;
 }
 
-function Button({ onClick, children, primary, amber, teal, violet }: ButtonProps) {
-  // Colors match the node border/badge palette for each variant
-  const bg = primary ? '#0070f3' : amber ? '#7a5500' : teal ? '#1a6bb5' : violet ? '#7c3aed' : '#2a2a3e'
+function Button({ onClick, children, variant, active }: ButtonProps) {
+  const cls = clsx('toolbar__btn', {
+    [`toolbar__btn--${variant}`]: !!variant,
+    'toolbar__btn--active':       !!active,
+  })
+
   return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: '6px 14px',
-        fontSize: 13,
-        fontWeight: 600,
-        border: (primary || amber || teal || violet) ? 'none' : '1px solid #555',
-        borderRadius: 6,
-        cursor: 'pointer',
-        background: bg,
-        color: '#fff',
-        transition: 'opacity 0.15s',
-      }}
-      onMouseEnter={e => (e.currentTarget.style.opacity = '0.8')}
-      onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-    >
+    <button className={cls} onClick={onClick}>
       {children}
     </button>
   )

@@ -1,6 +1,8 @@
 import type { Unit } from '../../types/graph'
 import SeriesChart from './SeriesChart'
 
+import clsx from 'clsx'
+
 export type ChartType = 'line' | 'area' | 'bar'
 
 const CHART_ICONS: Record<ChartType, string> = { line: '∿', area: '◿', bar: '▮▮' }
@@ -11,9 +13,9 @@ export function ChartTypeSelector({ current, onChange, wrapperStyle }: {
   wrapperStyle?: React.CSSProperties
 }) {
   return (
-    <div className="chart-type-row" style={wrapperStyle}>
+    <div className="feedback-node__chart-row" style={wrapperStyle}>
       {(['line', 'area', 'bar'] as const).map(t => (
-        <button key={t} className={`chart-type-btn${current === t ? ' active' : ''}`}
+        <button key={t} className={clsx('feedback-node__chart-btn', { 'feedback-node__chart-btn--active': current === t })}
           onMouseDown={e => e.stopPropagation()}
           onClick={e => { e.stopPropagation(); onChange(t) }}
           title={t}
@@ -47,7 +49,7 @@ export function SeriesModePanel({
           : <SeriesChart data={seriesHistory} chartType={seriesChartType} unit={primaryUnit} />
       )}
       {showExpanded && seriesHistory.length === 0 && (
-        <div className="series-empty" style={spanStyle}>Waiting for data…</div>
+        <div className="feedback-node__series-empty" style={spanStyle}>Waiting for data…</div>
       )}
     </>
   )

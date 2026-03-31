@@ -1,0 +1,79 @@
+:root {
+  /* ── Core palette ─────────────────────────────────────────────────────────── */
+  --c-g1: #05080D;  /* deep near-black */
+  --c-g2: #65768C;  /* slate blue-gray */
+  --c-g3: #263640;  /* dark teal-slate */
+  --c-g4: #BF5F0B;  /* warm orange-amber */
+  --c-g5: #733917;  /* deep burnt orange-brown */
+
+  /* ── Tints ────────────────────────────────────────────────────────────────── */
+  --c-g2-10: #EFF2F6;
+  --c-g2-20: #D7DCE3;
+  --c-g2-40: #94A3B4;
+  --c-g2-dk: #4A5E70;
+
+  --c-g3-5:  #F6F8F9;
+  --c-g3-10: #E6EBEE;
+  --c-g3-20: #CCD7DC;
+  --c-g3-dk: #1E2B33;
+
+  --c-g4-5:  #FDF7F2;
+  --c-g4-10: #FAECDE;
+  --c-g4-20: #F2CDA2;
+
+  --c-g5-10: #F1EBE8;
+  --c-g5-20: #E3D7D1;
+
+  /* ── Measure variant ──────────────────────────────────────────────────────── */
+  --c-measure-border: #1E5270;
+  --c-measure-header: #E4EEF6;
+  --c-measure-select: #C8DCEC;
+  --c-measure-text:   #0D3650;
+
+  /* ── Semantic ─────────────────────────────────────────────────────────────── */
+  --c-money:          #1A5040;
+  --c-money-bg:       #E8F4EF;
+  --c-money-border:   #1E6050;
+
+  --c-percent:        #1E4A6A;
+  --c-percent-bg:     #E0EFF5;
+
+  --c-error:          #C0350A;
+  --c-error-bg:       #FDF0EC;
+  --c-error-border:   #E8A090;
+
+  --c-positive:       #1A7A50;
+  --c-positive-bg:    #E8F7F0;
+  --c-positive-border:#7AD4A8;
+
+  --c-negative:       #B83010;
+  --c-negative-bg:    #FDF0EC;
+  --c-negative-border:#E8A090;
+
+  /* ── Surfaces ─────────────────────────────────────────────────────────────── */
+  --c-surface:      #ffffff;
+  --c-canvas:       #F6F8F9;
+  --c-sidebar:      #0D1820;
+  --c-toolbar:      #263640;
+  --c-toolbar-edge: #1E2B33;
+
+  /* ── Typography ───────────────────────────────────────────────────────────── */
+  --font-body:    'Montserrat', sans-serif;
+  --font-heading: 'Oswald', sans-serif;
+  --font-mono:    'Fira Mono', monospace;
+
+  /* ── Shadows ──────────────────────────────────────────────────────────────── */
+  --shadow-sm:  0 1px 4px rgba(5,8,13,0.12);
+  --shadow-md:  0 2px 8px rgba(5,8,13,0.15);
+  --shadow-lg:  0 4px 12px rgba(5,8,13,0.15);
+  --shadow-xl:  0 8px 32px rgba(5,8,13,0.28);
+  --shadow-2xl: 0 16px 48px rgba(5,8,13,0.32);
+
+  /* ── Border radius ────────────────────────────────────────────────────────── */
+  --r-sm:  3px;
+  --r-md:  4px;
+  --r-lg:  6px;
+  --r-xl:  8px;
+  --r-2xl: 10px;
+  --r-3xl: 12px;
+}

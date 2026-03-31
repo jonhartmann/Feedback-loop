@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import type { LibraryItem, NodeTemplate, NodeVariant, Unit } from '../types/graph'
-import { inp, btn } from './DrawerStyles'
+import './ItemForm.css'
 
 function UnitSelect({ value, onChange }: { value: Unit; onChange: (u: Unit) => void }) {
   return (
-    <select style={{ ...inp, marginBottom: 4 }} value={value} onChange={e => onChange(e.target.value as Unit)}>
+    <select className="item-form__select" value={value} onChange={e => onChange(e.target.value as Unit)}>
       <option value="number">Number</option>
       <option value="money">Money ($)</option>
       <option value="percent">Percent (%)</option>
@@ -46,10 +46,10 @@ export function ItemForm({
   }
 
   return (
-    <div style={{ padding: '8px 12px', background: '#111128', borderBottom: '1px solid #2a2a4a' }}>
-      <input style={inp} value={label} onChange={e => setLabel(e.target.value)} placeholder="Label" autoFocus />
+    <div className="item-form">
+      <input className="item-form__input" value={label} onChange={e => setLabel(e.target.value)} placeholder="Label" autoFocus />
 
-      <select style={{ ...inp, marginBottom: 4 }} value={variant} onChange={e => setVariant(e.target.value)}>
+      <select className="item-form__select" value={variant} onChange={e => setVariant(e.target.value)}>
         <option value="constant">Constant</option>
         <option value="measure">Measure</option>
         <option value="metric">Metric</option>
@@ -57,27 +57,27 @@ export function ItemForm({
       </select>
 
       {variant === 'constant' && <>
-        <input style={inp} type="number" value={value} onChange={e => setValue(parseFloat(e.target.value) || 0)} placeholder="Value" />
+        <input className="item-form__input" type="number" value={value} onChange={e => setValue(parseFloat(e.target.value) || 0)} placeholder="Value" />
         <UnitSelect value={unit} onChange={setUnit} />
       </>}
 
       {variant === 'measure' && <>
-        <input style={inp} value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="Source URL (optional)" />
+        <input className="item-form__input" value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="Source URL (optional)" />
         <UnitSelect value={unit} onChange={setUnit} />
       </>}
 
       {variant === 'metric' && <>
-        <input style={inp} value={formula} onChange={e => setFormula(e.target.value)} placeholder="Formula (e.g. a * b)" />
+        <input className="item-form__input" value={formula} onChange={e => setFormula(e.target.value)} placeholder="Formula (e.g. a * b)" />
         <UnitSelect value={unit} onChange={setUnit} />
       </>}
 
       {variant !== 'constant' && <>
-        <select style={{ ...inp, marginBottom: 4 }} value={displayMode} onChange={e => setDisplayMode(e.target.value as 'value' | 'series')}>
+        <select className="item-form__select" value={displayMode} onChange={e => setDisplayMode(e.target.value as 'value' | 'series')}>
           <option value="value">Current Value</option>
           <option value="series">Series</option>
         </select>
         {displayMode === 'series' && (
-          <select style={{ ...inp, marginBottom: 4 }} value={chartType} onChange={e => setChartType(e.target.value as 'line' | 'area' | 'bar')}>
+          <select className="item-form__select" value={chartType} onChange={e => setChartType(e.target.value as 'line' | 'area' | 'bar')}>
             <option value="line">Line Chart</option>
             <option value="area">Area Chart</option>
             <option value="bar">Bar Chart</option>
@@ -85,9 +85,9 @@ export function ItemForm({
         )}
       </>}
 
-      <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
-        <button style={btn(true)} onClick={handleSave}>Save</button>
-        <button style={btn()} onClick={onCancel}>Cancel</button>
+      <div className="item-form__actions">
+        <button className="item-form__btn item-form__btn--primary" onClick={handleSave}>Save</button>
+        <button className="item-form__btn" onClick={onCancel}>Cancel</button>
       </div>
     </div>
   )

@@ -82,13 +82,16 @@ export default function FormulaInput({
   }
 
   return (
-    <div className="formula-input-wrapper" style={wrapperStyle}>
+    <div className="formula-input" style={wrapperStyle}>
       <input
         ref={inputRef}
         className={className}
         value={localValue}
         placeholder={placeholder}
         style={{ width: '100%', minWidth: 0, boxSizing: 'border-box', ...inputStyle }}
+        spellCheck={false}
+        autoCorrect="off"
+        autoCapitalize="off"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onFocus={() => { focusedRef.current = true }}

@@ -1,17 +1,18 @@
+import clsx from 'clsx'
 import { METRIC_PORT_ID } from '../../types/graph'
 import { evalFormula, buildScope, labelToVarName, formatValue, FORMULA_BUILTINS } from '../../utils/formulaEval'
 import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
 import FormulaInput from './FormulaInput'
 import { SeriesModePanel } from './SeriesModePanel'
 import { InputsColumn } from './InputsColumn'
-import { unitClass, unitLabel } from './nodeFormatting'
+import { UnitDropdown } from './UnitDropdown'
 import { useNodeContext } from './NodeContext'
 
 export function MetricNodeBody() {
   const {
     nodeId, nodeData, showExpanded, displayMode,
     inputs, variables, seriesHistory, seriesChartType, primaryUnit,
-    cycleMetricUnit, onMetricFormulaChange, onChartTypeChange,
+    setMetricUnit, onMetricFormulaChange, onChartTypeChange,
   } = useNodeContext()
   const activeEvalMap = useEvalMap()
   const unitMap = useUnitMap()
@@ -36,14 +37,14 @@ export function MetricNodeBody() {
   }
 
   return (
-    <div className="node-body metric-body">
-      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} />
+    <div className="feedback-node__body feedback-node__body--metric">
+      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} gridSpan />
       <InputsColumn />
 
       {showExpanded && (
-        <div className="metric-formula-panel">
+        <div className="feedback-node__formula-panel">
           <FormulaInput
-            className="metric-formula-input"
+            className="feedback-node__formula-input"
             placeholder="formula…"
             value={metricFormula ?? ''}
             onChange={v => onMetricFormulaChange(v || undefined)}
@@ -55,19 +56,15 @@ export function MetricNodeBody() {
             onMouseDown={e => e.stopPropagation()}
           />
           {metricDisplay && (
-            <span className={`metric-result${metricDisplay.isError ? ' is-error' : ''}`}>
+            <span className={clsx('feedback-node__formula-result', { 'feedback-node__formula-result--error': metricDisplay.isError })}>
               {metricDisplay.text}
             </span>
           )}
-          <button
-            className={`unit-cycle-btn${unitClass(metricUnit)}`}
-            onMouseDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); cycleMetricUnit() }}
-            title={`Unit: ${metricResolvedUnit ?? 'number'} — click to cycle`}
+          <UnitDropdown
+            unit={metricUnit}
+            onChange={setMetricUnit}
             style={{ alignSelf: 'flex-end' }}
-          >
-            {unitLabel(metricUnit)}
-          </button>
+          />
         </div>
       )}
     </div>

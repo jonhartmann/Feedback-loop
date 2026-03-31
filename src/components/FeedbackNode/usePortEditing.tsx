@@ -56,7 +56,7 @@ export function usePortEditing({
   const portLabelField = (portId: string, portType: 'input' | 'output', currentLabel: string) =>
     editingPortId === portId ? (
       <input
-        className="port-label-input"
+        className="port__label-input"
         value={portLabelDraft}
         autoFocus
         onChange={e => setPortLabelDraft(e.target.value)}
@@ -69,7 +69,7 @@ export function usePortEditing({
       />
     ) : (
       <span
-        className="port-label"
+        className="port__label"
         title="Double-click to rename"
         onDoubleClick={() => startPortEdit(portId, currentLabel)}
       >

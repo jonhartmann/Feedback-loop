@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, useReactFlow } from '@xyflow/react'
 import type { EdgeProps } from '@xyflow/react'
 import { useSimContext } from '../context/SimContext'
@@ -50,7 +51,7 @@ export default function DeletableEdge(props: EdgeProps & { sourceHandle?: string
       {!simMode && selected && (
         <EdgeLabelRenderer>
           <button
-            className="edge-delete-btn"
+            className="deletable-edge__delete-btn"
             style={{
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
@@ -66,7 +67,10 @@ export default function DeletableEdge(props: EdgeProps & { sourceHandle?: string
       {simMode && delta !== undefined && (
         <EdgeLabelRenderer>
           <span
-            className={`edge-delta-badge${delta > 0 ? ' positive' : delta < 0 ? ' negative' : ''}`}
+            className={clsx('deletable-edge__delta', {
+              'deletable-edge__delta--positive': delta > 0,
+              'deletable-edge__delta--negative': delta < 0,
+            })}
             style={{
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,

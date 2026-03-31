@@ -1,6 +1,8 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
+import clsx from 'clsx'
 import { useTour } from '../context/TourContext'
 import { useEscapeKey } from '../hooks/useEscapeKey'
+import './Tour.css'
 
 // ── Step definitions ─────────────────────────────────────────────────────────
 
@@ -201,7 +203,7 @@ export default function Tour() {
         <rect
           width="100%"
           height="100%"
-          fill="rgba(15, 15, 40, 0.72)"
+          fill="rgba(5, 8, 13, 0.72)"
           mask="url(#tour-spotlight-mask)"
         />
         {/* Highlight ring around spotlight */}
@@ -210,101 +212,61 @@ export default function Tour() {
             x={spotX} y={spotY} width={spotW} height={spotH}
             rx={RADIUS} ry={RADIUS}
             fill="none"
-            stroke="rgba(100, 160, 255, 0.6)"
+            stroke="rgba(191, 95, 11, 0.6)"
             strokeWidth={2}
           />
         )}
       </svg>
 
-      {/* Popover card */}
+      {/* Popover card — position/top/left/width/zIndex set via computePopoverStyle */}
       <div
-        style={{
-          ...popoverStyle,
-          background: '#fff',
-          borderRadius: 10,
-          boxShadow: '0 8px 32px rgba(0,0,0,0.28)',
-          fontFamily: 'sans-serif',
-          overflow: 'hidden',
-        }}
+        className="tour-popover"
+        style={popoverStyle}
         onClick={e => e.stopPropagation()}
       >
         {/* Card header */}
-        <div style={{
-          background: '#1a1a2e',
-          padding: '14px 16px 12px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 10,
-        }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, color: '#6080b0', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+        <div className="tour-popover__header">
+          <div className="tour-popover__header-text">
+            <div className="tour-popover__step-label">
               Step {step + 1} of {totalSteps}
             </div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#e8e8ff' }}>
+            <div className="tour-popover__title">
               {currentStep.title}
             </div>
           </div>
-          <button
-            onClick={endTour}
-            style={{ background: 'none', border: 'none', color: '#6060a0', fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: '2px 4px', flexShrink: 0 }}
-            title="Exit tour (Esc)"
-          >
+          <button className="tour-popover__close" onClick={endTour} title="Exit tour (Esc)">
             ×
           </button>
         </div>
 
         {/* Step indicator dots */}
-        <div style={{ display: 'flex', gap: 5, padding: '10px 16px 0', background: '#fff' }}>
+        <div className="tour-popover__dots">
           {STEPS.map((_, i) => (
             <div
               key={i}
-              style={{
-                width: i === step ? 16 : 6,
-                height: 6,
-                borderRadius: 3,
-                background: i === step ? '#2255aa' : i < step ? '#99b8e8' : '#d0d0e8',
-                transition: 'all 0.2s',
-              }}
+              className={clsx('tour-popover__dot', {
+                'tour-popover__dot--active': i === step,
+                'tour-popover__dot--done':   i < step,
+              })}
             />
           ))}
         </div>
 
         {/* Body */}
-        <div style={{ padding: '12px 16px 16px', fontSize: 13, color: '#333', lineHeight: 1.6 }}>
+        <div className="tour-popover__body">
           {currentStep.body}
         </div>
 
         {/* Navigation */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 16px 14px' }}>
+        <div className="tour-popover__nav">
           <button
+            className="tour-popover__back-btn"
             onClick={prevStep}
             disabled={isFirst}
-            style={{
-              padding: '7px 16px',
-              fontSize: 13,
-              fontWeight: 600,
-              border: '1px solid #d0d0e0',
-              borderRadius: 6,
-              background: 'none',
-              color: isFirst ? '#bbb' : '#444',
-              cursor: isFirst ? 'default' : 'pointer',
-            }}
           >
             ← Back
           </button>
-          <button
-            onClick={nextStep}
-            style={{
-              padding: '7px 20px',
-              fontSize: 13,
-              fontWeight: 600,
-              border: 'none',
-              borderRadius: 6,
-              background: '#2255aa',
-              color: '#fff',
-              cursor: 'pointer',
-            }}
-          >
+          <button className="tour-popover__next-btn" onClick={nextStep}>
             {isLast ? 'Done' : 'Next →'}
           </button>
         </div>

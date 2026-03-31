@@ -8,32 +8,26 @@ interface NodeHeaderProps {
   isEditingLabel: boolean
   labelDraft: string
   showExpanded: boolean
-  showEditor: boolean
   displayMode: string
-  variantOptions: { value: string; label: string }[]
   setLabelDraft: (v: string) => void
   setIsEditingLabel: (v: boolean) => void
-  setShowEditor: (fn: (v: boolean) => boolean) => void
   commitLabel: () => void
-  changeVariant: (v: NodeVariant | undefined) => void
   saveToLibrary: (e: React.MouseEvent) => void
   deleteNode: (e: React.MouseEvent) => void
 }
 
 export function NodeHeader({
-  id, nodeData, variant, isEditingLabel, labelDraft, showExpanded, showEditor,
-  displayMode, variantOptions, setLabelDraft, setIsEditingLabel, setShowEditor,
-  commitLabel, changeVariant, saveToLibrary, deleteNode,
+  id, nodeData, variant, isEditingLabel, labelDraft, showExpanded,
+  displayMode, setLabelDraft, setIsEditingLabel,
+  commitLabel, saveToLibrary, deleteNode,
 }: NodeHeaderProps) {
   const { updateNodeData } = useReactFlow()
-  const isValueNode = variant === 'constant' || variant === 'measure'
-  const isMetric = variant === 'metric'
 
   return (
-    <div className="node-header">
+    <div className="feedback-node__header">
       {isEditingLabel ? (
         <input
-          className="node-label-input"
+          className="feedback-node__label-input"
           value={labelDraft}
           autoFocus
           onChange={e => setLabelDraft(e.target.value)}
@@ -46,7 +40,7 @@ export function NodeHeader({
         />
       ) : (
         <span
-          className="node-label"
+          className="feedback-node__label"
           title="Double-click to edit"
           onDoubleClick={() => { setLabelDraft(nodeData.label); setIsEditingLabel(true) }}
         >
@@ -54,22 +48,9 @@ export function NodeHeader({
         </span>
       )}
 
-      {showExpanded && (
-        <select
-          className={`variant-select${variant ? ` variant-${variant}` : ''}`}
-          value={variant ?? 'expression'}
-          onMouseDown={e => e.stopPropagation()}
-          onChange={e => changeVariant(e.target.value as NodeVariant)}
-        >
-          {variantOptions.map(o => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-      )}
-
       {showExpanded && variant !== 'constant' && (
         <button
-          className="display-mode-btn"
+          className="feedback-node__mode-btn"
           onMouseDown={e => e.stopPropagation()}
           onClick={e => {
             e.stopPropagation()
@@ -83,20 +64,9 @@ export function NodeHeader({
         </button>
       )}
 
-      {showExpanded && !isValueNode && !isMetric && (
-        <button
-          className="edit-ports-btn"
-          onMouseDown={e => e.stopPropagation()}
-          onClick={() => setShowEditor(v => !v)}
-          title="Edit node details"
-        >
-          {showEditor ? 'Done' : 'Edit'}
-        </button>
-      )}
-
       {showExpanded && (
         <button
-          className="save-library-btn"
+          className="feedback-node__save-btn"
           onMouseDown={e => e.stopPropagation()}
           onClick={saveToLibrary}
           title="Save to Library"
@@ -107,7 +77,7 @@ export function NodeHeader({
 
       {showExpanded && (
         <button
-          className="delete-node-btn"
+          className="feedback-node__delete-btn"
           onMouseDown={e => e.stopPropagation()}
           onClick={deleteNode}
           title="Delete node"

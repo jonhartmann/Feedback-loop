@@ -6,7 +6,7 @@ export function useDragDropPort(reorderPorts: (fromId: string, toId: string, typ
 
   function getPortRowDragProps(portId: string, type: 'input' | 'output') {
     return {
-      className: `port-row${dragOverPortId === portId && draggedPort?.type === type ? ' drag-over' : ''}`,
+      className: `port__row${dragOverPortId === portId && draggedPort?.type === type ? ' port__row--drag-over' : ''}`,
       onDragOver: (e: React.DragEvent) => { if (draggedPort?.type === type) { e.preventDefault(); setDragOverPortId(portId) } },
       onDragLeave: () => setDragOverPortId(null),
       onDrop: () => { if (draggedPort?.type === type) { reorderPorts(draggedPort.id, portId, type); setDraggedPort(null); setDragOverPortId(null) } },
