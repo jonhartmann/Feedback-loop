@@ -20,7 +20,7 @@ function ValueInput({ value, onChange }: { value: number; onChange: (v: number) 
   return (
     <input
       type="number"
-      className="port-value-input"
+      className="port__value"
       value={draft}
       onChange={e => setDraft(e.target.value)}
       onFocus={() => { focusedRef.current = true }}
@@ -44,12 +44,12 @@ export function ValueNodeBody() {
   } = useNodeContext()
 
   return (
-    <div className="node-body value-node-body">
+    <div className="feedback-node__body feedback-node__body--value">
       <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} />
       {outputs.map(port => {
         if (variant === 'constant' || variant === 'measure') {
           return (
-            <div key={port.id} className="port-row" style={showExpanded ? { justifyContent: 'flex-end' } : undefined}>
+            <div key={port.id} className="port__row" style={showExpanded ? { justifyContent: 'flex-end' } : undefined}>
               <Handle id={port.id} type="source" position={Position.Right} title={port.label} />
               {showExpanded && <ValueInput value={port.value ?? 0} onChange={v => updateOutputValue(port.id, v)} />}
               {showExpanded && (
@@ -61,13 +61,13 @@ export function ValueNodeBody() {
       })}
 
       {showExpanded && variant === 'measure' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 4px 4px' }}>
-          <span style={{ fontSize: 10, color: '#888', flexShrink: 0 }}>URL</span>
+        <div className="feedback-node__url-row">
+          <span className="feedback-node__url-label">URL</span>
           <input
+            className="feedback-node__url-input"
             value={nodeData.sourceUrl ?? ''}
             onChange={e => onSourceUrlChange(e.target.value || undefined)}
             placeholder="/api/range?min=0&max=100"
-            style={{ flex: 1, fontSize: 10, padding: '1px 4px', border: '1px solid #b0cce8', borderRadius: 3, fontFamily: 'monospace', minWidth: 0 }}
             onMouseDown={e => e.stopPropagation()}
           />
         </div>

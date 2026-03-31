@@ -299,7 +299,7 @@ export function useCanvasConnections({ setEdges, setNodes }: UseCanvasConnection
 
         setNodes(nds => {
           const freePos = findFreePosition(position, nds)
-          return [...nds, { id: newNodeId, type: 'feedbackNode', position: freePos, dragHandle: '.node-header', data: newNodeData }]
+          return [...nds, { id: newNodeId, type: 'feedbackNode', position: freePos, dragHandle: '.feedback-node__header', data: newNodeData }]
         })
         setEdges(eds => [...eds, newEdge])
       }

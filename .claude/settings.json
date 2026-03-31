@@ -3,7 +3,20 @@
     "allow": [
       "Bash(grep -r react-flow__node /c/Users/jonha/Desktop/projects/Feedback-loop/src --include=*.tsx --include=*.ts --include=*.css)",
       "Bash(grep -n outputs.*[] c:UsersjonhaDesktopprojectsFeedback-loopsrcApp.tsx)",
-      "Bash(grep -rn \"function addNode\\\\|addNode.*=\" src/ --include=*.ts --include=*.tsx)"
+      "Bash(grep -rn \"function addNode\\\\|addNode.*=\" src/ --include=*.ts --include=*.tsx)",
+      "Bash(find /c/Users/jonha/Desktop/projects/Feedback-loop/src -name *.css -o -name index.html)",
+      "Bash(grep -rE \"\\(color|background|border|fill|stroke\\):\\\\s*[''''\"\"]?#[0-9a-fA-F]{3,6}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src --include=\"*.tsx\" --include=\"*.ts\" -n)",
+      "Bash(grep -rE \"\\(color|background|border|fill|stroke\\):\\\\s*[''''\"\"]?#[0-9a-fA-F]{3,6}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src --include=\"*.tsx\" --include=\"*.ts\" -h)",
+      "Bash(ls -la /c/Users/jonha/Desktop/projects/Feedback-loop/src/*.css)",
+      "Bash(/tmp/color_analysis.txt:*)",
+      "Read(//tmp/**)",
+      "Bash(find /c/Users/jonha/Desktop/projects/Feedback-loop -maxdepth 2 -name *.css -type f)",
+      "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/ExpressionNodeBody.tsx)",
+      "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/ValueNodeBody.tsx)",
+      "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/InputsColumn.tsx)",
+      "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/PortEditor.tsx)",
+      "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/NodeSummaryOverlay.tsx /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/SimSliderRow.tsx)",
+      "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/Drawer.tsx)"
     ]
   }
 }

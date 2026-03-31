@@ -1,0 +1,44 @@
+/* ── item-form block ──────────────────────────────────────────────────────── */
+
+.item-form {
+  padding: 8px 12px;
+  background: #131E28;
+  border-bottom: 1px solid var(--c-g3);
+}
+
+.item-form__input,
+.item-form__select {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 11px;
+  font-family: var(--font-body);
+  padding: 3px 6px;
+  background: #131E28;
+  color: var(--c-g3-20);
+  border: 1px solid var(--c-g3);
+  border-radius: var(--r-sm);
+  outline: none;
+  margin-bottom: 4px;
+}
+
+.item-form__actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.item-form__btn {
+  font-size: 11px;
+  font-family: var(--font-body);
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  border: none;
+  background: #1A2A36;
+  color: var(--c-g2-40);
+
+  &.item-form__btn--primary {
+    background: var(--c-g4);
+    color: var(--c-g4-10);
+  }
+}

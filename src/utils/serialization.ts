@@ -44,7 +44,7 @@ export function deserializeGraph(graph: SerializedGraph): {
     id: n.id,
     type: 'feedbackNode',
     position: n.position,
-    dragHandle: '.node-header',
+    dragHandle: '.feedback-node__header',
     data: {
       label: n.data.label,
       variant: (n.data.variant ?? 'expression') as NodeVariant,

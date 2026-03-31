@@ -36,14 +36,14 @@ export function MetricNodeBody() {
   }
 
   return (
-    <div className="node-body metric-body">
+    <div className="feedback-node__body feedback-node__body--metric">
       <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} />
       <InputsColumn />
 
       {showExpanded && (
-        <div className="metric-formula-panel">
+        <div className="feedback-node__formula-panel">
           <FormulaInput
-            className="metric-formula-input"
+            className="feedback-node__formula-input"
             placeholder="formula…"
             value={metricFormula ?? ''}
             onChange={v => onMetricFormulaChange(v || undefined)}
@@ -55,7 +55,7 @@ export function MetricNodeBody() {
             onMouseDown={e => e.stopPropagation()}
           />
           {metricDisplay && (
-            <span className={`metric-result${metricDisplay.isError ? ' is-error' : ''}`}>
+            <span className={`feedback-node__formula-result${metricDisplay.isError ? ' feedback-node__formula-result--error' : ''}`}>
               {metricDisplay.text}
             </span>
           )}

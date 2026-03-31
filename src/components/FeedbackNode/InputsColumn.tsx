@@ -22,7 +22,7 @@ export function InputsColumn() {
   }
 
   return (
-    <div className="ports-column inputs">
+    <div className="feedback-node__column feedback-node__column--inputs">
       {inputs.map(port => (
         <div
           key={port.id}
@@ -37,11 +37,11 @@ export function InputsColumn() {
             title={port.label}
             isConnectableStart={edges.some(e => e.target === nodeId && e.targetHandle === port.id)}
           />
-          {showExpanded && <span className="port-drag-handle" {...getDragHandleProps(port.id, 'input')}>⠿</span>}
+          {showExpanded && <span className="port__drag-handle" {...getDragHandleProps(port.id, 'input')}>⠿</span>}
           {showExpanded && portLabelField(port.id, 'input', port.label)}
           {showExpanded && canAddInputs && (
             <button
-              className="delete-node-btn"
+              className="feedback-node__delete-btn"
               onMouseDown={e => e.stopPropagation()}
               onClick={e => { e.stopPropagation(); deleteInput(port.id) }}
               title="Remove input"
@@ -53,17 +53,17 @@ export function InputsColumn() {
         </div>
       ))}
       {showExpanded && variables.map((v, i) => (
-        <div key={i} className="port-row">
-          <span className="port-label is-constant">{v.name}</span>
-          <span className="port-constant-badge">= {v.value}</span>
+        <div key={i} className="port__row">
+          <span className="port__label port__label--constant">{v.name}</span>
+          <span className="port__badge">= {v.value}</span>
         </div>
       ))}
       {showExpanded && inputs.length === 0 && variables.length === 0 && (
-        <span style={{ fontSize: 11, color: '#aaa' }}>no inputs</span>
+        <span className="feedback-node__empty-note">no inputs</span>
       )}
       {canAddInputs && (
         <div
-          className="port-row"
+          className="port__row"
           style={{
             height: 0,
             minHeight: 0,
@@ -78,7 +78,7 @@ export function InputsColumn() {
             type="target"
             position={Position.Left}
             title="Drop here to add a new input"
-            style={{ background: '#aaa', border: '2px dashed #888', borderRadius: '50%' }}
+            style={{ background: '#94A3B4', border: '2px dashed #65768C', borderRadius: '50%' }}
           />
         </div>
       )}

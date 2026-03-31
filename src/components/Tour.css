@@ -1,0 +1,123 @@
+/* position, top, left, width, zIndex are set inline via computePopoverStyle() */
+.tour-popover {
+  background: var(--c-surface);
+  border-radius: var(--r-2xl);
+  box-shadow: var(--shadow-xl);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.tour-popover__header {
+  background: var(--c-g3);
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.tour-popover__header-text {
+  flex: 1;
+}
+
+.tour-popover__step-label {
+  font-size: 11px;
+  color: var(--c-g2-40);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.tour-popover__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-g4-10);
+  font-family: var(--font-heading);
+  letter-spacing: 0.03em;
+}
+
+.tour-popover__close {
+  background: none;
+  border: none;
+  color: var(--c-g2-40);
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 4px;
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--c-surface);
+  }
+}
+
+.tour-popover__dots {
+  display: flex;
+  gap: 5px;
+  padding: 10px 16px 0;
+  background: var(--c-surface);
+}
+
+.tour-popover__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--c-g2-20);
+  transition: all 0.2s;
+
+  &.tour-popover__dot--active {
+    width: 16px;
+    background: var(--c-g4);
+  }
+
+  &.tour-popover__dot--done {
+    background: var(--c-g4-20);
+  }
+}
+
+.tour-popover__body {
+  padding: 12px 16px 16px;
+  font-size: 13px;
+  color: var(--c-g3);
+  line-height: 1.6;
+}
+
+.tour-popover__nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px 14px;
+}
+
+.tour-popover__back-btn {
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-lg);
+  background: none;
+  color: var(--c-g3);
+  cursor: pointer;
+  font-family: var(--font-body);
+
+  &:disabled {
+    color: var(--c-g2-40);
+    cursor: default;
+  }
+}
+
+.tour-popover__next-btn {
+  padding: 7px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--r-lg);
+  background: var(--c-g4);
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-body);
+
+  &:hover {
+    opacity: 0.88;
+  }
+}

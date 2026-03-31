@@ -80,10 +80,10 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
   const nodeClass = [
     'feedback-node',
-    variant ? `variant-${variant}` : '',
-    selected ? 'selected' : '',
-    displayMode === 'series' ? 'is-series' : '',
-    simMode ? 'sim-mode' : '',
+    variant ? `feedback-node--variant-${variant}` : '',
+    selected ? 'feedback-node--selected' : '',
+    displayMode === 'series' ? 'feedback-node--series' : '',
+    simMode ? 'feedback-node--sim-mode' : '',
   ].filter(Boolean).join(' ')
 
   const nodeCtx = {

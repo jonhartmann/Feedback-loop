@@ -82,7 +82,7 @@ export default function FormulaInput({
   }
 
   return (
-    <div className="formula-input-wrapper" style={wrapperStyle}>
+    <div className="formula-input" style={wrapperStyle}>
       <input
         ref={inputRef}
         className={className}

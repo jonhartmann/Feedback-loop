@@ -39,7 +39,7 @@ export function SimSliders({ nodeId, isValueNode, outputs, simOverlay, baseEvalM
   if (sliders.length === 0) return null
 
   return (
-    <div className="sim-sliders">
+    <div className="sim-panel">
       {sliders.map(({ portId, label, unit, baseVal }) => (
         <SimSliderRow
           key={portId}

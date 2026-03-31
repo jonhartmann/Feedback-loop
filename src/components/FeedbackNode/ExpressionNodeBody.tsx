@@ -19,11 +19,11 @@ export function ExpressionNodeBody() {
 
   return (
     <>
-      <div className="node-body">
+      <div className="feedback-node__body">
         <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} gridSpan />
         <InputsColumn />
 
-        <div className="ports-column outputs">
+        <div className="feedback-node__column feedback-node__column--outputs">
           {outputs.map(port => {
             const graphValue = activeEvalMap.get(`${nodeId}:${port.id}`)
             const resolvedUnit = unitMap.get(`${nodeId}:${port.id}`) ?? port.unit
@@ -41,15 +41,11 @@ export function ExpressionNodeBody() {
             }
 
             return (
-              <div
-                key={port.id}
-                className="port-row"
-                style={showExpanded ? { flexDirection: 'column', alignItems: 'stretch', flex: 1, borderLeft: '1px dashed #d0b0f0', padding: '6px 8px', gap: 4, minWidth: 120 } : undefined}
-              >
+              <div key={port.id} className="port__row feedback-node__formula-panel">
                 <Handle id={port.id} type="source" position={Position.Right} title={port.label} />
                 {showExpanded && (
                   <FormulaInput
-                    className="metric-formula-input"
+                    className="feedback-node__formula-input"
                     placeholder="formula…"
                     value={port.formula ?? ''}
                     onChange={v => onOutputFormulaChange(port.id, v || undefined)}
@@ -62,7 +58,7 @@ export function ExpressionNodeBody() {
                   />
                 )}
                 {showExpanded && display && (
-                  <span className={`metric-result${display.isError ? ' is-error' : ''}`}>{display.text}</span>
+                  <span className={`feedback-node__formula-result${display.isError ? ' feedback-node__formula-result--error' : ''}`}>{display.text}</span>
                 )}
                 {showExpanded && (
                   <UnitDropdown
@@ -74,13 +70,13 @@ export function ExpressionNodeBody() {
               </div>
             )
           })}
-          {showExpanded && outputs.length === 0 && <span style={{ fontSize: 11, color: '#aaa' }}>no outputs</span>}
+          {showExpanded && outputs.length === 0 && <span className="feedback-node__empty-note">no outputs</span>}
         </div>
       </div>
 
       {showExpanded && nodeData.description && (
-        <div className="node-meta">
-          <p className="node-description">{nodeData.description}</p>
+        <div className="feedback-node__meta">
+          <p className="feedback-node__description">{nodeData.description}</p>
         </div>
       )}
     </>

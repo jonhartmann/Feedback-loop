@@ -41,7 +41,7 @@ export function useGraphState() {
         id: newId(),
         type: 'feedbackNode',
         position: freePos,
-        dragHandle: '.node-header',
+        dragHandle: '.feedback-node__header',
         data: {
           label: defaultLabel,
           variant,

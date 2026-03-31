@@ -24,10 +24,10 @@ export function NodeHeader({
   const { updateNodeData } = useReactFlow()
 
   return (
-    <div className="node-header">
+    <div className="feedback-node__header">
       {isEditingLabel ? (
         <input
-          className="node-label-input"
+          className="feedback-node__label-input"
           value={labelDraft}
           autoFocus
           onChange={e => setLabelDraft(e.target.value)}
@@ -40,7 +40,7 @@ export function NodeHeader({
         />
       ) : (
         <span
-          className="node-label"
+          className="feedback-node__label"
           title="Double-click to edit"
           onDoubleClick={() => { setLabelDraft(nodeData.label); setIsEditingLabel(true) }}
         >
@@ -50,7 +50,7 @@ export function NodeHeader({
 
       {showExpanded && variant !== 'constant' && (
         <button
-          className="display-mode-btn"
+          className="feedback-node__mode-btn"
           onMouseDown={e => e.stopPropagation()}
           onClick={e => {
             e.stopPropagation()
@@ -66,7 +66,7 @@ export function NodeHeader({
 
       {showExpanded && (
         <button
-          className="save-library-btn"
+          className="feedback-node__save-btn"
           onMouseDown={e => e.stopPropagation()}
           onClick={saveToLibrary}
           title="Save to Library"
@@ -77,7 +77,7 @@ export function NodeHeader({
 
       {showExpanded && (
         <button
-          className="delete-node-btn"
+          className="feedback-node__delete-btn"
           onMouseDown={e => e.stopPropagation()}
           onClick={deleteNode}
           title="Delete node"

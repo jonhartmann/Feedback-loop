@@ -11,9 +11,9 @@ export function ChartTypeSelector({ current, onChange, wrapperStyle }: {
   wrapperStyle?: React.CSSProperties
 }) {
   return (
-    <div className="chart-type-row" style={wrapperStyle}>
+    <div className="feedback-node__chart-row" style={wrapperStyle}>
       {(['line', 'area', 'bar'] as const).map(t => (
-        <button key={t} className={`chart-type-btn${current === t ? ' active' : ''}`}
+        <button key={t} className={`feedback-node__chart-btn${current === t ? ' feedback-node__chart-btn--active' : ''}`}
           onMouseDown={e => e.stopPropagation()}
           onClick={e => { e.stopPropagation(); onChange(t) }}
           title={t}
@@ -47,7 +47,7 @@ export function SeriesModePanel({
           : <SeriesChart data={seriesHistory} chartType={seriesChartType} unit={primaryUnit} />
       )}
       {showExpanded && seriesHistory.length === 0 && (
-        <div className="series-empty" style={spanStyle}>Waiting for data…</div>
+        <div className="feedback-node__series-empty" style={spanStyle}>Waiting for data…</div>
       )}
     </>
   )

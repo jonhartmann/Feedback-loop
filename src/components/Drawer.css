@@ -1,0 +1,85 @@
+/* ── drawer block ─────────────────────────────────────────────────────────── */
+
+.drawer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 260px;
+  background: var(--c-sidebar);
+  border-left: 1px solid var(--c-g3);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.drawer__header {
+  display: flex;
+  align-items: center;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--c-g3);
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.drawer__title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--c-g3-20);
+  flex: 1;
+}
+
+.drawer__icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 3px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--c-g2);
+
+  &:hover { color: var(--c-g3-20); }
+}
+
+.drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.drawer__section {
+  margin-bottom: 6px;
+}
+
+.drawer__section-label {
+  padding: 4px 12px 5px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-g2-dk);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.drawer__btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  border: none;
+  background: #1A2A36;
+  color: var(--c-g2-40);
+  font-family: var(--font-body);
+
+  &.drawer__btn--primary {
+    background: var(--c-g4);
+    color: var(--c-g4-10);
+  }
+}
+
+.drawer__empty {
+  padding: 20px 12px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--c-g2);
+}

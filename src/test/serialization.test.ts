@@ -10,7 +10,7 @@ function makeNode(overrides: Partial<Node<FeedbackNodeData>> = {}): Node<Feedbac
     id: 'n1',
     type: 'feedbackNode',
     position: { x: 100, y: 200 },
-    dragHandle: '.node-header',
+    dragHandle: '.feedback-node__header',
     data: {
       label: 'Test Node',
       inputs: [],

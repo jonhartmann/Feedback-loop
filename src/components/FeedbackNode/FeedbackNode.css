@@ -1,315 +1,104 @@
-/* ── Series mode ────────────────────────────────────────────────────────────── */
+/* ── feedback-node ────────────────────────────────────────────────────────────
+ * BEM blocks in this file:
+ *   .feedback-node   — the node card
+ *   .port            — input/output port rows
+ *   .node-summary    — collapsed value overlay
+ *   .formula-input   — formula autocomplete widget
+ *   .unit-dropdown   — unit picker widget
+ *   .sim-panel       — experiment mode slider overlay
+ *   .port-editor     — port editing form
+ * ─────────────────────────────────────────────────────────────────────────── */
 
-.feedback-node.is-series {
-  min-width: 200px;
-  min-height: 104px; /* 34px header + 70px chart area */
-}
-
-.chart-type-row {
-  display: flex;
-  gap: 4px;
-  padding: 3px 8px 0;
-  justify-content: flex-end;
-}
-
-.chart-type-btn {
-  font-size: 11px;
-  padding: 1px 5px;
-  border-radius: 3px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-  color: #888;
-}
-
-.chart-type-btn.active {
-  background: #ede8ff;
-  border-color: #9060cc;
-  color: #5030aa;
-  font-weight: 600;
-}
-
-.display-mode-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0 2px;
-  font-size: 13px;
-  color: #9060cc;
-  opacity: 0.65;
-  flex-shrink: 0;
-}
-
-.display-mode-btn:hover {
-  opacity: 1;
-}
-
-.series-empty {
-  text-align: center;
-  font-size: 10px;
-  color: #bbb;
-  padding: 8px 0;
-}
-
-.node-summary-overlay.is-series-collapsed {
-  padding: 2px 4px;
-  align-items: stretch;
-  justify-content: flex-start;
-}
-
-.series-collapsed-value {
-  position: absolute;
-  bottom: 4px;
-  right: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  font-family: monospace;
-  color: #333;
-  text-shadow: 0 0 4px #fff, 0 0 4px #fff;
-  pointer-events: none;
-}
-
-.series-collapsed-value.is-money   { color: #1a5a1a; }
-.series-collapsed-value.is-percent { color: #003090; }
-
-/* ── FormulaInput autocomplete ────────────────────────────────────────────── */
-
-.formula-input-wrapper {
-  position: relative;
-  min-width: 0;
-}
-
-.formula-input-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: #fff;
-  border: 1px solid #c0a0f0;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  list-style: none;
-  margin: 0;
-  padding: 2px 0;
-  overflow: hidden;
-}
-
-.formula-input-suggestion {
-  font-size: 11px;
-  font-family: monospace;
-  padding: 3px 8px;
-  cursor: pointer;
-  color: #333;
-  white-space: nowrap;
-}
-
-.formula-input-suggestion.is-active,
-.formula-input-suggestion:hover {
-  background: #ede8ff;
-  color: #4a0099;
-}
-
-.port-drag-handle {
-  cursor: grab;
-  color: #ccc;
-  font-size: 13px;
-  padding: 0 2px;
-  flex-shrink: 0;
-  user-select: none;
-  line-height: 1;
-}
-
-.port-drag-handle:active {
-  cursor: grabbing;
-}
-
-.port-row.drag-over {
-  background: rgba(140, 80, 255, 0.07);
-  border-radius: 3px;
-  outline: 1px dashed #9060cc;
-}
-
-.formula-suggestion-name {
-  font-family: monospace;
-}
-
-.formula-suggestion-sig {
-  font-size: 10px;
-  color: #999;
-  margin-left: 8px;
-  font-family: monospace;
-}
-
-.formula-input-suggestion.is-active .formula-suggestion-sig,
-.formula-input-suggestion:hover .formula-suggestion-sig {
-  color: #8060cc;
-}
-
-/* ── Node ─────────────────────────────────────────────────────────────────── */
+/* ── feedback-node block ──────────────────────────────────────────────────── */
 
 .feedback-node {
-  background: #ffffff;
-  border: 2px solid #555;
-  border-radius: 8px;
+  /* Node-scoped design tokens — overridden per variant modifier */
+  --node-border:        var(--c-g3);
+  --node-header-bg:     var(--c-g3-10);
+  --node-select-shadow: rgba(38,54,64,0.2);
+
+  background: var(--c-surface);
+  border: 2px solid var(--node-border);
+  border-radius: var(--r-xl);
   min-width: 200px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-md);
   position: relative;
-  font-family: sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
+
+  /* ── Variant modifiers ─────────────────────────────────────────────────── */
+
+  &.feedback-node--variant-constant {
+    --node-border:        var(--c-g5);
+    --node-header-bg:     var(--c-g5-10);
+    --node-select-shadow: rgba(115,57,23,0.2);
+  }
+
+  &.feedback-node--variant-measure {
+    --node-border:        var(--c-measure-border);
+    --node-header-bg:     var(--c-measure-header);
+    --node-select-shadow: rgba(30,82,112,0.2);
+  }
+
+  &.feedback-node--variant-metric {
+    --node-border:        var(--c-g4);
+    --node-header-bg:     var(--c-g4-10);
+    --node-select-shadow: rgba(191,95,11,0.25);
+  }
+
+  /* ── State modifiers ───────────────────────────────────────────────────── */
+
+  &.feedback-node--selected {
+    border-color: var(--node-border);
+    box-shadow: 0 0 0 3px var(--node-select-shadow);
+  }
+
+  &.feedback-node--sim-mode {
+    cursor: default;
+
+    /* Body stays in-flow to maintain dimensions; hidden + non-interactive */
+    & .feedback-node__body {
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    /* Constant/measure body is minimal (~36px) — too short for sim panel (~80px) */
+    &.feedback-node--variant-constant .feedback-node__body,
+    &.feedback-node--variant-measure  .feedback-node__body {
+      min-height: 80px;
+    }
+
+    /* Keep handles visible/interactive through the hidden body */
+    & .feedback-node__body .react-flow__handle {
+      visibility: visible;
+      pointer-events: all;
+    }
+  }
+
+  &.feedback-node--series {
+    min-width: 200px;
+    min-height: 104px; /* 34px header + 70px chart area */
+  }
+
+  /* ── Extended hover halo ───────────────────────────────────────────────── */
+  /* ::before extends 1em beyond the visual boundary so onMouseEnter/Leave
+     fire in the full halo zone without intercepting clicks */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -1em;
+    z-index: -1;
+    border-radius: var(--r-2xl);
+    pointer-events: auto;
+  }
 }
 
-/* ── Collapsed handle columns ─────────────────────────────────────────────
-   When the node is collapsed, these absolutely-positioned strips hold the
-   React Flow handles so edge endpoints remain measurable in the DOM.
-   Port-rows inside use the same .port-row class → same handle CSS offsets
-   as in the expanded view, so edges don't jump on expand/collapse.
-────────────────────────────────────────────────────────────────────────── */
+/* ── feedback-node elements ───────────────────────────────────────────────── */
 
-/* ── Extended hover halo ──────────────────────────────────────────────────
-   The ::before pseudo-element extends 1em beyond the visual node boundary.
-   Mouse events over it are dispatched to the host element, so
-   onMouseEnter/onMouseLeave fire in the full halo zone.
-────────────────────────────────────────────────────────────────────────── */
-
-.feedback-node::before {
-  content: '';
-  position: absolute;
-  inset: -1em;
-  z-index: -1; /* behind node content so it never intercepts clicks */
-  border-radius: 20px;
-  pointer-events: auto;
-}
-
-/* ── Collapsed summary overlay ────────────────────────────────────────────
-   When the node is collapsed this div is absolutely positioned over the
-   body area, showing the current value(s). The body itself (with its
-   handles) is always rendered beneath so handles stay at their natural
-   DOM positions. Handles are raised above the overlay via z-index so
-   they remain visible and interactive.
-────────────────────────────────────────────────────────────────────────── */
-
-.node-summary-overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 34px; /* flush below header */
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 16px 10px;
-  pointer-events: none; /* let clicks pass through to handles */
-  z-index: 1;
-  background: #fff;
-  border-radius: 0 0 6px 6px;
-}
-
-/* Multi-output regular nodes left-align rows */
-.node-summary-overlay.is-rows {
-  align-items: stretch;
-  padding: 6px 10px 10px;
-}
-
-/* Handles must be above the overlay so they're visible and draggable */
-.port-row .react-flow__handle {
-  z-index: 2;
-}
-
-/* Variant overlay backgrounds match node body colour */
-.feedback-node.variant-constant .node-summary-overlay { background: #fff; }
-.feedback-node.variant-measure  .node-summary-overlay { background: #fff; }
-.feedback-node.variant-metric   .node-summary-overlay { background: #fff; }
-
-/* When collapsed, body port-rows shrink to just their handle height so
-   the node is compact. The overlay covers the minimal body. */
-.feedback-node:not(:hover) .node-body {
-  /* keep in document flow but row content hidden — height from handles */
-}
-.port-row:empty,
-.port-row:has(> .react-flow__handle:only-child) {
-  min-height: 16px;
-}
-
-/* ── Summary panel ────────────────────────────────────────────────────────── */
-
-.node-summary {
-  padding: 6px 10px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.node-summary.is-centered {
-  align-items: center;
-  padding: 4px 16px 12px;
-}
-
-/* Large value for Constant / Measure / Metric */
-.summary-value {
-  font-size: 20px;
-  font-weight: 700;
-  font-family: monospace;
-  color: #222;
-  text-align: center;
-  line-height: 1.2;
-}
-
-.summary-value.is-money  { color: #1a5a1a; }
-.summary-value.is-percent { color: #003090; }
-.summary-value.is-empty  { font-size: 14px; font-weight: 400; color: #bbb; }
-
-.summary-value-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-}
-
-.summary-value-label {
-  font-size: 10px;
-  color: #999;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Output rows for regular nodes */
-.summary-output-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 10px;
-  min-height: 18px;
-}
-
-.summary-output-label {
-  font-size: 11px;
-  color: #888;
-  white-space: nowrap;
-}
-
-.summary-output-value {
-  font-size: 13px;
-  font-weight: 600;
-  font-family: monospace;
-  color: #333;
-  white-space: nowrap;
-}
-
-.summary-output-value.is-money   { color: #1a5a1a; }
-.summary-output-value.is-percent { color: #003090; }
-
-.feedback-node.selected {
-  border-color: #0070f3;
-  box-shadow: 0 0 0 3px rgba(0,112,243,0.2);
-}
-
-.node-header {
-  background: #f0f0f0;
-  border-bottom: 1px solid #ddd;
-  border-radius: 6px 6px 0 0;
+.feedback-node__header {
+  background: var(--node-header-bg);
+  border-bottom: 1px solid var(--c-g3-20);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
   padding: 6px 10px;
   display: flex;
   align-items: center;
@@ -318,593 +107,727 @@
   min-height: 34px;
 }
 
-.node-label {
+.feedback-node__label {
+  font-family: var(--font-heading);
   font-weight: 600;
   font-size: 14px;
   flex: 1;
   cursor: text;
   padding: 2px 4px;
-  border-radius: 4px;
+  border-radius: var(--r-md);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &:hover { background: rgba(0,0,0,0.05); }
 }
 
-.node-label:hover {
-  background: rgba(0,0,0,0.05);
-}
-
-.node-label-input {
+.feedback-node__label-input {
+  font-family: var(--font-heading);
   font-weight: 600;
   font-size: 14px;
   flex: 1;
-  border: 1px solid #0070f3;
-  border-radius: 4px;
+  border: 1px solid var(--c-g4);
+  border-radius: var(--r-md);
   padding: 2px 4px;
   outline: none;
-  background: #fff;
+  background: var(--c-surface);
   min-width: 0;
 }
 
-.edit-ports-btn {
+.feedback-node__edit-btn {
   font-size: 11px;
   padding: 2px 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: #fff;
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+
+  &:hover { background: var(--c-g2-10); }
 }
 
-.edit-ports-btn:hover {
-  background: #e8e8e8;
-}
-
-.save-library-btn {
+.feedback-node__save-btn {
   background: none;
   border: none;
   cursor: pointer;
   padding: 0 2px;
   font-size: 13px;
   line-height: 1;
-  color: #aaa;
+  color: var(--c-g2-40);
   opacity: 0.55;
   transition: opacity 0.15s, color 0.15s;
   flex-shrink: 0;
+
+  &:hover { opacity: 1; color: var(--c-g4); }
 }
 
-.save-library-btn:hover {
-  opacity: 1;
-  color: #e8a800;
-}
-
-.delete-node-btn {
+.feedback-node__delete-btn {
   font-size: 11px;
   padding: 2px 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: #fff;
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-md);
+  background: var(--c-surface);
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  color: #aaa;
+  color: var(--c-g2-40);
+
+  &:hover {
+    background: var(--c-error-bg);
+    border-color: var(--c-error);
+    color: var(--c-error);
+  }
 }
 
-.delete-node-btn:hover {
-  background: #fff0f0;
-  border-color: #d00;
-  color: #d00;
+.feedback-node__mode-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 13px;
+  color: var(--c-g4);
+  opacity: 0.65;
+  flex-shrink: 0;
+
+  &:hover { opacity: 1; }
 }
 
-.node-body {
+.feedback-node__chart-row {
   display: flex;
+  gap: 4px;
+  padding: 3px 8px 0;
+  justify-content: flex-end;
+}
+
+.feedback-node__chart-btn {
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--c-g3-20);
+  background: var(--c-surface);
+  cursor: pointer;
+  color: var(--c-g2);
+
+  &.feedback-node__chart-btn--active {
+    background: var(--c-g4-10);
+    border-color: var(--c-g4);
+    color: var(--c-g5);
+    font-weight: 600;
+  }
+}
+
+.feedback-node__series-empty {
+  text-align: center;
+  font-size: 10px;
+  color: var(--c-g2-40);
   padding: 8px 0;
 }
 
-.ports-column {
+.feedback-node__body {
+  display: flex;
+  padding: 8px 0;
+
+  &.feedback-node__body--metric {
+    /* Metric body is just a flex row — column layout handled by children */
+  }
+
+  &.feedback-node__body--value {
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+  }
+}
+
+.feedback-node__column {
   display: flex;
   flex-direction: column;
   gap: 6px;
   flex: 1;
   padding: 0 8px;
+
+  &.feedback-node__column--inputs  { align-items: flex-start; }
+  &.feedback-node__column--outputs { align-items: flex-end; }
 }
 
-.ports-column.inputs {
-  align-items: flex-start;
-}
-
-.ports-column.outputs {
-  align-items: flex-end;
-}
-
-.port-row {
+.feedback-node__quick-add {
   display: flex;
-  align-items: center;
   gap: 4px;
-  position: relative; /* handles inside port-rows are positioned relative to this */
-  min-height: 20px;
+  margin-top: 4px;
 }
 
-.port-label {
-  font-size: 11px;
-  color: #555;
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 3px;
+.feedback-node__quick-add-btn {
+  font-size: 10px;
   padding: 1px 5px;
-  line-height: 18px;
-  cursor: text;
+  border: 1px dashed var(--c-g3-20);
+  border-radius: var(--r-sm);
+  background: transparent;
+  cursor: pointer;
+  color: var(--c-g2);
+  line-height: 16px;
+
+  &:hover {
+    background: var(--c-g2-10);
+    border-color: var(--c-g2);
+    color: var(--c-g3);
+  }
+
+  &.feedback-node__quick-add-btn--constant {
+    border-color: var(--c-g5);
+    color: var(--c-g3);
+
+    &:hover { background: var(--c-g5-10); }
+  }
 }
 
-.port-label-input {
-  font-size: 11px;
-  color: #333;
-  border: 1px solid #0070f3;
-  border-radius: 3px;
-  padding: 1px 5px;
-  line-height: 18px;
-  outline: none;
-  background: #fff;
-  width: 80px;
-  min-width: 0;
+.feedback-node__variant-select {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--c-g3-20);
+  background: var(--c-g2-10);
+  cursor: pointer;
+  color: var(--c-g2);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+
+  &.feedback-node__variant-select--constant {
+    background: var(--c-g5-20);
+    color: var(--c-g3);
+    border-color: var(--c-g5);
+  }
+
+  &.feedback-node__variant-select--measure {
+    background: var(--c-measure-select);
+    color: var(--c-measure-text);
+    border-color: var(--c-measure-border);
+  }
+
+  &.feedback-node__variant-select--metric {
+    background: var(--c-g4-20);
+    color: var(--c-g5);
+    border-color: var(--c-g4);
+  }
 }
 
-.node-meta {
-  border-top: 1px solid #eee;
+.feedback-node__meta {
+  border-top: 1px solid var(--c-g2-20);
   padding: 6px 10px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.node-description {
+.feedback-node__description {
   font-size: 11px;
-  color: #666;
+  color: var(--c-g2);
   margin: 0;
   line-height: 1.4;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-/* Formula pill displayed on each output port row */
-.port-formula-display {
+.feedback-node__formula-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border-left: 1px dashed var(--c-g3-20);
+  min-width: 120px;
+}
+
+.feedback-node__formula-input {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-sm);
+  padding: 4px 6px;
+  outline: none;
+  background: var(--c-g3-5);
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+
+  &:focus { border-color: var(--c-g3); }
+}
+
+.feedback-node__formula-result {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--c-g3);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.feedback-node__formula-result--error {
+    color: var(--c-error);
+    font-size: 10px;
+    font-weight: 400;
+  }
+}
+
+.feedback-node__empty-note {
+  font-size: 11px;
+  color: var(--c-g2-40);
+}
+
+.feedback-node__url-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px 4px;
+}
+
+.feedback-node__url-label {
   font-size: 10px;
-  font-family: monospace;
-  color: #1a5a1a;
-  background: #f0f7f0;
-  border: 1px solid #c8e6c8;
-  border-radius: 3px;
+  color: var(--c-g2);
+  flex-shrink: 0;
+}
+
+.feedback-node__url-input {
+  flex: 1;
+  font-size: 10px;
+  padding: 1px 4px;
+  border: 1px solid var(--c-measure-border);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  min-width: 0;
+}
+
+/* ── port block ───────────────────────────────────────────────────────────── */
+
+.port__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  min-height: 20px;
+
+  &.port__row--drag-over {
+    background: rgba(191,95,11,0.07);
+    border-radius: var(--r-sm);
+    outline: 1px dashed var(--c-g4);
+  }
+
+  /* Keep handles above summary overlay */
+  & .react-flow__handle { z-index: 2; }
+}
+
+/* Collapsed port rows shrink to just handle height */
+.port__row:empty,
+.port__row:has(> .react-flow__handle:only-child) {
+  min-height: 16px;
+}
+
+.port__drag-handle {
+  cursor: grab;
+  color: #ccc;
+  font-size: 13px;
+  padding: 0 2px;
+  flex-shrink: 0;
+  user-select: none;
+  line-height: 1;
+
+  &:active { cursor: grabbing; }
+}
+
+.port__label {
+  font-size: 11px;
+  color: var(--c-g2);
+  background: var(--c-g2-10);
+  border: 1px solid var(--c-g2-20);
+  border-radius: var(--r-sm);
+  padding: 1px 5px;
+  line-height: 18px;
+  cursor: text;
+
+  &.port__label--constant {
+    background: var(--c-g5-10);
+    border-color: var(--c-g5);
+    color: var(--c-g3);
+  }
+}
+
+.port__label-input {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--c-g3);
+  border: 1px solid var(--c-g4);
+  border-radius: var(--r-sm);
+  padding: 1px 5px;
+  line-height: 18px;
+  outline: none;
+  background: var(--c-surface);
+  width: 80px;
+  min-width: 0;
+}
+
+.port__formula {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--c-money);
+  background: var(--c-money-bg);
+  border: 1px solid var(--c-money-border);
+  border-radius: var(--r-sm);
   padding: 0 4px;
   line-height: 16px;
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  &.port__formula--error {
+    color: var(--c-error);
+    background: var(--c-error-bg);
+    border-color: var(--c-error-border);
+  }
 }
 
-.port-formula-display.is-error {
-  color: #a00;
-  background: #fff0f0;
-  border-color: #f5c0c0;
-}
-
-/* Formula input row inside the output port editor */
-.output-formula-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 3px;
-}
-
-.output-formula-hint {
-  font-size: 9px;
-  color: #aaa;
-  margin-top: 2px;
-  font-family: monospace;
-}
-
-/* Variable rows inside PortEditor */
-.variable-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 3px;
-}
-
-.port-editor-wrapper {
-  border-top: 1px solid #ddd;
-  padding: 8px;
-  background: #fafafa;
-  border-radius: 0 0 6px 6px;
-}
-
-/* ── Variant type selector ─────────────────────────────────────────────── */
-
-.variant-select {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 1px 3px;
-  border-radius: 3px;
-  border: 1px solid #ccc;
-  background: #f5f5f5;
-  cursor: pointer;
-  color: #555;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
+.port__eq {
+  font-size: 11px;
+  color: var(--c-g2);
   flex-shrink: 0;
-  appearance: none;
-  -webkit-appearance: none;
+  margin: 0 2px;
 }
 
-.variant-select.variant-constant {
-  background: #f5d67a;
-  color: #7a5500;
-  border-color: #c89020;
+.port__value {
+  width: 72px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 1px 4px;
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-sm);
+  text-align: right;
+  background: var(--c-g3-5);
+  min-width: 0;
 }
 
-.variant-select.variant-measure {
-  background: #a8d4f5;
-  color: #00367a;
-  border-color: #1a6bb5;
+.feedback-node--variant-constant .port__value {
+  border-color: var(--c-g5);
+  background: var(--c-g5-10);
 }
 
-.variant-select.variant-metric {
-  background: #ddd0ff;
-  color: #4a0099;
-  border-color: #7c3aed;
+.feedback-node--variant-measure .port__value {
+  border-color: var(--c-measure-border);
+  background: var(--c-measure-header);
 }
 
-/* ── Unit cycle button ─────────────────────────────────────────────────── */
+.port__badge {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--c-g3);
+  background: var(--c-g5-10);
+  border: 1px solid var(--c-g5);
+  border-radius: var(--r-sm);
+  padding: 0 4px;
+  line-height: 16px;
+}
 
-.unit-cycle-btn {
+.port__float {
+  position: absolute;
+  left: calc(100% + 22px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  background: var(--c-surface);
+  border: 1px solid var(--c-g2-20);
+  border-radius: var(--r-2xl);
+  padding: 2px 8px;
+  color: var(--c-g3);
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+
+  &.port__float--money {
+    color: var(--c-money);
+    border-color: var(--c-money-border);
+    background: var(--c-money-bg);
+  }
+
+  &.port__float--percent {
+    color: var(--c-percent);
+    border-color: #1E3A6A;
+    background: var(--c-percent-bg);
+  }
+}
+
+/* React Flow handle overrides
+   Handle is inside .port__row (position:relative).
+   .port__row sits inside .feedback-node__column (padding: 0 8px),
+   so row left/right edges are 8px inside the node edge.
+   To place handle at -6px from node edge: -6 - 8 - 2(border) = -16px */
+.port__row .react-flow__handle {
+  width: 10px;
+  height: 10px;
+  background: var(--c-g2);
+  border: 2px solid var(--c-surface);
+  border-radius: 50%;
+
+  &.react-flow__handle-left  { left: -16px; }
+  &.react-flow__handle-right { right: -16px; }
+
+  &:hover {
+    background: var(--c-g4);
+    transform: translate(0, -50%) scale(1.3);
+  }
+}
+
+/* ── node-summary block ───────────────────────────────────────────────────── */
+
+/* Absolutely-positioned over the body area when collapsed */
+.node-summary {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 34px;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 16px 10px;
+  pointer-events: none;
+  z-index: 1;
+  background: var(--c-surface);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+
+  &.node-summary--rows {
+    align-items: stretch;
+    padding: 6px 10px 10px;
+  }
+
+  &.node-summary--series {
+    padding: 2px 4px;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+}
+
+.node-summary__panel {
+  padding: 6px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  &.node-summary__panel--centered {
+    align-items: center;
+    padding: 4px 16px 12px;
+  }
+}
+
+.node-summary__value {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--c-g1);
+  text-align: center;
+  line-height: 1.2;
+
+  &.node-summary__value--money   { color: var(--c-money); }
+  &.node-summary__value--percent { color: var(--c-percent); }
+  &.node-summary__value--empty   { font-size: 14px; font-weight: 400; color: var(--c-g2-40); }
+}
+
+.node-summary__value-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.node-summary__value-label {
+  font-size: 10px;
+  color: var(--c-g2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.node-summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 18px;
+}
+
+.node-summary__row-label {
+  font-size: 11px;
+  color: var(--c-g2);
+  white-space: nowrap;
+}
+
+.node-summary__row-value {
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--c-g3);
+  white-space: nowrap;
+
+  &.node-summary__row-value--money   { color: var(--c-money); }
+  &.node-summary__row-value--percent { color: var(--c-percent); }
+}
+
+.node-summary__series-value {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--c-g3);
+  text-shadow: 0 0 4px var(--c-surface), 0 0 4px var(--c-surface);
+  pointer-events: none;
+
+  &.node-summary__series-value--money   { color: var(--c-money); }
+  &.node-summary__series-value--percent { color: var(--c-percent); }
+}
+
+/* ── formula-input block ──────────────────────────────────────────────────── */
+
+.formula-input {
+  position: relative;
+  min-width: 0;
+}
+
+.formula-input__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--c-surface);
+  border: 1px solid var(--c-g3-20);
+  border-top: none;
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  box-shadow: var(--shadow-lg);
+  list-style: none;
+  margin: 0;
+  padding: 2px 0;
+  overflow: hidden;
+}
+
+.formula-input__suggestion {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 3px 8px;
+  cursor: pointer;
+  color: var(--c-g3);
+  white-space: nowrap;
+
+  &.formula-input__suggestion--active,
+  &:hover {
+    background: var(--c-g3-10);
+    color: var(--c-g5);
+  }
+
+  & .formula-input__suggestion-sig {
+    font-size: 10px;
+    color: var(--c-g2);
+    margin-left: 8px;
+    font-family: var(--font-mono);
+  }
+
+  &.formula-input__suggestion--active .formula-input__suggestion-sig,
+  &:hover .formula-input__suggestion-sig {
+    color: var(--c-g4);
+  }
+}
+
+.formula-input__suggestion-name {
+  font-family: var(--font-mono);
+}
+
+/* ── unit-dropdown block ──────────────────────────────────────────────────── */
+
+.unit-dropdown__trigger {
   font-size: 9px;
   font-weight: 700;
   padding: 0 3px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  background: #f5f5f5;
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-sm);
+  background: var(--c-g2-10);
   cursor: pointer;
-  color: #888;
+  color: var(--c-g2);
   line-height: 16px;
   min-width: 14px;
   text-align: center;
   flex-shrink: 0;
+
+  &:hover {
+    background: var(--c-g2-10);
+    border-color: var(--c-g2);
+    color: var(--c-g3);
+  }
+
+  &.is-money {
+    border-color: var(--c-money-border);
+    color: var(--c-money);
+    background: var(--c-money-bg);
+  }
+
+  &.is-percent {
+    border-color: #1E3A6A;
+    color: var(--c-percent);
+    background: var(--c-percent-bg);
+  }
 }
 
-.unit-cycle-btn:hover {
-  background: #e8e8e8;
-  border-color: #888;
-  color: #444;
-}
-
-.unit-cycle-btn.is-money {
-  border-color: #2a7a2a;
-  color: #1a5a1a;
-  background: #f0f7f0;
-}
-
-.unit-cycle-btn.is-percent {
-  border-color: #0050c0;
-  color: #003090;
-  background: #f0f4ff;
-}
-
-/* ── Unit dropdown ─────────────────────────────────────────────────────── */
-
-.unit-dropdown {
+.unit-dropdown__list {
   position: absolute;
   right: 0;
   top: calc(100% + 2px);
   z-index: 1000;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: var(--c-surface);
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
   list-style: none;
   margin: 0;
   padding: 2px 0;
   min-width: 110px;
 }
 
-.unit-dropdown-option {
+.unit-dropdown__option {
   display: flex;
   align-items: center;
   gap: 7px;
   padding: 5px 10px;
   cursor: pointer;
   font-size: 11px;
-  color: #333;
+  color: var(--c-g3);
   white-space: nowrap;
+
+  &:hover { background: var(--c-g2-10); }
+
+  &.unit-dropdown__option--active {
+    background: var(--c-g4-10);
+    color: var(--c-g5);
+  }
 }
 
-.unit-dropdown-option:hover {
-  background: #f0f0f0;
-}
-
-.unit-dropdown-option.is-active {
-  background: #ede8ff;
-  color: #4a0099;
-}
-
-.unit-dropdown-symbol {
+.unit-dropdown__symbol {
   font-weight: 700;
   font-size: 10px;
   min-width: 10px;
   text-align: center;
 }
 
-/* ── Variant node theming ──────────────────────────────────────────────── */
+/* ── sim-panel block ──────────────────────────────────────────────────────── */
 
-.feedback-node.variant-constant {
-  border-color: #c89020;
-}
-.feedback-node.variant-constant .node-header {
-  background: #fff9e6;
-}
-.feedback-node.variant-constant.selected {
-  border-color: #c89020;
-  box-shadow: 0 0 0 3px rgba(200,144,32,0.25);
-}
-
-.feedback-node.variant-measure {
-  border-color: #1a6bb5;
-}
-.feedback-node.variant-measure .node-header {
-  background: #eef5ff;
-}
-.feedback-node.variant-measure.selected {
-  border-color: #1a6bb5;
-  box-shadow: 0 0 0 3px rgba(26,107,181,0.2);
-}
-
-.feedback-node.variant-metric {
-  border-color: #7c3aed;
-}
-.feedback-node.variant-metric .node-header {
-  background: #f5f0ff;
-}
-.feedback-node.variant-metric.selected {
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124,58,237,0.2);
-}
-
-/* ── Metric body ─────────────────────────────────────────────────────────── */
-
-.metric-body {
-  display: flex;
-}
-
-.metric-formula-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 6px 8px;
-  border-left: 1px dashed #d0b0f0;
-  min-width: 120px;
-}
-
-.metric-formula-input {
-  font-size: 12px;
-  font-family: monospace;
-  border: 1px solid #c0a0f0;
-  border-radius: 3px;
-  padding: 4px 6px;
-  outline: none;
-  background: #faf8ff;
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-
-.metric-formula-input:focus {
-  border-color: #7c3aed;
-}
-
-.metric-result {
-  font-size: 12px;
-  font-weight: 700;
-  font-family: monospace;
-  color: #7c3aed;
-  text-align: right;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.metric-result.is-error {
-  color: #a00;
-  font-size: 10px;
-  font-weight: 400;
-}
-
-/* Value-node body: single column of output rows */
-.value-node-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-}
-
-/* Separator glyph between label and value input */
-.port-value-eq {
-  font-size: 11px;
-  color: #888;
-  flex-shrink: 0;
-  margin: 0 2px;
-}
-
-/* Numeric value input for constant/measure outputs */
-.port-value-input {
-  width: 72px;
-  font-size: 11px;
-  font-family: monospace;
-  padding: 1px 4px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  text-align: right;
-  background: #fafafa;
-  min-width: 0;
-}
-
-.variant-constant .port-value-input {
-  border-color: #c89020;
-  background: #fffbf0;
-}
-.variant-measure .port-value-input {
-  border-color: #1a6bb5;
-  background: #f0f5ff;
-}
-
-/* Constant port label variant */
-.port-label.is-constant {
-  background: #fffbf0;
-  border-color: #e8c84a;
-  color: #6e5000;
-}
-
-/* Value badge next to a constant port */
-.port-constant-badge {
-  font-size: 10px;
-  font-family: monospace;
-  color: #6e5000;
-  background: #fffbf0;
-  border: 1px solid #e8c84a;
-  border-radius: 3px;
-  padding: 0 4px;
-  line-height: 16px;
-}
-
-/* Quick-add button row at bottom of each ports column */
-.quick-add-row {
-  display: flex;
-  gap: 4px;
-  margin-top: 4px;
-}
-
-.port-quick-add-btn {
-  font-size: 10px;
-  padding: 1px 5px;
-  border: 1px dashed #ccc;
-  border-radius: 3px;
-  background: transparent;
-  cursor: pointer;
-  color: #999;
-  line-height: 16px;
-}
-
-.port-quick-add-btn:hover {
-  background: #f5f5f5;
-  border-color: #888;
-  color: #555;
-}
-
-.port-quick-add-btn.is-constant {
-  border-color: #e8c84a;
-  color: #a88c00;
-}
-
-.port-quick-add-btn.is-constant:hover {
-  background: #fffbf0;
-}
-
-/* Floating computed value label, shown outside the node aligned with output handle */
-.port-value-float {
+/* Absolutely-positioned over the hidden body in sim mode */
+.sim-panel {
   position: absolute;
-  left: calc(100% + 22px); /* 16px handle offset + 6px gap */
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  font-size: 11px;
-  font-family: monospace;
-  font-weight: 600;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 2px 8px;
-  color: #444;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  pointer-events: none;
-}
-
-.port-value-float.is-money {
-  color: #1a5a1a;
-  border-color: #b0d8b0;
-  background: #f4fbf4;
-}
-
-.port-value-float.is-percent {
-  color: #003090;
-  border-color: #b0c4f0;
-  background: #f2f6ff;
-}
-
-/* React Flow handle overrides
-   Handles are rendered INSIDE .port-row (position:relative).
-   The port-row sits inside .ports-column which has padding: 0 8px,
-   so the row's left/right edges are 8px inside the node edge.
-   To place the handle at the same visual position as before (-6px from node edge):
-     left from port-row = -6 - 8 - 2(border) = -16px  (same for right side)
-*/
-.port-row .react-flow__handle {
-  width: 10px;
-  height: 10px;
-  background: #555;
-  border: 2px solid #fff;
-  border-radius: 50%;
-}
-
-.port-row .react-flow__handle-left {
-  left: -16px;
-}
-
-.port-row .react-flow__handle-right {
-  right: -16px;
-}
-
-.port-row .react-flow__handle:hover {
-  background: #0070f3;
-  transform: translate(0, -50%) scale(1.3);
-}
-
-/* ── Experiment / Sim mode ───────────────────────────────────────────────────── */
-
-/* In sim mode, cursor changes but node size is unchanged (body stays in-flow). */
-.feedback-node.sim-mode {
-  cursor: default;
-}
-
-/*
-  In sim mode, the body stays in-flow so it continues to set the node dimensions.
-  It is hidden (but not removed from layout) and non-interactive.
-  Handles are revealed individually so edge endpoints remain accessible.
-*/
-.feedback-node.sim-mode .node-body {
-  pointer-events: none;
-  visibility: hidden;
-}
-
-/* Constant/measure nodes have a minimal body (~36px) which is too short for
-   the sim slider content (value display + range + % input ≈ 80px).
-   Give them a minimum height so the absolutely-positioned sim panel fits. */
-.feedback-node.sim-mode.variant-constant .node-body,
-.feedback-node.sim-mode.variant-measure .node-body {
-  min-height: 80px;
-}
-
-.feedback-node.sim-mode .node-body .react-flow__handle {
-  visibility: visible;
-  pointer-events: all;
-}
-
-/*
-  Slider panel is absolutely positioned over the (hidden) body so it doesn't
-  affect node dimensions. The body underneath still provides the stable size.
-*/
-.sim-sliders {
-  position: absolute;
-  top: 34px; /* flush below header */
+  top: 34px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -913,151 +836,187 @@
   flex-direction: column;
   gap: 2px;
   padding: 4px 10px 6px;
-  border-top: 1px solid #e8e8f0;
-  background: #f8f8ff;
-  border-radius: 0 0 6px 6px;
+  border-top: 1px solid var(--c-g2-20);
+  background: var(--c-g2-10);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
   overflow-y: auto;
 }
 
-.sim-slider-row {
+.sim-panel__row {
   display: flex;
   flex-direction: column;
   gap: 2px;
+
+  &.sim-panel__row--propagated .sim-panel__control input[type=range] {
+    accent-color: #aaa;
+  }
+
+  &.sim-panel__row--locked {
+    background: rgba(191,95,11,0.06);
+    border-radius: var(--r-md);
+    padding: 2px 4px;
+
+    & .sim-panel__control input[type=range] {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    & .sim-panel__pct-input {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
 }
 
-/* Prominent value — same font style as .summary-value */
-.sim-value-display {
+.sim-panel__value-display {
   display: flex;
   align-items: baseline;
   gap: 6px;
 }
 
-.sim-slider-label {
+.sim-panel__label {
   font-size: 10px;
-  color: #999;
+  color: var(--c-g2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   flex-shrink: 0;
 }
 
-.sim-current-value {
+.sim-panel__value {
   font-size: 20px;
   font-weight: 700;
-  font-family: monospace;
-  color: #222;
+  font-family: var(--font-mono);
+  color: var(--c-g1);
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
+
+  &.sim-panel__value--money   { color: var(--c-money); }
+  &.sim-panel__value--percent { color: var(--c-percent); }
 }
 
-.sim-current-value.is-money  { color: #1a5a1a; }
-.sim-current-value.is-percent { color: #003090; }
-
-/* Delta badge — shown alongside the value on propagated (downstream-affected) nodes */
-.sim-delta-badge {
+.sim-panel__delta {
   font-size: 12px;
   font-weight: 700;
   padding: 1px 5px;
-  border-radius: 4px;
-  background: #f0f0f0;
-  color: #888;
+  border-radius: var(--r-md);
+  background: var(--c-g2-10);
+  color: var(--c-g2);
   flex-shrink: 0;
-}
-.sim-delta-badge.positive { background: #f0fdf4; color: #16a34a; }
-.sim-delta-badge.negative { background: #fef2f2; color: #dc2626; }
 
-/* Propagated rows: slider accent is grey to signal "driven by upstream" */
-.sim-slider-row.is-propagated .sim-control-row input[type=range] {
-  accent-color: #aaa;
+  &.sim-panel__delta--positive { background: var(--c-positive-bg); color: var(--c-positive); }
+  &.sim-panel__delta--negative { background: var(--c-negative-bg); color: var(--c-negative); }
 }
 
-/* Control row: slider + number input + % label */
-.sim-control-row {
+.sim-panel__control {
   display: flex;
   align-items: center;
   gap: 4px;
+
+  & input[type=range] {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--c-g4);
+    height: 14px;
+    cursor: pointer;
+  }
 }
 
-.sim-control-row input[type=range] {
-  flex: 1;
-  min-width: 0;
-  accent-color: #7c3aed;
-  height: 14px;
-  cursor: pointer;
-}
-
-.sim-pct-input {
+.sim-panel__pct-input {
   width: 46px;
   font-size: 11px;
   font-weight: 600;
+  font-family: var(--font-mono);
   text-align: right;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+  border: 1px solid var(--c-g3-20);
+  border-radius: var(--r-sm);
   padding: 1px 3px;
-  background: #fff;
-  color: #444;
+  background: var(--c-surface);
+  color: var(--c-g3);
   flex-shrink: 0;
-  /* hide spinner arrows */
   -moz-appearance: textfield;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+  &.sim-panel__pct-input--positive { color: var(--c-positive); border-color: var(--c-positive-border); }
+  &.sim-panel__pct-input--negative { color: var(--c-negative); border-color: var(--c-negative-border); }
 }
-.sim-pct-input::-webkit-inner-spin-button,
-.sim-pct-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-.sim-pct-input.positive { color: #16a34a; border-color: #86efac; }
-.sim-pct-input.negative { color: #dc2626; border-color: #fca5a5; }
-
-.sim-pct-unit {
+.sim-panel__pct-unit {
   font-size: 11px;
-  color: #888;
+  color: var(--c-g2);
   flex-shrink: 0;
 }
 
-.sim-reset-btn {
+.sim-panel__reset {
   flex-shrink: 0;
   background: none;
   border: none;
-  color: #aaa;
+  color: var(--c-g2-40);
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
   padding: 0 2px;
-  border-radius: 3px;
-}
-.sim-reset-btn:hover { color: #7c3aed; background: #f3f0ff; }
+  border-radius: var(--r-sm);
 
-/* Lock button — sits inline with value display */
-.sim-lock-btn {
+  &:hover { color: var(--c-g4); background: var(--c-g4-10); }
+}
+
+.sim-panel__lock {
   flex-shrink: 0;
   background: none;
   border: none;
   cursor: pointer;
-  color: #aaa;
+  color: var(--c-g2-40);
   padding: 1px 2px;
-  border-radius: 3px;
+  border-radius: var(--r-sm);
   line-height: 1;
   display: flex;
   align-items: center;
   margin-left: auto;
   opacity: 0.5;
   transition: opacity 0.15s, color 0.15s;
-}
-.sim-lock-btn:hover { opacity: 1; color: #7c3aed; }
-.sim-lock-btn.locked { color: #d97706; opacity: 1; }
-.sim-lock-btn.locked:hover { color: #b45309; }
 
-/* Locked row: dim controls, tint background */
-.sim-slider-row.is-locked {
-  background: rgba(217, 119, 6, 0.06);
-  border-radius: 4px;
-  padding: 2px 4px;
+  &:hover { opacity: 1; color: var(--c-g4); }
+
+  &.sim-panel__lock--locked {
+    color: var(--c-g4);
+    opacity: 1;
+
+    &:hover { color: var(--c-g5); }
+  }
 }
-.sim-slider-row.is-locked .sim-control-row input[type=range] {
-  opacity: 0.3;
-  cursor: not-allowed;
+
+/* ── port-editor block ────────────────────────────────────────────────────── */
+
+.port-editor {
+  border-top: 1px solid var(--c-g3-20);
+  padding: 8px;
+  background: var(--c-g3-5);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  font-size: 12px;
 }
-.sim-slider-row.is-locked .sim-pct-input {
-  opacity: 0.4;
-  cursor: not-allowed;
+
+.port-editor__variable-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.port-editor__formula-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.port-editor__formula-hint {
+  font-size: 9px;
+  color: var(--c-g2-40);
+  margin-top: 2px;
+  font-family: var(--font-mono);
 }

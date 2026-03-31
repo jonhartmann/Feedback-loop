@@ -20,7 +20,7 @@ export function UnitDropdown({ unit, onChange, style }: UnitDropdownProps) {
   return (
     <div style={{ position: 'relative', ...style }}>
       <button
-        className={`unit-cycle-btn${unitClass(unit)}`}
+        className={`unit-dropdown__trigger${unitClass(unit)}`}
         onMouseDown={e => e.stopPropagation()}
         onClick={e => { e.stopPropagation(); setOpen(o => !o) }}
         title="Select unit type"
@@ -35,18 +35,18 @@ export function UnitDropdown({ unit, onChange, style }: UnitDropdownProps) {
             style={{ position: 'fixed', inset: 0, zIndex: 999 }}
             onMouseDown={e => { e.stopPropagation(); setOpen(false) }}
           />
-          <ul className="unit-dropdown">
+          <ul className="unit-dropdown__list">
             {UNIT_OPTIONS.map(opt => {
               const active = opt.value === unit || (!opt.value && !unit)
               return (
                 <li
                   key={opt.name}
-                  className={`unit-dropdown-option${active ? ' is-active' : ''}`}
+                  className={`unit-dropdown__option${active ? ' unit-dropdown__option--active' : ''}`}
                   onMouseDown={e => e.stopPropagation()}
                   onClick={e => { e.stopPropagation(); onChange(opt.value); setOpen(false) }}
                 >
-                  <span className="unit-dropdown-symbol">{opt.symbol}</span>
-                  <span className="unit-dropdown-name">{opt.name}</span>
+                  <span className="unit-dropdown__symbol">{opt.symbol}</span>
+                  <span>{opt.name}</span>
                 </li>
               )
             })}
