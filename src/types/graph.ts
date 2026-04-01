@@ -32,7 +32,7 @@ export interface FeedbackNodeData extends Record<string, unknown> {
   metricUnit?: Unit;            // metric variant: explicit display unit (else inferred)
   sourceUrl?: string;           // measure variant: URL to fetch value from
   displayMode?: 'value' | 'series';              // 'value' (default) or accumulated series
-  seriesChartType?: 'line' | 'area' | 'bar';     // chart type when in series mode
+  seriesChartType?: 'area' | 'bar';               // chart type when in series mode
 }
 
 export interface NodeTemplate {
@@ -49,7 +49,7 @@ export interface NodeTemplate {
   metricUnit?: Unit;
   description?: string;
   displayMode?: 'value' | 'series';
-  seriesChartType?: 'line' | 'area' | 'bar';
+  seriesChartType?: 'area' | 'bar';
 }
 
 export interface LibraryItem {

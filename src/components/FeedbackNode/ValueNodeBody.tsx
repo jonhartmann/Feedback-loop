@@ -40,12 +40,12 @@ export function ValueNodeBody() {
     nodeData, variant, showExpanded, displayMode,
     outputs, seriesHistory, seriesChartType, primaryUnit,
     updateOutputValue, setOutputUnit,
-    onChartTypeChange, onSourceUrlChange,
+    onSourceUrlChange,
   } = useNodeContext()
 
   return (
     <div className="feedback-node__body feedback-node__body--value">
-      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} />
+      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} />
       {outputs.map(port => {
         if (variant === 'constant' || variant === 'measure') {
           return (

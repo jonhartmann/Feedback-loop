@@ -148,6 +148,18 @@
   &:hover { background: var(--c-g2-10); }
 }
 
+.feedback-node__save-btn,
+.feedback-node__delete-btn,
+.feedback-node__display-btn {
+  visibility: hidden;
+}
+
+.feedback-node:hover .feedback-node__save-btn,
+.feedback-node:hover .feedback-node__delete-btn,
+.feedback-node:hover .feedback-node__display-btn {
+  visibility: visible;
+}
+
 .feedback-node__save-btn {
   background: none;
   border: none;
@@ -181,7 +193,7 @@
   }
 }
 
-.feedback-node__mode-btn {
+.feedback-node__display-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -192,30 +204,50 @@
   flex-shrink: 0;
 
   &:hover { opacity: 1; }
-}
 
-.feedback-node__chart-row {
-  display: flex;
-  gap: 4px;
-  padding: 3px 8px 0;
-  justify-content: flex-end;
-}
-
-.feedback-node__chart-btn {
-  font-size: 11px;
-  padding: 1px 5px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--c-g3-20);
-  background: var(--c-surface);
-  cursor: pointer;
-  color: var(--c-g2);
-
-  &.feedback-node__chart-btn--active {
-    background: var(--c-g4-10);
-    border-color: var(--c-g4);
+  &.feedback-node__display-btn--series {
+    opacity: 1;
     color: var(--c-g5);
-    font-weight: 600;
   }
+}
+
+.feedback-node__display-list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 2px);
+  background: var(--c-surface);
+  border: 1px solid var(--c-g2-dk);
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  list-style: none;
+  padding: 4px 0;
+  margin: 0;
+  min-width: 120px;
+  z-index: 1000;
+}
+
+.feedback-node__display-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--c-g3-20);
+
+  &:hover { background: var(--c-g2-10); }
+
+  &.feedback-node__display-option--active {
+    background: var(--c-g4-10);
+    color: var(--c-g5);
+  }
+}
+
+.feedback-node__display-symbol {
+  font-weight: 700;
+  font-size: 10px;
+  min-width: 14px;
+  text-align: center;
 }
 
 .feedback-node__series-empty {
@@ -226,21 +258,18 @@
 }
 
 .feedback-node__body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   padding: 8px 0;
 
   &.feedback-node__body--value {
-    display: flex;
-    flex-direction: column;
     gap: 4px;
     padding: 8px;
   }
 }
 
-.feedback-node__chart-row,
-.feedback-node__series-empty {
-  grid-column: 1 / -1;
+.feedback-node__body-columns {
+  display: flex;
 }
 
 .feedback-node__column {

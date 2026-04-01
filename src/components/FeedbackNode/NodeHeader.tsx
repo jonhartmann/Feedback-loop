@@ -1,14 +1,10 @@
-import { useReactFlow } from '@xyflow/react'
-import type { FeedbackNodeData, NodeVariant } from '../../types/graph'
+import { DisplayModeDropdown } from './DisplayModeDropdown'
 
 interface NodeHeaderProps {
-  id: string
-  nodeData: FeedbackNodeData
-  variant: NodeVariant | undefined
+  nodeData: { label: string }
   isEditingLabel: boolean
   labelDraft: string
   showExpanded: boolean
-  displayMode: string
   setLabelDraft: (v: string) => void
   setIsEditingLabel: (v: boolean) => void
   commitLabel: () => void
@@ -17,11 +13,10 @@ interface NodeHeaderProps {
 }
 
 export function NodeHeader({
-  id, nodeData, variant, isEditingLabel, labelDraft, showExpanded,
-  displayMode, setLabelDraft, setIsEditingLabel,
+  nodeData, isEditingLabel, labelDraft, showExpanded,
+  setLabelDraft, setIsEditingLabel,
   commitLabel, saveToLibrary, deleteNode,
 }: NodeHeaderProps) {
-  const { updateNodeData } = useReactFlow()
 
   return (
     <div className="feedback-node__header">
@@ -48,21 +43,7 @@ export function NodeHeader({
         </span>
       )}
 
-      {showExpanded && variant !== 'constant' && (
-        <button
-          className="feedback-node__mode-btn"
-          onMouseDown={e => e.stopPropagation()}
-          onClick={e => {
-            e.stopPropagation()
-            updateNodeData(id, {
-              displayMode: displayMode === 'series' ? undefined : 'series',
-            } as Partial<FeedbackNodeData>)
-          }}
-          title={displayMode === 'series' ? 'Switch to current value' : 'Switch to series view'}
-        >
-          {displayMode === 'series' ? '⊟' : '∿'}
-        </button>
-      )}
+      {showExpanded && <DisplayModeDropdown />}
 
       {showExpanded && (
         <button

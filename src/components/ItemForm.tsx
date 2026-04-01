@@ -29,7 +29,7 @@ export function ItemForm({
   const [sourceUrl, setSourceUrl] = useState(t?.sourceUrl ?? '')
   const [formula, setFormula] = useState(t?.metricFormula ?? '')
   const [displayMode, setDisplayMode] = useState<'value' | 'series'>(t?.displayMode ?? 'value')
-  const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>(t?.seriesChartType ?? 'line')
+  const [chartType, setChartType] = useState<'area' | 'bar'>(t?.seriesChartType ?? 'area')
 
   function handleSave() {
     if (!label.trim()) return
@@ -77,8 +77,7 @@ export function ItemForm({
           <option value="series">Series</option>
         </select>
         {displayMode === 'series' && (
-          <select className="item-form__select" value={chartType} onChange={e => setChartType(e.target.value as 'line' | 'area' | 'bar')}>
-            <option value="line">Line Chart</option>
+          <select className="item-form__select" value={chartType} onChange={e => setChartType(e.target.value as 'area' | 'bar')}>
             <option value="area">Area Chart</option>
             <option value="bar">Bar Chart</option>
           </select>

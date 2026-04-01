@@ -1,7 +1,6 @@
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, ResponsiveContainer } from 'recharts'
+import { AreaChart, Area, BarChart, Bar, ResponsiveContainer } from 'recharts'
 import type { Unit } from '../../types/graph'
-
-type ChartType = 'line' | 'area' | 'bar'
+import type { ChartType } from './SeriesModePanel'
 
 interface SeriesChartProps {
   data: number[]
@@ -25,21 +24,11 @@ export default function SeriesChart({ data, chartType, unit, height = 72 }: Seri
     )
   }
 
-  if (chartType === 'area') {
-    return (
-      <ResponsiveContainer width="100%" height={height}>
-        <AreaChart data={d} margin={m}>
-          <Area type="monotone" dataKey="value" stroke={color} fill={color} fillOpacity={0.25} dot={false} isAnimationActive={false} />
-        </AreaChart>
-      </ResponsiveContainer>
-    )
-  }
-
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={d} margin={m}>
-        <Line type="monotone" dataKey="value" stroke={color} dot={false} strokeWidth={1.5} isAnimationActive={false} />
-      </LineChart>
+      <AreaChart data={d} margin={m}>
+        <Area type="monotone" dataKey="value" stroke={color} fill={color} fillOpacity={0.25} dot={false} isAnimationActive={false} />
+      </AreaChart>
     </ResponsiveContainer>
   )
 }

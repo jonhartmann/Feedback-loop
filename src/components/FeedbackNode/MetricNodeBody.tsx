@@ -12,7 +12,7 @@ export function MetricNodeBody() {
   const {
     nodeId, nodeData, showExpanded, displayMode,
     inputs, variables, seriesHistory, seriesChartType, primaryUnit,
-    setMetricUnit, onMetricFormulaChange, onChartTypeChange,
+    setMetricUnit, onMetricFormulaChange,
   } = useNodeContext()
   const activeEvalMap = useEvalMap()
   const unitMap = useUnitMap()
@@ -38,11 +38,12 @@ export function MetricNodeBody() {
 
   return (
     <div className="feedback-node__body feedback-node__body--metric">
-      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} gridSpan />
+      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} />
+      <div className="feedback-node__body-columns">
       <InputsColumn />
 
       {showExpanded && (
-        <div className="feedback-node__formula-panel">
+        <div className="feedback-node__formula-panel" style={{ flex: 1 }}>
           <FormulaInput
             className="feedback-node__formula-input"
             placeholder="formula…"
@@ -67,6 +68,7 @@ export function MetricNodeBody() {
           />
         </div>
       )}
+      </div>
     </div>
   )
 }

@@ -18,6 +18,7 @@ interface NodeContextValue {
   seriesChartType: ChartType
   primaryUnit: Unit | undefined
   primaryValue: number | undefined
+  hasMeasureInput: boolean
   portLabelField: (portId: string, portType: 'input' | 'output', currentLabel: string) => React.ReactNode
   getPortRowDragProps: (portId: string, type: 'input' | 'output') => React.HTMLAttributes<HTMLDivElement> & { className: string }
   getDragHandleProps: (portId: string, type: 'input' | 'output') => { draggable: true; onDragStart: React.DragEventHandler; onDragEnd: React.DragEventHandler }
@@ -27,7 +28,6 @@ interface NodeContextValue {
   addQuickInput: (e: React.MouseEvent) => void
   addQuickConstant: (e: React.MouseEvent) => void
   addQuickOutput: (e: React.MouseEvent) => void
-  onChartTypeChange: (t: ChartType) => void
   onSourceUrlChange: (url: string | undefined) => void
   onMetricFormulaChange: (v: string | undefined) => void
   onOutputFormulaChange: (portId: string, formula: string | undefined) => void
