@@ -116,48 +116,51 @@ const COMPOUNDING_INTEREST: SerializedGraph = {
 }
 
 // ── Starter graph: Website Metrics Flow ───────────────────────────────────────
-// Demonstrates a multi-step funnel with Expression and Metric nodes.
+// Demonstrates a multi-step funnel with Measure, Expression, and Metric nodes.
+// Monthly Visitors and Bounce Rate are Measures polling the mock /api/range
+// endpoint so they fluctuate on each refresh, driving the downstream charts.
 // Visitors → Engaged Visitors → Conversions → Monthly Revenue
 const WEBSITE_METRICS: SerializedGraph = {
   version: 1,
   name: 'Website Metrics Flow',
   nodes: [
-    // ── Left column: raw inputs (Constants) ───────────────────────────────
+    // ── Left column: live measure inputs ─────────────────────────────────
     {
       id: 'wm-n1',
-      position: { x: 40, y: 60 },
+      position: { x: 40, y: 80 },
       data: {
         label: 'Monthly Visitors',
-        variant: 'constant',
+        variant: 'measure',
         inputs: [],
         outputs: [{ id: 'wm-v-out', label: 'value', value: 50000 }],
+        sourceUrl: '/api/increment?start=50000&rate=100', // start at 50k and +100 each refresh to show dynamic updates
       },
     },
     {
       id: 'wm-n2',
-      position: { x: 40, y: 190 },
+      position: { x: 40, y: 230 },
       data: {
         label: 'Bounce Rate',
-        variant: 'constant',
+        variant: 'measure',
         inputs: [],
-        // 0.45 = 45% of visitors leave immediately
         outputs: [{ id: 'wm-b-out', label: 'value', value: 0.45, unit: 'percent' }],
+        sourceUrl: '/api/range?min=0.35&max=0.55',
       },
     },
+    // ── Constants ─────────────────────────────────────────────────────────
     {
       id: 'wm-n3',
-      position: { x: 40, y: 380 },
+      position: { x: 370, y: 400 },
       data: {
         label: 'Conversion Rate',
         variant: 'constant',
         inputs: [],
-        // 0.03 = 3% of engaged visitors convert
         outputs: [{ id: 'wm-cr-out', label: 'value', value: 0.03, unit: 'percent' }],
       },
     },
     {
       id: 'wm-n4',
-      position: { x: 40, y: 510 },
+      position: { x: 720, y: 490 },
       data: {
         label: 'Avg Order Value',
         variant: 'constant',
@@ -165,10 +168,10 @@ const WEBSITE_METRICS: SerializedGraph = {
         outputs: [{ id: 'wm-aov-out', label: 'value', value: 85, unit: 'money' }],
       },
     },
-    // ── Middle column: intermediate calculations (Expressions) ────────────
+    // ── Expressions — defaulted to area chart to show series capability ───
     {
       id: 'wm-n5',
-      position: { x: 330, y: 100 },
+      position: { x: 350, y: 30 },
       data: {
         label: 'Engaged Visitors',
         inputs: [
@@ -176,14 +179,15 @@ const WEBSITE_METRICS: SerializedGraph = {
           { id: 'wm-e-in2', label: 'bounceRate' },
         ],
         outputs: [
-          // Visitors who did NOT bounce
           { id: 'wm-e-out', label: 'engaged', formula: 'visitors * (1 - bounceRate)' },
         ],
+        displayMode: 'series',
+        seriesChartType: 'area',
       },
     },
     {
       id: 'wm-n6',
-      position: { x: 330, y: 370 },
+      position: { x: 700, y: 80 },
       data: {
         label: 'Conversions',
         inputs: [
@@ -193,12 +197,14 @@ const WEBSITE_METRICS: SerializedGraph = {
         outputs: [
           { id: 'wm-c-out', label: 'conversions', formula: 'engaged * convRate' },
         ],
+        displayMode: 'series',
+        seriesChartType: 'area',
       },
     },
-    // ── Right column: headline KPI (Metric) ───────────────────────────────
+    // ── Metric — bar chart to contrast with the area charts upstream ──────
     {
       id: 'wm-n7',
-      position: { x: 620, y: 240 },
+      position: { x: 1060, y: 200 },
       data: {
         label: 'Monthly Revenue',
         variant: 'metric',
@@ -209,6 +215,8 @@ const WEBSITE_METRICS: SerializedGraph = {
         outputs: [],
         metricFormula: 'conversions * aov',
         metricUnit: 'money',
+        displayMode: 'series',
+        seriesChartType: 'bar',
       },
     },
   ],
@@ -216,7 +224,7 @@ const WEBSITE_METRICS: SerializedGraph = {
     // Visitors funnel → Engaged Visitors
     { id: 'wm-e1', source: 'wm-n1', sourceHandle: 'wm-v-out',   target: 'wm-n5', targetHandle: 'wm-e-in1' },
     { id: 'wm-e2', source: 'wm-n2', sourceHandle: 'wm-b-out',   target: 'wm-n5', targetHandle: 'wm-e-in2' },
-    // Engaged Visitors → Conversions
+    // Engaged Visitors + Conversion Rate → Conversions
     { id: 'wm-e3', source: 'wm-n5', sourceHandle: 'wm-e-out',   target: 'wm-n6', targetHandle: 'wm-c-in1' },
     { id: 'wm-e4', source: 'wm-n3', sourceHandle: 'wm-cr-out',  target: 'wm-n6', targetHandle: 'wm-c-in2' },
     // Conversions + AOV → Revenue
