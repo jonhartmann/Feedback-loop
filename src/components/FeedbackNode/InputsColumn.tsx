@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Handle, Position, useConnection, useEdges, useReactFlow } from '@xyflow/react'
+import { useState, useEffect } from 'react'
+import { Handle, Position, useConnection, useEdges, useReactFlow, useUpdateNodeInternals } from '@xyflow/react'
 import type { FeedbackNodeData } from '../../types/graph'
 import { useNodeContext } from './NodeContext'
 
@@ -11,6 +11,14 @@ export function InputsColumn() {
   const { updateNodeData, setEdges } = useReactFlow()
   const edges = useEdges()
   const [hoveredPortId, setHoveredPortId] = useState<string | null>(null)
+  const updateNodeInternals = useUpdateNodeInternals()
+
+  // Re-measure handle positions whenever inputs change so edges to newly
+  // created ports render immediately (React Flow's ResizeObserver may not
+  // fire if the node height doesn't change, e.g. 0→1 ports).
+  useEffect(() => {
+    updateNodeInternals(nodeId)
+  }, [inputs.length, nodeId, updateNodeInternals])
 
   const canAddInputs = variant === 'expression' || variant === 'metric'
 
