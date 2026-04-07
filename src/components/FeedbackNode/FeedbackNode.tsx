@@ -36,13 +36,14 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
 
   const inputs = nodeData.inputs ?? []
   const outputs = nodeData.outputs ?? []
-  const variables = nodeData.variables ?? []
   const displayMode     = nodeData.displayMode ?? 'value'
   const seriesChartType = nodeData.seriesChartType ?? 'line'
 
   const primaryPortId = isMetric ? METRIC_PORT_ID : (outputs[0]?.id ?? '')
   const primaryValue  = activeEvalMap.get(`${id as string}:${primaryPortId}`)
-    ?? (isValueNode ? (simMode && simOverlay.has(`${id as string}:${primaryPortId}`) ? simOverlay.get(`${id as string}:${primaryPortId}`) : outputs[0]?.value) : undefined)
+    ?? (variant === 'constant' ? outputs[0]?.value
+      : variant === 'measure'  ? inputs[0]?.value
+      : undefined)
   const primaryUnit   = unitMap.get(`${id as string}:${primaryPortId}`) ?? outputs[0]?.unit
 
   const [seriesHistory, setSeriesHistory] = useState<number[]>([])
@@ -70,7 +71,6 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
     nodeId: id as string,
     inputs,
     outputs,
-    metricFormula: nodeData.metricFormula,
     updateNodeData,
   })
 
@@ -97,7 +97,6 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
     displayMode,
     inputs,
     outputs,
-    variables,
     seriesHistory,
     seriesChartType,
     primaryUnit,
@@ -106,14 +105,13 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
     getPortRowDragProps,
     getDragHandleProps,
     updateOutputValue: actions.updateOutputValue,
+    updateInputValue: actions.updateInputValue,
     setOutputUnit: actions.setOutputUnit,
-    setMetricUnit: actions.setMetricUnit,
+    onMetricPortChange: actions.onMetricPortChange,
     addQuickInput: actions.addQuickInput,
-    addQuickConstant: actions.addQuickConstant,
     addQuickOutput: actions.addQuickOutput,
     onChartTypeChange: (t: import('./SeriesModePanel').ChartType) => updateNodeData(id as string, { seriesChartType: t } as Partial<FeedbackNodeData>),
-    onSourceUrlChange: (url: string | undefined) => updateNodeData(id as string, { sourceUrl: url } as Partial<FeedbackNodeData>),
-    onMetricFormulaChange: (v: string | undefined) => updateNodeData(id as string, { metricFormula: v } as Partial<FeedbackNodeData>),
+    onSourceUrlChange: actions.onSourceUrlChange,
     onOutputFormulaChange: (portId: string, formula: string | undefined) => updateNodeData(id as string, { outputs: outputs.map(p => p.id === portId ? { ...p, formula } : p) } as Partial<FeedbackNodeData>),
   }
 
@@ -138,7 +136,6 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
       {simMode && <SimSliders
         nodeId={id as string}
         isValueNode={isValueNode}
-        isMetric={isMetric}
         outputs={outputs}
         simOverlay={simOverlay}
         baseEvalMap={evalMap}

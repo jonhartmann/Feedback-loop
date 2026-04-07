@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useReactFlow } from '@xyflow/react'
 import type { FeedbackNodeData, OutputPort } from '../../types/graph'
+import { METRIC_PORT_ID } from '../../types/graph'
 import { toCamelCase } from '../../utils/formulaEval'
 import { nodeDataToTemplate } from '../../utils/nodeTemplate'
 import { useLibraryContext } from '../../context/LibraryContext'
@@ -21,7 +22,6 @@ export function useNodeActions({ id, nodeData }: NodeActionProps) {
   const isValueNode = variant === 'constant' || variant === 'measure'
   const inputs = nodeData.inputs ?? []
   const outputs = nodeData.outputs ?? []
-  const variables = nodeData.variables ?? []
 
   const commitLabel = useCallback((labelDraft: string, onDone: (trimmed: string) => void) => {
     const trimmed = labelDraft.trim() || 'Node'
@@ -57,15 +57,27 @@ export function useNodeActions({ id, nodeData }: NodeActionProps) {
     } as Partial<FeedbackNodeData>)
   }, [id, outputs, updateNodeData])
 
+  const updateInputValue = useCallback((portId: string, rawVal: number) => {
+    const value = isFinite(rawVal) ? rawVal : 0
+    updateNodeData(id, {
+      inputs: inputs.map(p => p.id === portId ? { ...p, value } : p),
+    } as Partial<FeedbackNodeData>)
+  }, [id, inputs, updateNodeData])
+
   const setOutputUnit = useCallback((portId: string, unit: Unit | undefined) => {
     updateNodeData(id, {
       outputs: outputs.map(p => p.id === portId ? { ...p, unit } : p),
     } as Partial<FeedbackNodeData>)
   }, [id, outputs, updateNodeData])
 
-  const setMetricUnit = useCallback((unit: Unit | undefined) => {
-    updateNodeData(id, { metricUnit: unit } as Partial<FeedbackNodeData>)
-  }, [id, updateNodeData])
+  /** Update formula and/or unit on the metric output port (METRIC_PORT_ID). */
+  const onMetricPortChange = useCallback((patch: { formula?: string; unit?: Unit | undefined }) => {
+    updateNodeData(id, {
+      outputs: outputs.map(p =>
+        p.id === METRIC_PORT_ID ? { ...p, ...patch } : p
+      ),
+    } as Partial<FeedbackNodeData>)
+  }, [id, outputs, updateNodeData])
 
   const addQuickInput = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
@@ -73,13 +85,6 @@ export function useNodeActions({ id, nodeData }: NodeActionProps) {
       inputs: [...inputs, { id: crypto.randomUUID(), label: `in${inputs.length + 1}` }],
     } as Partial<FeedbackNodeData>)
   }, [id, inputs, updateNodeData])
-
-  const addQuickConstant = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    updateNodeData(id, {
-      variables: [...variables, { name: `k${variables.length + 1}`, value: 0 }],
-    } as Partial<FeedbackNodeData>)
-  }, [id, variables, updateNodeData])
 
   const addQuickOutput = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
@@ -99,15 +104,22 @@ export function useNodeActions({ id, nodeData }: NodeActionProps) {
     } as Partial<FeedbackNodeData>)
   }, [id, outputs, isValueNode, nodeData.label, updateNodeData])
 
+  const onSourceUrlChange = useCallback((url: string | undefined) => {
+    updateNodeData(id, {
+      inputs: inputs.map((p, i) => i === 0 ? { ...p, sourceUrl: url } : p),
+    } as Partial<FeedbackNodeData>)
+  }, [id, inputs, updateNodeData])
+
   return {
     commitLabel,
     deleteNode,
     saveToLibrary,
     updateOutputValue,
+    updateInputValue,
     setOutputUnit,
-    setMetricUnit,
+    onMetricPortChange,
     addQuickInput,
-    addQuickConstant,
     addQuickOutput,
+    onSourceUrlChange,
   }
 }

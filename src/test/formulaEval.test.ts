@@ -172,19 +172,12 @@ describe('labelToVarName', () => {
 // ── buildScope ────────────────────────────────────────────────────────────────
 
 describe('buildScope', () => {
-  it('merges variables and input values into a flat scope', () => {
-    const vars = [{ name: 'k', value: 42 }]
+  it('converts input values map to a plain scope object', () => {
     const inputs = new Map([['x', 10], ['y', 20]])
-    expect(buildScope(vars, inputs)).toEqual({ k: 42, x: 10, y: 20 })
+    expect(buildScope(inputs)).toEqual({ x: 10, y: 20 })
   })
 
-  it('input values override variables with the same name', () => {
-    const vars = [{ name: 'x', value: 1 }]
-    const inputs = new Map([['x', 99]])
-    expect(buildScope(vars, inputs).x).toBe(99)
-  })
-
-  it('handles empty variables and inputs', () => {
-    expect(buildScope([], new Map())).toEqual({})
+  it('handles empty inputs', () => {
+    expect(buildScope(new Map())).toEqual({})
   })
 })

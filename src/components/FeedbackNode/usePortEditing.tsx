@@ -1,18 +1,16 @@
 import { useState, useCallback } from 'react'
-import type { FeedbackNodeData, Port, OutputPort } from '../../types/graph'
+import type { FeedbackNodeData, InputPort, OutputPort } from '../../types/graph'
 import { labelToVarName } from '../../utils/formulaEval'
 
 export function usePortEditing({
   nodeId,
   inputs,
   outputs,
-  metricFormula,
   updateNodeData,
 }: {
   nodeId: string
-  inputs: Port[]
+  inputs: InputPort[]
   outputs: OutputPort[]
-  metricFormula: string | undefined
   updateNodeData: (id: string, data: Partial<FeedbackNodeData>) => void
 }) {
   const [editingPortId, setEditingPortId] = useState<string | null>(null)
@@ -39,9 +37,6 @@ export function usePortEditing({
           update.outputs = outputs.map(p =>
             p.formula ? { ...p, formula: p.formula.replace(re, newVar) } : p
           )
-          if (metricFormula) {
-            update.metricFormula = metricFormula.replace(re, newVar)
-          }
         }
         updateNodeData(nodeId, update)
       } else {
@@ -51,7 +46,7 @@ export function usePortEditing({
       }
     }
     setEditingPortId(null)
-  }, [nodeId, portLabelDraft, inputs, outputs, metricFormula, updateNodeData])
+  }, [nodeId, portLabelDraft, inputs, outputs, updateNodeData])
 
   const portLabelField = (portId: string, portType: 'input' | 'output', currentLabel: string) =>
     editingPortId === portId ? (

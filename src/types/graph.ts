@@ -1,7 +1,7 @@
 export type NodeVariant = 'constant' | 'measure' | 'metric' | 'expression'
 export type Unit = 'number' | 'money' | 'percent'
 
-/** Sentinel port ID used for metric nodes in evalMap / simOverlay keys. */
+/** Sentinel port ID used for metric nodes — stored as the output port's id. */
 export const METRIC_PORT_ID = '__metric' as const
 
 export interface Port {
@@ -9,45 +9,35 @@ export interface Port {
   label: string;
 }
 
+/** Input port — may carry a source URL and/or a direct value (measure nodes). */
+export interface InputPort extends Port {
+  sourceUrl?: string;
+  value?: number;
+}
+
 export interface OutputPort extends Port {
   formula?: string;   // expression, e.g. "a / b * 5"
-  value?: number;     // direct value set on constant/measure nodes
+  value?: number;     // direct value set on constant nodes
   unit?: Unit;        // explicit unit; if absent, inferred from upstream inputs
 }
 
-export interface NodeVariable {
-  name: string;       // valid JS identifier, e.g. "alpha"
-  value: number;
-}
-
+// Extends Record<string, unknown> to satisfy React Flow's Node<T> constraint.
 export interface FeedbackNodeData extends Record<string, unknown> {
   label: string;
-  variant?: NodeVariant;        // undefined only in legacy/unmigrayed data; normalized to 'expression' on load
-  inputs: Port[];
+  variant?: NodeVariant;        // undefined only in legacy/unmigrated data; normalized to 'expression' on load
+  inputs: InputPort[];
   outputs: OutputPort[];
-  description?: string;
-  variables?: NodeVariable[];   // user-defined named constants (for formula scope)
   formula?: string;             // DEPRECATED — read-only for migration
-  metricFormula?: string;       // metric variant: single formula defining the node's value
-  metricUnit?: Unit;            // metric variant: explicit display unit (else inferred)
-  sourceUrl?: string;           // measure variant: URL to fetch value from
-  displayMode?: 'value' | 'series';              // 'value' (default) or accumulated series
-  seriesChartType?: 'line' | 'area' | 'bar';     // chart type when in series mode
+  displayMode?: 'value' | 'series';
+  seriesChartType?: 'line' | 'area' | 'bar';
 }
 
 export interface NodeTemplate {
   label: string;
   variant?: NodeVariant;
-  value?: number;         // initial value for first output (constant/measure)
-  unit?: Unit;
-  sourceUrl?: string;
-  // Full port spec — captured when saving a live node to the library
-  inputs?: Port[];
+  inputs?: InputPort[];
   outputs?: OutputPort[];
-  variables?: NodeVariable[];
-  metricFormula?: string;
-  metricUnit?: Unit;
-  description?: string;
+  value?: number;         // shorthand: initial outputs[0].value on creation (constant nodes)
   displayMode?: 'value' | 'series';
   seriesChartType?: 'line' | 'area' | 'bar';
 }

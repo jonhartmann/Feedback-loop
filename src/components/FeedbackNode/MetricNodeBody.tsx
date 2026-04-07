@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { METRIC_PORT_ID } from '../../types/graph'
-import { evalFormula, buildScope, labelToVarName, formatValue, FORMULA_BUILTINS } from '../../utils/formulaEval'
+import { evalFormula, labelToVarName, formatValue, FORMULA_BUILTINS } from '../../utils/formulaEval'
 import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
 import FormulaInput from './FormulaInput'
 import { SeriesModePanel } from './SeriesModePanel'
@@ -11,18 +11,24 @@ import { useNodeContext } from './NodeContext'
 export function MetricNodeBody() {
   const {
     nodeId, nodeData, showExpanded, displayMode,
-    inputs, variables, seriesHistory, seriesChartType, primaryUnit,
-    setMetricUnit, onMetricFormulaChange, onChartTypeChange,
+    inputs, seriesHistory, seriesChartType, primaryUnit,
+    onMetricPortChange, onChartTypeChange,
   } = useNodeContext()
   const activeEvalMap = useEvalMap()
   const unitMap = useUnitMap()
 
-  const metricFormula = nodeData.metricFormula
-  const metricUnit = nodeData.metricUnit
+  const metricPort = nodeData.outputs.find(p => p.id === METRIC_PORT_ID)
+  const metricFormula = metricPort?.formula
+  const metricUnit = metricPort?.unit
   const metricKey = `${nodeId}:${METRIC_PORT_ID}`
   const metricGraphValue = activeEvalMap.get(metricKey)
   const metricResolvedUnit = unitMap.get(metricKey) ?? metricUnit
-  const localScope = buildScope(variables, new Map())
+
+  // Local preview scope — inputs may not be connected yet
+  const localScope: Record<string, number> = {}
+  for (const input of inputs) {
+    if (input.value !== undefined) localScope[labelToVarName(input.label)] = input.value
+  }
   const metricLocalResult = metricFormula ? evalFormula(metricFormula, localScope) : null
 
   let metricDisplay: { text: string; isError: boolean } | null = null
@@ -47,11 +53,8 @@ export function MetricNodeBody() {
             className="feedback-node__formula-input"
             placeholder="formula…"
             value={metricFormula ?? ''}
-            onChange={v => onMetricFormulaChange(v || undefined)}
-            variables={[
-              ...inputs.map(i => labelToVarName(i.label)),
-              ...variables.filter(v => /^[a-zA-Z_]\w*$/.test(v.name)).map(v => v.name),
-            ].filter(Boolean)}
+            onChange={v => onMetricPortChange({ formula: v || undefined })}
+            variables={inputs.map(i => labelToVarName(i.label)).filter(Boolean)}
             builtins={FORMULA_BUILTINS}
             onMouseDown={e => e.stopPropagation()}
           />
@@ -62,7 +65,7 @@ export function MetricNodeBody() {
           )}
           <UnitDropdown
             unit={metricUnit}
-            onChange={setMetricUnit}
+            onChange={u => onMetricPortChange({ unit: u })}
             style={{ alignSelf: 'flex-end' }}
           />
         </div>

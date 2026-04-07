@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { Handle, Position } from '@xyflow/react'
-import { evalFormula, buildScope, formatValue, labelToVarName, FORMULA_BUILTINS } from '../../utils/formulaEval'
+import { evalFormula, formatValue, labelToVarName, FORMULA_BUILTINS } from '../../utils/formulaEval'
 import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
 import FormulaInput from './FormulaInput'
 import { SeriesModePanel } from './SeriesModePanel'
@@ -10,13 +10,12 @@ import { useNodeContext } from './NodeContext'
 
 export function ExpressionNodeBody() {
   const {
-    nodeId, nodeData, showExpanded, displayMode,
-    inputs, outputs, variables, seriesHistory, seriesChartType, primaryUnit,
+    nodeId, showExpanded, displayMode,
+    inputs, outputs, seriesHistory, seriesChartType, primaryUnit,
     setOutputUnit, onChartTypeChange, onOutputFormulaChange,
   } = useNodeContext()
   const activeEvalMap = useEvalMap()
   const unitMap = useUnitMap()
-  const localScope = buildScope(variables, new Map())
 
   return (
     <>
@@ -28,7 +27,8 @@ export function ExpressionNodeBody() {
           {outputs.map(port => {
             const graphValue = activeEvalMap.get(`${nodeId}:${port.id}`)
             const resolvedUnit = unitMap.get(`${nodeId}:${port.id}`) ?? port.unit
-            const localResult = port.formula ? evalFormula(port.formula, localScope) : null
+            // Local preview with no scope — shows formula text until graph resolves a value
+            const localResult = port.formula ? evalFormula(port.formula, {}) : null
 
             let display: { text: string; isError: boolean } | null = null
             if (port.formula) {
@@ -50,10 +50,7 @@ export function ExpressionNodeBody() {
                     placeholder="formula…"
                     value={port.formula ?? ''}
                     onChange={v => onOutputFormulaChange(port.id, v || undefined)}
-                    variables={[
-                      ...inputs.map(i => labelToVarName(i.label)),
-                      ...variables.filter(v => /^[a-zA-Z_]\w*$/.test(v.name)).map(v => v.name),
-                    ].filter(Boolean)}
+                    variables={inputs.map(i => labelToVarName(i.label)).filter(Boolean)}
                     builtins={FORMULA_BUILTINS}
                     onMouseDown={e => e.stopPropagation()}
                   />
@@ -74,12 +71,6 @@ export function ExpressionNodeBody() {
           {showExpanded && outputs.length === 0 && <span className="feedback-node__empty-note">no outputs</span>}
         </div>
       </div>
-
-      {showExpanded && nodeData.description && (
-        <div className="feedback-node__meta">
-          <p className="feedback-node__description">{nodeData.description}</p>
-        </div>
-      )}
     </>
   )
 }

@@ -1,11 +1,9 @@
-import { METRIC_PORT_ID } from '../../types/graph'
 import type { OutputPort, Unit } from '../../types/graph'
 import { SimSliderRow } from './SimSliderRow'
 
 interface SimSlidersProps {
   nodeId: string
   isValueNode: boolean
-  isMetric: boolean
   outputs: OutputPort[]
   simOverlay: Map<string, number>
   baseEvalMap: Map<string, number>
@@ -14,18 +12,14 @@ interface SimSlidersProps {
   removeSimValue: (key: string) => void
 }
 
-export function SimSliders({ nodeId, isValueNode, outputs, simOverlay, baseEvalMap, unitMap, setSimValue, removeSimValue, isMetric }: SimSlidersProps) {
+export function SimSliders({ nodeId, isValueNode, outputs, simOverlay, baseEvalMap, unitMap, setSimValue, removeSimValue }: SimSlidersProps) {
   type SliderDef = { portId: string; label: string; unit: Unit | undefined; baseVal: number }
   const sliders: SliderDef[] = []
 
   if (isValueNode) {
     for (const port of outputs) {
-      sliders.push({ portId: port.id, label: port.label, unit: port.unit, baseVal: baseEvalMap.get(`${nodeId}:${port.id}`) ?? port.value ?? 0 })
-    }
-  } else if (isMetric) {
-    const baseVal = baseEvalMap.get(`${nodeId}:${METRIC_PORT_ID}`)
-    if (baseVal !== undefined) {
-      sliders.push({ portId: METRIC_PORT_ID, label: 'value', unit: unitMap.get(`${nodeId}:${METRIC_PORT_ID}`), baseVal })
+      const baseVal = baseEvalMap.get(`${nodeId}:${port.id}`) ?? port.value ?? 0
+      sliders.push({ portId: port.id, label: port.label, unit: port.unit, baseVal })
     }
   } else {
     for (const port of outputs) {

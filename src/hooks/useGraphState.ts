@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react'
 import { useNodesState, useEdgesState } from '@xyflow/react'
 import type { Node, Edge, XYPosition } from '@xyflow/react'
-import type { FeedbackNodeData, NodeVariant, SerializedGraph, NodeTemplate, Port, OutputPort } from '../types/graph'
+import type { FeedbackNodeData, NodeVariant, SerializedGraph, NodeTemplate, InputPort, OutputPort } from '../types/graph'
+import { METRIC_PORT_ID } from '../types/graph'
 import { serializeGraph, deserializeGraph } from '../utils/serialization'
 import { findFreePosition } from '../utils/placement'
+import { toCamelCase, labelToVarName } from '../utils/formulaEval'
 
 export function useGraphState() {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<FeedbackNodeData>>([])
@@ -24,18 +26,31 @@ export function useGraphState() {
     setNodes(nds => {
       const freePos = findFreePosition(position, nds)
       const newId = () => crypto.randomUUID()
-      const isValue = variant === 'constant' || variant === 'measure'
 
-      // If template has full port spec (saved from a live node), regenerate IDs to avoid conflicts
-      const inputs: Port[] = template?.inputs?.length
-        ? template.inputs.map(p => ({ ...p, id: newId() }))
-        : (isValue ? [] : [{ id: newId(), label: 'in' }])
+      let inputs: InputPort[]
+      let outputs: OutputPort[]
 
-      const outputs: OutputPort[] = template?.outputs?.length
-        ? (template.outputs.map(p => ({ ...p, id: newId() })) as OutputPort[])
-        : (isValue
-            ? [{ id: newId(), label: 'value', value: template?.value ?? 0, ...(template?.unit ? { unit: template.unit } : {}) }]
-            : [{ id: newId(), label: 'out1' }])
+      if (template?.inputs?.length) {
+        // Full port spec saved from a live node — regenerate IDs to avoid conflicts
+        inputs = template.inputs.map(p => ({ ...p, id: newId() }))
+        outputs = template.outputs?.length
+          ? template.outputs.map(p => ({ ...p, id: newId() }))
+          : []
+      } else if (variant === 'constant') {
+        inputs = []
+        outputs = [{ id: newId(), label: toCamelCase(defaultLabel) || 'value', value: template?.value ?? 0 }]
+      } else if (variant === 'measure') {
+        const portLabel = toCamelCase(defaultLabel) || 'value'
+        inputs = [{ id: newId(), label: portLabel }]
+        outputs = [{ id: newId(), label: portLabel, formula: labelToVarName(portLabel) }]
+      } else if (variant === 'metric') {
+        inputs = [{ id: newId(), label: 'in' }]
+        outputs = [{ id: METRIC_PORT_ID, label: 'value' }]
+      } else {
+        // expression
+        inputs = [{ id: newId(), label: 'in' }]
+        outputs = [{ id: newId(), label: 'out1' }]
+      }
 
       const newNode: Node<FeedbackNodeData> = {
         id: newId(),
@@ -47,11 +62,6 @@ export function useGraphState() {
           variant,
           inputs,
           outputs,
-          variables: template?.variables ?? [],
-          ...(template?.metricFormula ? { metricFormula: template.metricFormula } : {}),
-          ...(template?.metricUnit    ? { metricUnit: template.metricUnit }        : {}),
-          ...(template?.sourceUrl     ? { sourceUrl: template.sourceUrl }          : {}),
-          ...(template?.description   ? { description: template.description }      : {}),
           ...(template?.displayMode     ? { displayMode: template.displayMode }         : {}),
           ...(template?.seriesChartType ? { seriesChartType: template.seriesChartType } : {}),
         },
