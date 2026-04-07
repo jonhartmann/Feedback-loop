@@ -17,7 +17,20 @@
       "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/PortEditor.tsx)",
       "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/NodeSummaryOverlay.tsx /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/FeedbackNode/SimSliderRow.tsx)",
       "Bash(grep -n \"color\\\\|background\\\\|border\\\\|rgba\\\\|#[0-9a-fA-F]\\\\{3,6\\\\}\" /c/Users/jonha/Desktop/projects/Feedback-loop/src/components/Drawer.tsx)",
-      "Bash(node -e \"require\\(''clsx''\\); console.log\\(''ok''\\)\")"
+      "Bash(node -e \"require\\(''clsx''\\); console.log\\(''ok''\\)\")",
+      "Bash(awk 'NR==1029,NR==1037' node_modules/@xyflow/system/dist/esm/index.js)",
+      "Bash(awk 'NR==2794,NR==2848' node_modules/@xyflow/react/dist/esm/index.js)",
+      "Bash(awk 'NR==1366,NR==1420' node_modules/@xyflow/system/dist/esm/index.js)",
+      "Bash(awk 'NR==2711,NR==2725' node_modules/@xyflow/react/dist/esm/index.js)",
+      "Bash(awk 'NR==2810,NR==2848' node_modules/@xyflow/react/dist/esm/index.js)",
+      "Bash(awk 'NR==1732,NR==1883' node_modules/@xyflow/react/dist/esm/index.js)",
+      "Bash(awk 'NR==3290,NR==3360' node_modules/@xyflow/react/dist/esm/index.js)",
+      "Bash(awk 'NR==920,NR==980' node_modules/@xyflow/react/dist/esm/index.js)",
+      "Bash(awk 'NR==3254,NR==3300' node_modules/@xyflow/react/dist/esm/index.js)",
+      "Bash(awk 'NR==1543,NR==1560' node_modules/@xyflow/system/dist/esm/index.js)",
+      "Bash(awk 'NR==1603,NR==1680' node_modules/@xyflow/system/dist/esm/index.js)",
+      "Bash(awk 'NR==1571,NR==1602' node_modules/@xyflow/system/dist/esm/index.js)",
+      "Bash(awk 'NR==3715,NR==3770' node_modules/@xyflow/react/dist/esm/index.js)"
     ]
   }
 }

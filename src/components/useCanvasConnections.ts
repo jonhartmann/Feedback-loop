@@ -86,8 +86,12 @@ export function useCanvasConnections({ setEdges, setNodes }: UseCanvasConnection
             const sourceNode = getNode(realConn.source)
             if (sourceNode) {
               const sd = sourceNode.data as FeedbackNodeData
-              if (sd.variant === 'constant' || sd.variant === 'measure')
+              if (sd.variant === 'constant' || sd.variant === 'measure') {
                 portLabel = toCamelCase(sd.label) || portLabel
+              } else if (realConn.sourceHandle) {
+                const sourcePort = sd.outputs?.find(p => p.id === realConn.sourceHandle)
+                if (sourcePort && !/^out\d+$/.test(sourcePort.label)) portLabel = sourcePort.label
+              }
             }
           }
           updateNodeData(realConn.target, {
@@ -136,8 +140,12 @@ export function useCanvasConnections({ setEdges, setNodes }: UseCanvasConnection
           const sourceNode = getNode(connection.source)
           if (sourceNode) {
             const sourceData = sourceNode.data as FeedbackNodeData
-            if (sourceData.variant === 'constant' || sourceData.variant === 'measure')
+            if (sourceData.variant === 'constant' || sourceData.variant === 'measure') {
               portLabel = toCamelCase(sourceData.label) || portLabel
+            } else if (connection.sourceHandle) {
+              const sourcePort = sourceData.outputs?.find(p => p.id === connection.sourceHandle)
+              if (sourcePort && !/^out\d+$/.test(sourcePort.label)) portLabel = sourcePort.label
+            }
           }
         }
 
