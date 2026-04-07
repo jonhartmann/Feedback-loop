@@ -41,7 +41,6 @@ export function ValueNodeBody() {
     inputs, outputs, seriesHistory, seriesChartType, primaryUnit,
     updateOutputValue, setOutputUnit,
     updateInputValue, onSourceUrlChange,
-    onChartTypeChange,
   } = useNodeContext()
 
   // For measure nodes the value/url live on the source InputPort
@@ -49,7 +48,7 @@ export function ValueNodeBody() {
 
   return (
     <div className="feedback-node__body feedback-node__body--value">
-      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} />
+      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} />
       {outputs.map(port => {
         if (variant === 'constant' || variant === 'measure') {
           return (

@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react'
 import type { FeedbackNodeData, NodeVariant, InputPort, OutputPort, Unit } from '../../types/graph'
-import type { ChartType } from './SeriesModePanel'
 
 interface NodeContextValue {
   nodeId: string
@@ -14,7 +13,7 @@ interface NodeContextValue {
   inputs: InputPort[]
   outputs: OutputPort[]
   seriesHistory: number[]
-  seriesChartType: ChartType
+  seriesChartType: 'line' | 'area' | 'bar'
   primaryUnit: Unit | undefined
   primaryValue: number | undefined
   portLabelField: (portId: string, portType: 'input' | 'output', currentLabel: string) => React.ReactNode
@@ -26,7 +25,6 @@ interface NodeContextValue {
   onMetricPortChange: (patch: { formula?: string; unit?: Unit | undefined }) => void
   addQuickInput: (e: React.MouseEvent) => void
   addQuickOutput: (e: React.MouseEvent) => void
-  onChartTypeChange: (t: ChartType) => void
   onSourceUrlChange: (url: string | undefined) => void
   onOutputFormulaChange: (portId: string, formula: string | undefined) => void
 }

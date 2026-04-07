@@ -4,7 +4,9 @@ import type { Node, NodeProps } from '@xyflow/react'
 import { useReactFlow } from '@xyflow/react'
 import type { FeedbackNodeData } from '../../types/graph'
 import { METRIC_PORT_ID } from '../../types/graph'
-import { useEvalMap, useUnitMap } from '../../context/GraphEvalContext'
+import { useEvalMap, useUnitMap, useCanShowSeries } from '../../context/GraphEvalContext'
+import { DisplayModeDropdown } from './DisplayModeDropdown'
+import type { DisplayModeCombined } from './DisplayModeDropdown'
 import { useSimContext } from '../../context/SimContext'
 import { SimSliders } from './SimSliders'
 import { useDragDropPort } from './useDragDropPort'
@@ -31,6 +33,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
   const evalMap = useEvalMap()
   const unitMap = useUnitMap()
   const { simMode, simOverlay, setSimValue, removeSimValue, simEvalMap } = useSimContext()
+  const canShowSeries = useCanShowSeries(id as string)
 
   const activeEvalMap = simMode ? simEvalMap : evalMap
 
@@ -79,6 +82,17 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
   const showExpanded = true
   const isSingleOutputRegular = !isValueNode && !isMetric && outputs.length === 1
 
+  function handleDisplayModeChange(mode: DisplayModeCombined) {
+    updateNodeData(id as string, {
+      displayMode: mode === 'value' ? undefined : 'series',
+      seriesChartType: mode === 'value' ? undefined : mode,
+    } as Partial<FeedbackNodeData>)
+  }
+
+  const displayModeSlot = canShowSeries
+    ? <DisplayModeDropdown displayMode={displayMode} seriesChartType={seriesChartType} onChange={handleDisplayModeChange} />
+    : null
+
   const nodeClass = clsx('feedback-node', {
     [`feedback-node--variant-${variant}`]: !!variant,
     'feedback-node--selected':             !!selected,
@@ -110,7 +124,6 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
     onMetricPortChange: actions.onMetricPortChange,
     addQuickInput: actions.addQuickInput,
     addQuickOutput: actions.addQuickOutput,
-    onChartTypeChange: (t: import('./SeriesModePanel').ChartType) => updateNodeData(id as string, { seriesChartType: t } as Partial<FeedbackNodeData>),
     onSourceUrlChange: actions.onSourceUrlChange,
     onOutputFormulaChange: (portId: string, formula: string | undefined) => updateNodeData(id as string, { outputs: outputs.map(p => p.id === portId ? { ...p, formula } : p) } as Partial<FeedbackNodeData>),
   }
@@ -119,18 +132,16 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
     <NodeContext.Provider value={nodeCtx}>
     <div className={nodeClass}>
       <NodeHeader
-        id={id as string}
         nodeData={nodeData}
-        variant={variant}
         isEditingLabel={isEditingLabel}
         labelDraft={labelDraft}
         showExpanded={showExpanded}
-        displayMode={displayMode}
         setLabelDraft={setLabelDraft}
         setIsEditingLabel={setIsEditingLabel}
         commitLabel={() => actions.commitLabel(labelDraft, trimmed => { setLabelDraft(trimmed); setIsEditingLabel(false) })}
         saveToLibrary={actions.saveToLibrary}
         deleteNode={actions.deleteNode}
+        displayModeSlot={displayModeSlot}
       />
 
       {simMode && <SimSliders

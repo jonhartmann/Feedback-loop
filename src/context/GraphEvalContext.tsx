@@ -20,15 +20,18 @@ import { buildEvalMaps } from '../utils/graphEval'
 // Re-export pure utilities so existing SimContext imports are unchanged
 export { buildEvalMaps, buildEvalMapsWithIndex } from '../utils/graphEval'
 
+import { buildHasMeasureMap } from '../utils/graphEval'
+
 type EvalMap = Map<string, number>
 type UnitMap = Map<string, Unit>
 
 interface GraphEvalMaps {
   evalMap: EvalMap
   unitMap: UnitMap
+  hasMeasureMap: Map<string, boolean>
 }
 
-const GraphEvalContext = createContext<GraphEvalMaps>({ evalMap: new Map(), unitMap: new Map() })
+const GraphEvalContext = createContext<GraphEvalMaps>({ evalMap: new Map(), unitMap: new Map(), hasMeasureMap: new Map() })
 
 export function useEvalMap(): EvalMap {
   return useContext(GraphEvalContext).evalMap
@@ -38,13 +41,20 @@ export function useUnitMap(): UnitMap {
   return useContext(GraphEvalContext).unitMap
 }
 
+export function useCanShowSeries(nodeId: string): boolean {
+  return useContext(GraphEvalContext).hasMeasureMap.get(nodeId) ?? false
+}
+
 // ── Provider ─────────────────────────────────────────────────────────────────
 
 export function GraphEvalProvider({ children }: { children: React.ReactNode }) {
   const nodes = useNodes() as Node<FeedbackNodeData>[]
   const edges = useEdges()
 
-  const maps = useMemo<GraphEvalMaps>(() => buildEvalMaps(nodes, edges), [nodes, edges])
+  const maps = useMemo<GraphEvalMaps>(() => ({
+    ...buildEvalMaps(nodes, edges),
+    hasMeasureMap: buildHasMeasureMap(nodes, edges),
+  }), [nodes, edges])
 
   return (
     <GraphEvalContext.Provider value={maps}>

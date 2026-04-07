@@ -103,6 +103,37 @@ function resolveUnit(
   )
 }
 
+/** Returns true for nodeId if that node is a measure or has any measure node upstream. */
+export function buildHasMeasureMap(
+  nodes: Node<FeedbackNodeData>[],
+  edges: Edge[],
+): Map<string, boolean> {
+  const incoming = new Map<string, string[]>()
+  for (const e of edges) {
+    const arr = incoming.get(e.target) ?? []
+    arr.push(e.source)
+    incoming.set(e.target, arr)
+  }
+
+  const memo = new Map<string, boolean>()
+
+  function check(nodeId: string, visited: Set<string>): boolean {
+    if (memo.has(nodeId)) return memo.get(nodeId)!
+    if (visited.has(nodeId)) return false
+    visited.add(nodeId)
+    const node = nodes.find(n => n.id === nodeId)
+    if (!node) return false
+    if (node.data.variant === 'measure') { memo.set(nodeId, true); return true }
+    const result = (incoming.get(nodeId) ?? []).some(src => check(src, new Set(visited)))
+    memo.set(nodeId, result)
+    return result
+  }
+
+  const result = new Map<string, boolean>()
+  for (const node of nodes) result.set(node.id, check(node.id, new Set()))
+  return result
+}
+
 export function buildEvalMaps(
   nodes: Node<FeedbackNodeData>[],
   edges: Edge[],

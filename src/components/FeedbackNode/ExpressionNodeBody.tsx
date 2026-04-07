@@ -12,7 +12,7 @@ export function ExpressionNodeBody() {
   const {
     nodeId, showExpanded, displayMode,
     inputs, outputs, seriesHistory, seriesChartType, primaryUnit,
-    setOutputUnit, onChartTypeChange, onOutputFormulaChange,
+    setOutputUnit, onOutputFormulaChange,
   } = useNodeContext()
   const activeEvalMap = useEvalMap()
   const unitMap = useUnitMap()
@@ -20,7 +20,7 @@ export function ExpressionNodeBody() {
   return (
     <>
       <div className="feedback-node__body">
-        <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} gridSpan />
+        <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} gridSpan />
         <InputsColumn />
 
         <div className="feedback-node__column feedback-node__column--outputs">
