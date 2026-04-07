@@ -51,16 +51,9 @@ export function useCanvasConnections({ setEdges, setNodes }: UseCanvasConnection
             originalSourceHandleId: existingEdge.sourceHandle ?? '',
           }
         }
-      } else if (handleType === 'source') {
-        // User grabbed an occupied OUTPUT handle. Just remove the existing edge;
-        // the drag naturally starts from this source handle (correct visual).
-        const existingEdge = currentEdges.find(
-          e => e.source === nodeId && e.sourceHandle === handleId
-        )
-        if (existingEdge) {
-          setEdges(eds => eds.filter(e => e.id !== existingEdge.id))
-        }
       }
+      // Output handles (source) keep their existing edges — dragging from an
+      // occupied output just adds another connection (fan-out).
     },
     [setEdges, getEdges]
   )
