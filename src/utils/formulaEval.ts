@@ -1,5 +1,5 @@
 import { create, all } from 'mathjs'
-import type { NodeVariable, Unit } from '../types/graph'
+import type { Unit } from '../types/graph'
 
 // Restricted mathjs instance — disables side-effectful operations
 const math = create(all)
@@ -140,17 +140,11 @@ export function labelToVarName(label: string): string {
 }
 
 /**
- * Build a scope from node-level variables and optional input port values.
+ * Build a scope from resolved input port values.
  * inputValues is keyed by labelToVarName(port.label).
  */
-export function buildScope(
-  variables: NodeVariable[],
-  inputValues: Map<string, number>
-): Record<string, number> {
-  const scope: Record<string, number> = {}
-  for (const v of variables) scope[v.name] = v.value
-  for (const [k, v] of inputValues) scope[k] = v
-  return scope
+export function buildScope(inputValues: Map<string, number>): Record<string, number> {
+  return Object.fromEntries(inputValues)
 }
 
 /**

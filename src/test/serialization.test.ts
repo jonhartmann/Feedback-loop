@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { serializeGraph, deserializeGraph } from '../utils/serialization'
 import type { Node, Edge } from '@xyflow/react'
 import type { FeedbackNodeData, SerializedGraph } from '../types/graph'
+import { METRIC_PORT_ID } from '../types/graph'
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -81,20 +82,19 @@ describe('serializeGraph', () => {
     expect(nodes[0].data.outputs[0].formula).toBe('x * 2')
   })
 
-  it('serializes metric formula and unit', () => {
+  it('serializes metric formula and unit via output port', () => {
     const node = makeNode({
       data: {
         label: 'KPI',
         variant: 'metric',
-        inputs: [],
-        outputs: [],
-        metricFormula: 'a + b',
-        metricUnit: 'money',
+        inputs: [{ id: 'i1', label: 'a' }, { id: 'i2', label: 'b' }],
+        outputs: [{ id: METRIC_PORT_ID, label: 'value', formula: 'a + b', unit: 'money' }],
       },
     })
     const { nodes } = serializeGraph([node], [])
-    expect(nodes[0].data.metricFormula).toBe('a + b')
-    expect(nodes[0].data.metricUnit).toBe('money')
+    const metricOut = nodes[0].data.outputs.find(p => p.id === METRIC_PORT_ID)
+    expect(metricOut?.formula).toBe('a + b')
+    expect(metricOut?.unit).toBe('money')
   })
 
   it('serializes displayMode and seriesChartType', () => {
@@ -152,7 +152,7 @@ describe('deserializeGraph', () => {
       edges: [],
     }
     const { nodes } = deserializeGraph(graph)
-    expect(nodes[0].dragHandle).toBe('.node-header')
+    expect(nodes[0].dragHandle).toBe('.feedback-node__header')
   })
 
   it('round-trips a constant node without data loss', () => {
@@ -178,17 +178,61 @@ describe('deserializeGraph', () => {
         label: 'Final Amount',
         variant: 'metric',
         inputs: [{ id: 'i1', label: 'principal' }],
-        outputs: [],
-        metricFormula: 'principal * 2',
-        metricUnit: 'money',
+        outputs: [{ id: METRIC_PORT_ID, label: 'value', formula: 'principal * 2', unit: 'money' }],
       },
     })
     const serialized = serializeGraph([original], [])
     const { nodes } = deserializeGraph(serialized)
 
-    expect(nodes[0].data.metricFormula).toBe('principal * 2')
-    expect(nodes[0].data.metricUnit).toBe('money')
+    const metricOut = nodes[0].data.outputs.find(p => p.id === METRIC_PORT_ID)
+    expect(metricOut?.formula).toBe('principal * 2')
+    expect(metricOut?.unit).toBe('money')
     expect(nodes[0].data.inputs[0].label).toBe('principal')
+  })
+
+  it('migrates legacy metricFormula/metricUnit into the metric output port', () => {
+    const graph: SerializedGraph = {
+      version: 1,
+      nodes: [{
+        id: 'n1',
+        position: { x: 0, y: 0 },
+        data: {
+          label: 'Old KPI',
+          variant: 'metric',
+          inputs: [{ id: 'i1', label: 'revenue' }],
+          outputs: [],
+          metricFormula: 'revenue * 0.1',
+          metricUnit: 'percent',
+        } as unknown as FeedbackNodeData,
+      }],
+      edges: [],
+    }
+    const { nodes } = deserializeGraph(graph)
+    const metricOut = nodes[0].data.outputs.find(p => p.id === METRIC_PORT_ID)
+    expect(metricOut?.formula).toBe('revenue * 0.1')
+    expect(metricOut?.unit).toBe('percent')
+  })
+
+  it('migrates legacy measure node sourceUrl into InputPort', () => {
+    const graph: SerializedGraph = {
+      version: 1,
+      nodes: [{
+        id: 'n1',
+        position: { x: 0, y: 0 },
+        data: {
+          label: 'Revenue',
+          variant: 'measure',
+          inputs: [],
+          outputs: [{ id: 'o1', label: 'revenue', value: 1000 }],
+          sourceUrl: '/api/revenue',
+        } as unknown as FeedbackNodeData,
+      }],
+      edges: [],
+    }
+    const { nodes } = deserializeGraph(graph)
+    expect(nodes[0].data.inputs[0].sourceUrl).toBe('/api/revenue')
+    expect(nodes[0].data.inputs[0].value).toBe(1000)
+    expect(nodes[0].data.outputs[0].formula).toBeTruthy()
   })
 
   it('converts empty-string handles back to null on edges', () => {

@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { FeedbackNodeData, NodeVariant, Port, OutputPort, NodeVariable, Unit } from '../../types/graph'
-import type { ChartType } from './SeriesModePanel'
+import type { FeedbackNodeData, NodeVariant, InputPort, OutputPort, Unit } from '../../types/graph'
 
 interface NodeContextValue {
   nodeId: string
@@ -11,25 +10,22 @@ interface NodeContextValue {
   isSingleOutputRegular: boolean
   showExpanded: boolean
   displayMode: 'value' | 'series'
-  inputs: Port[]
+  inputs: InputPort[]
   outputs: OutputPort[]
-  variables: NodeVariable[]
   seriesHistory: number[]
-  seriesChartType: ChartType
+  seriesChartType: 'line' | 'area' | 'bar'
   primaryUnit: Unit | undefined
   primaryValue: number | undefined
   portLabelField: (portId: string, portType: 'input' | 'output', currentLabel: string) => React.ReactNode
   getPortRowDragProps: (portId: string, type: 'input' | 'output') => React.HTMLAttributes<HTMLDivElement> & { className: string }
   getDragHandleProps: (portId: string, type: 'input' | 'output') => { draggable: true; onDragStart: React.DragEventHandler; onDragEnd: React.DragEventHandler }
   updateOutputValue: (portId: string, value: number) => void
+  updateInputValue: (portId: string, value: number) => void
   setOutputUnit: (portId: string, unit: Unit | undefined) => void
-  setMetricUnit: (unit: Unit | undefined) => void
+  onMetricPortChange: (patch: { formula?: string; unit?: Unit | undefined }) => void
   addQuickInput: (e: React.MouseEvent) => void
-  addQuickConstant: (e: React.MouseEvent) => void
   addQuickOutput: (e: React.MouseEvent) => void
-  onChartTypeChange: (t: ChartType) => void
   onSourceUrlChange: (url: string | undefined) => void
-  onMetricFormulaChange: (v: string | undefined) => void
   onOutputFormulaChange: (portId: string, formula: string | undefined) => void
 }
 

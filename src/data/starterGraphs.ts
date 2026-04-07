@@ -1,4 +1,5 @@
 import type { SerializedGraph } from '../types/graph'
+import { METRIC_PORT_ID } from '../types/graph'
 
 // ── Starter graph: Compounding Interest Calculator ────────────────────────────
 // Breaks the formula into two intermediate Expression nodes so the flow
@@ -95,9 +96,7 @@ const COMPOUNDING_INTEREST: SerializedGraph = {
           { id: 'ci-fa-in-pr', label: 'periodRate' },
           { id: 'ci-fa-in-tp', label: 'totalPeriods' },
         ],
-        outputs: [],
-        metricFormula: 'principal * (1 + periodRate) ^ totalPeriods',
-        metricUnit: 'money',
+        outputs: [{ id: METRIC_PORT_ID, label: 'value', formula: 'principal * (1 + periodRate) ^ totalPeriods', unit: 'money' }],
       },
     },
   ],
@@ -206,9 +205,7 @@ const WEBSITE_METRICS: SerializedGraph = {
           { id: 'wm-r-in1', label: 'conversions' },
           { id: 'wm-r-in2', label: 'aov' },
         ],
-        outputs: [],
-        metricFormula: 'conversions * aov',
-        metricUnit: 'money',
+        outputs: [{ id: METRIC_PORT_ID, label: 'value', formula: 'conversions * aov', unit: 'money' }],
       },
     },
   ],
@@ -364,8 +361,7 @@ const BUSINESS_KPIS: SerializedGraph = {
           { id: 'kpi-r-in1', label: 'ltv' },
           { id: 'kpi-r-in2', label: 'cac' },
         ],
-        outputs: [],
-        metricFormula: 'ltv / cac',
+        outputs: [{ id: METRIC_PORT_ID, label: 'value', formula: 'ltv / cac' }],
       },
     },
   ],

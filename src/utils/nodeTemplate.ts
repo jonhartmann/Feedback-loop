@@ -6,13 +6,9 @@ export function nodeDataToTemplate(data: FeedbackNodeData): NodeTemplate {
     label: data.label,
     variant: data.variant,
     value: data.outputs[0]?.value,
-    unit: data.outputs[0]?.unit ?? data.metricUnit,
-    sourceUrl: data.sourceUrl,
     inputs: data.inputs,
     outputs: data.outputs,
-    variables: data.variables,
-    metricFormula: data.metricFormula,
-    metricUnit: data.metricUnit,
-    description: data.description,
+    ...(data.displayMode !== undefined && { displayMode: data.displayMode }),
+    ...(data.seriesChartType !== undefined && { seriesChartType: data.seriesChartType }),
   }
 }

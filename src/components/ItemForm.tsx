@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import type { LibraryItem, NodeTemplate, NodeVariant, Unit } from '../types/graph'
+import type { LibraryItem, NodeTemplate, NodeVariant, Unit, OutputPort, InputPort } from '../types/graph'
+import { METRIC_PORT_ID } from '../types/graph'
+import { toCamelCase, labelToVarName } from '../utils/formulaEval'
 import './ItemForm.css'
 
 function UnitSelect({ value, onChange }: { value: Unit; onChange: (u: Unit) => void }) {
@@ -22,27 +24,55 @@ export function ItemForm({
   onCancel: () => void
 }) {
   const t = initialValues?.template
+
+  // Derive initial state from existing template ports when available
+  const existingMetricPort = t?.outputs?.find(p => p.id === METRIC_PORT_ID)
+  const existingSourceInput = t?.inputs?.[0]
+
   const [label, setLabel]     = useState(initialValues?.label ?? '')
   const [variant, setVariant] = useState<string>(t?.variant ?? 'constant')
   const [value, setValue]     = useState(t?.value ?? 0)
-  const [unit, setUnit]       = useState<Unit>(t?.unit ?? t?.metricUnit ?? 'number')
-  const [sourceUrl, setSourceUrl] = useState(t?.sourceUrl ?? '')
-  const [formula, setFormula] = useState(t?.metricFormula ?? '')
+  const [unit, setUnit]       = useState<Unit>(t?.outputs?.[0]?.unit ?? existingMetricPort?.unit ?? 'number')
+  const [sourceUrl, setSourceUrl] = useState(existingSourceInput?.sourceUrl ?? '')
+  const [formula, setFormula] = useState(existingMetricPort?.formula ?? '')
   const [displayMode, setDisplayMode] = useState<'value' | 'series'>(t?.displayMode ?? 'value')
   const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>(t?.seriesChartType ?? 'line')
 
   function handleSave() {
     if (!label.trim()) return
-    const template: NodeTemplate = { label: label.trim() }
+    const trimmed = label.trim()
+    const template: NodeTemplate = { label: trimmed }
     template.variant = variant as NodeVariant
-    if (variant === 'constant') { template.value = value; if (unit !== 'number') template.unit = unit }
-    if (variant === 'measure')  { template.sourceUrl = sourceUrl || undefined; if (unit !== 'number') template.unit = unit }
-    if (variant === 'metric')   { template.metricFormula = formula || undefined; if (unit !== 'number') template.metricUnit = unit }
+
+    if (variant === 'constant') {
+      template.value = value
+      const outputs: OutputPort[] = [{ id: crypto.randomUUID(), label: toCamelCase(trimmed) || 'value', value }]
+      if (unit !== 'number') { outputs[0].unit = unit }
+      template.outputs = outputs
+    }
+
+    if (variant === 'measure') {
+      const portLabel = toCamelCase(trimmed) || 'value'
+      const sourceInput: InputPort = { id: crypto.randomUUID(), label: portLabel }
+      if (sourceUrl) sourceInput.sourceUrl = sourceUrl
+      template.inputs = [sourceInput]
+      template.outputs = [{ id: crypto.randomUUID(), label: portLabel, formula: labelToVarName(portLabel) }]
+      if (unit !== 'number') template.outputs[0].unit = unit
+    }
+
+    if (variant === 'metric') {
+      const metricOutput: OutputPort = { id: METRIC_PORT_ID, label: 'value' }
+      if (formula) metricOutput.formula = formula
+      if (unit !== 'number') metricOutput.unit = unit
+      template.outputs = [metricOutput]
+    }
+
     if (variant !== 'constant' && displayMode === 'series') {
       template.displayMode = 'series'
       template.seriesChartType = chartType
     }
-    onSave({ label: label.trim(), template })
+
+    onSave({ label: trimmed, template })
   }
 
   return (

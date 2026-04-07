@@ -30,7 +30,10 @@
       "Bash(awk 'NR==1543,NR==1560' node_modules/@xyflow/system/dist/esm/index.js)",
       "Bash(awk 'NR==1603,NR==1680' node_modules/@xyflow/system/dist/esm/index.js)",
       "Bash(awk 'NR==1571,NR==1602' node_modules/@xyflow/system/dist/esm/index.js)",
-      "Bash(awk 'NR==3715,NR==3770' node_modules/@xyflow/react/dist/esm/index.js)"
+      "Bash(awk 'NR==3715,NR==3770' node_modules/@xyflow/react/dist/esm/index.js)",
+      "Bash(npx vitest:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)"
     ]
   }
 }

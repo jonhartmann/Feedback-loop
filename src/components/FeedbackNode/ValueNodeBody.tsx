@@ -37,35 +37,46 @@ function ValueInput({ value, onChange }: { value: number; onChange: (v: number) 
 
 export function ValueNodeBody() {
   const {
-    nodeData, variant, showExpanded, displayMode,
-    outputs, seriesHistory, seriesChartType, primaryUnit,
+    variant, showExpanded, displayMode,
+    inputs, outputs, seriesHistory, seriesChartType, primaryUnit,
     updateOutputValue, setOutputUnit,
-    onChartTypeChange, onSourceUrlChange,
+    updateInputValue, onSourceUrlChange,
   } = useNodeContext()
+
+  // For measure nodes the value/url live on the source InputPort
+  const sourceInput = variant === 'measure' ? inputs[0] : undefined
 
   return (
     <div className="feedback-node__body feedback-node__body--value">
-      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} onChartTypeChange={onChartTypeChange} />
+      <SeriesModePanel showExpanded={showExpanded} displayMode={displayMode} seriesHistory={seriesHistory} seriesChartType={seriesChartType} primaryUnit={primaryUnit} />
       {outputs.map(port => {
         if (variant === 'constant' || variant === 'measure') {
           return (
             <div key={port.id} className="port__row" style={showExpanded ? { justifyContent: 'flex-end' } : undefined}>
               <Handle id={port.id} type="source" position={Position.Right} title={port.label} />
-              {showExpanded && <ValueInput value={port.value ?? 0} onChange={v => updateOutputValue(port.id, v)} />}
-              {showExpanded && (
-                <UnitDropdown unit={port.unit} onChange={u => setOutputUnit(port.id, u)} />
+              {showExpanded && variant === 'constant' && (
+                <>
+                  <ValueInput value={port.value ?? 0} onChange={v => updateOutputValue(port.id, v)} />
+                  <UnitDropdown unit={port.unit} onChange={u => setOutputUnit(port.id, u)} />
+                </>
+              )}
+              {showExpanded && variant === 'measure' && sourceInput && (
+                <>
+                  <ValueInput value={sourceInput.value ?? 0} onChange={v => updateInputValue(sourceInput.id, v)} />
+                  <UnitDropdown unit={port.unit} onChange={u => setOutputUnit(port.id, u)} />
+                </>
               )}
             </div>
           )
         }
       })}
 
-      {showExpanded && variant === 'measure' && (
+      {showExpanded && variant === 'measure' && sourceInput && (
         <div className="feedback-node__url-row">
           <span className="feedback-node__url-label">URL</span>
           <input
             className="feedback-node__url-input"
-            value={nodeData.sourceUrl ?? ''}
+            value={sourceInput.sourceUrl ?? ''}
             onChange={e => onSourceUrlChange(e.target.value || undefined)}
             placeholder="/api/range?min=0&max=100"
             onMouseDown={e => e.stopPropagation()}

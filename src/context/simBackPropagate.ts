@@ -92,8 +92,41 @@ export function computeBackPropagateUpdates(
   const logDerivs: number[] = []
 
   for (const { nodeId: cNId, portId: cPId } of upstreamConstants) {
+    const constNode = nodes.find(n => n.id === cNId)
+    if (!constNode) { logDerivs.push(0); continue }
+
     const tweakedNodes = nodes.map(n => {
       if (n.id !== cNId) return n
+
+      if (n.data.variant === 'measure') {
+        // Measure nodes: value lives on inputs[0]; perturb there
+        const inputList = n.data.inputs ?? []
+        let changed = false
+        const newInputs = inputList.map(p => {
+          if (p.id !== cPId) return p
+          // cPId is the OUTPUT port id — for measure nodes, map to the input's value
+          // We find the base value via evalMap since the output formula is identity
+          const v = baseEvalMap.get(`${cNId}:${cPId}`) ?? 0
+          if (v === 0) return p
+          changed = true
+          return { ...p, value: v * (1 + ε) }
+        })
+        // If the portId didn't match an input id directly, match via evalMap key
+        if (!changed) {
+          // Try matching the single source input (measure has exactly one)
+          const sourceInput = inputList[0]
+          if (sourceInput && sourceInput.value !== undefined && sourceInput.value !== 0) {
+            const newInputs2 = inputList.map((p, i) =>
+              i === 0 ? { ...p, value: p.value! * (1 + ε) } : p
+            )
+            return { ...n, data: { ...n.data, inputs: newInputs2 } }
+          }
+          return n
+        }
+        return changed ? { ...n, data: { ...n.data, inputs: newInputs } } : n
+      }
+
+      // Constant nodes: value lives on outputs
       const outputList = n.data.outputs ?? []
       let changed = false
       const newOutputs = outputList.map(p => {
@@ -125,10 +158,16 @@ export function computeBackPropagateUpdates(
     const constNode = nodes.find(n => n.id === cNId)
     if (!constNode) continue
 
-    const portObj = (constNode.data.outputs ?? []).find(p => p.id === cPId)
-    const liveBase = (portObj?.value !== undefined && isFinite(portObj.value))
-      ? portObj.value
-      : (baseEvalMap.get(key) ?? 0)
+    let liveBase: number
+    if (constNode.data.variant === 'measure') {
+      // For measure nodes, base value comes from evalMap (identity formula)
+      liveBase = baseEvalMap.get(key) ?? 0
+    } else {
+      const portObj = (constNode.data.outputs ?? []).find(p => p.id === cPId)
+      liveBase = (portObj?.value !== undefined && isFinite(portObj.value))
+        ? portObj.value
+        : (baseEvalMap.get(key) ?? 0)
+    }
     if (liveBase === 0) continue
 
     const exponent = Math.sign(d) / totalAbsSens

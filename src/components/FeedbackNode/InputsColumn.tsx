@@ -6,7 +6,7 @@ import { useNodeContext } from './NodeContext'
 export const ADD_INPUT_HANDLE_ID = '__add_input__'
 
 export function InputsColumn() {
-  const { variant, nodeId, inputs, variables, showExpanded, portLabelField, getPortRowDragProps, getDragHandleProps } = useNodeContext()
+  const { variant, nodeId, inputs, showExpanded, portLabelField, getPortRowDragProps, getDragHandleProps } = useNodeContext()
   const { inProgress } = useConnection()
   const { updateNodeData, setEdges } = useReactFlow()
   const edges = useEdges()
@@ -60,13 +60,7 @@ export function InputsColumn() {
           )}
         </div>
       ))}
-      {showExpanded && variables.map((v, i) => (
-        <div key={i} className="port__row">
-          <span className="port__label port__label--constant">{v.name}</span>
-          <span className="port__badge">= {v.value}</span>
-        </div>
-      ))}
-      {showExpanded && inputs.length === 0 && variables.length === 0 && (
+      {showExpanded && inputs.length === 0 && (
         <span className="feedback-node__empty-note">no inputs</span>
       )}
       {canAddInputs && (

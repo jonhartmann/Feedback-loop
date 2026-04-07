@@ -47,23 +47,28 @@ export function NodeSummaryOverlay() {
         {isValueNode && (
           outputs.length === 0
             ? <span className="node-summary__value node-summary__value--empty">—</span>
-            : outputs.map(port => (
-                <div key={port.id} className="node-summary__value-block">
-                  {outputs.length > 1 && <span className="node-summary__value-label">{port.label}</span>}
-                  <span className={clsx('node-summary__value', unitMod('node-summary__value', port.unit))}>
-                    {port.value !== undefined ? formatValue(port.value, port.unit) : '—'}
-                  </span>
-                </div>
-              ))
+            : outputs.map(port => {
+                const val = activeEvalMap.get(`${nodeId}:${port.id}`) ?? port.value
+                const unit = unitMap.get(`${nodeId}:${port.id}`) ?? port.unit
+                return (
+                  <div key={port.id} className="node-summary__value-block">
+                    {outputs.length > 1 && <span className="node-summary__value-label">{port.label}</span>}
+                    <span className={clsx('node-summary__value', unitMod('node-summary__value', unit))}>
+                      {val !== undefined ? formatValue(val, unit) : '—'}
+                    </span>
+                  </div>
+                )
+              })
         )}
 
         {isMetric && (() => {
           const metricKey = `${nodeId}:${METRIC_PORT_ID}`
           const metricVal = activeEvalMap.get(metricKey)
-          const resolvedUnit = unitMap.get(metricKey) ?? nodeData.metricUnit
+          const metricPort = nodeData.outputs.find(p => p.id === METRIC_PORT_ID)
+          const resolvedUnit = unitMap.get(metricKey) ?? metricPort?.unit
           return (
             <span className={clsx('node-summary__value', unitMod('node-summary__value', resolvedUnit))}>
-              {metricVal !== undefined ? formatValue(metricVal, resolvedUnit) : nodeData.metricFormula ? '…' : '—'}
+              {metricVal !== undefined ? formatValue(metricVal, resolvedUnit) : metricPort?.formula ? '…' : '—'}
             </span>
           )
         })()}

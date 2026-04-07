@@ -1,5 +1,19 @@
 import type { LibraryItem } from '../types/graph'
 
+function measure(id: string, displayLabel: string, portLabel: string, sourceUrl: string, unit?: 'number' | 'money' | 'percent'): LibraryItem {
+  return {
+    id,
+    label: displayLabel,
+    category: 'Web Performance',
+    template: {
+      label: displayLabel,
+      variant: 'measure',
+      inputs: [{ id: 'src', label: portLabel, sourceUrl }],
+      outputs: [{ id: 'out', label: portLabel, formula: portLabel, ...(unit && unit !== 'number' ? { unit } : {}) }],
+    },
+  }
+}
+
 export const DEFAULT_ITEMS: LibraryItem[] = [
   // Math Constants
   { id: 'b-pi',    label: 'π (pi)',            category: 'Math Constants',  template: { label: 'π',     variant: 'constant', value: Math.PI } },
@@ -9,16 +23,16 @@ export const DEFAULT_ITEMS: LibraryItem[] = [
   { id: 'b-ln2',   label: 'ln(2)',              category: 'Math Constants',  template: { label: 'ln2',  variant: 'constant', value: Math.LN2 } },
   { id: 'b-ln10',  label: 'ln(10)',             category: 'Math Constants',  template: { label: 'ln10', variant: 'constant', value: Math.LN10 } },
   // Web Performance Measures
-  { id: 'b-plt',   label: 'Page Load Time (ms)',       category: 'Web Performance', template: { label: 'Page Load Time',     variant: 'measure', sourceUrl: '/api/range?min=800&max=4000' } },
-  { id: 'b-ttfb',  label: 'Time to First Byte (ms)',   category: 'Web Performance', template: { label: 'Time to First Byte', variant: 'measure', sourceUrl: '/api/range?min=100&max=800' } },
-  { id: 'b-fcp',   label: 'First Contentful Paint (ms)',category: 'Web Performance', template: { label: 'First Contentful Paint', variant: 'measure', sourceUrl: '/api/range?min=500&max=3000' } },
-  { id: 'b-lcp',   label: 'Largest Contentful Paint (ms)', category: 'Web Performance', template: { label: 'Largest Contentful Paint', variant: 'measure', sourceUrl: '/api/range?min=1000&max=5000' } },
-  { id: 'b-cls',   label: 'Cumulative Layout Shift',   category: 'Web Performance', template: { label: 'CLS',              variant: 'measure', sourceUrl: '/api/range?min=0&max=0.5' } },
-  { id: 'b-br',    label: 'Bounce Rate',               category: 'Web Performance', template: { label: 'Bounce Rate',      variant: 'measure', unit: 'percent', sourceUrl: '/api/range?min=0.2&max=0.8' } },
-  { id: 'b-sd',    label: 'Session Duration (s)',       category: 'Web Performance', template: { label: 'Session Duration', variant: 'measure', sourceUrl: '/api/increment?start=120&rate=5' } },
-  { id: 'b-pv',    label: 'Page Views',                category: 'Web Performance', template: { label: 'Page Views',       variant: 'measure', sourceUrl: '/api/increment?start=1000&rate=3' } },
-  { id: 'b-cr',    label: 'Conversion Rate',           category: 'Web Performance', template: { label: 'Conversion Rate',  variant: 'measure', unit: 'percent', sourceUrl: '/api/range?min=0.01&max=0.08' } },
-  { id: 'b-er',    label: 'Error Rate',                category: 'Web Performance', template: { label: 'Error Rate',       variant: 'measure', unit: 'percent', sourceUrl: '/api/range?min=0&max=0.05' } },
-  { id: 'b-lat',   label: 'API Latency (ms)',          category: 'Web Performance', template: { label: 'API Latency',      variant: 'measure', sourceUrl: '/api/range?min=50&max=500' } },
-  { id: 'b-au',    label: 'Active Users',              category: 'Web Performance', template: { label: 'Active Users',     variant: 'measure', sourceUrl: '/api/increment?start=50&rate=1' } },
+  measure('b-plt',  'Page Load Time (ms)',             'pageLoadTime',         '/api/range?min=800&max=4000'),
+  measure('b-ttfb', 'Time to First Byte (ms)',         'timeToFirstByte',      '/api/range?min=100&max=800'),
+  measure('b-fcp',  'First Contentful Paint (ms)',     'firstContentfulPaint', '/api/range?min=500&max=3000'),
+  measure('b-lcp',  'Largest Contentful Paint (ms)',   'largestContentfulPaint', '/api/range?min=1000&max=5000'),
+  measure('b-cls',  'Cumulative Layout Shift',         'cls',                  '/api/range?min=0&max=0.5'),
+  measure('b-br',   'Bounce Rate',                     'bounceRate',           '/api/range?min=0.2&max=0.8',    'percent'),
+  measure('b-sd',   'Session Duration (s)',            'sessionDuration',      '/api/increment?start=120&rate=5'),
+  measure('b-pv',   'Page Views',                      'pageViews',            '/api/increment?start=1000&rate=3'),
+  measure('b-cr',   'Conversion Rate',                 'conversionRate',       '/api/range?min=0.01&max=0.08',  'percent'),
+  measure('b-er',   'Error Rate',                      'errorRate',            '/api/range?min=0&max=0.05',     'percent'),
+  measure('b-lat',  'API Latency (ms)',                'apiLatency',           '/api/range?min=50&max=500'),
+  measure('b-au',   'Active Users',                    'activeUsers',          '/api/increment?start=50&rate=1'),
 ]
