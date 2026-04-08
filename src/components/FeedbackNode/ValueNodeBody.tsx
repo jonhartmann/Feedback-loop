@@ -56,13 +56,19 @@ export function ValueNodeBody() {
               <Handle id={port.id} type="source" position={Position.Right} title={port.label} />
               {showExpanded && variant === 'constant' && (
                 <>
-                  <ValueInput value={port.value ?? 0} onChange={v => updateOutputValue(port.id, v)} />
+                  <ValueInput
+                    value={port.unit === 'percent' ? (port.value ?? 0) * 100 : (port.value ?? 0)}
+                    onChange={v => updateOutputValue(port.id, port.unit === 'percent' ? v / 100 : v)}
+                  />
                   <UnitDropdown unit={port.unit} onChange={u => setOutputUnit(port.id, u)} />
                 </>
               )}
               {showExpanded && variant === 'measure' && sourceInput && (
                 <>
-                  <ValueInput value={sourceInput.value ?? 0} onChange={v => updateInputValue(sourceInput.id, v)} />
+                  <ValueInput
+                    value={port.unit === 'percent' ? (sourceInput.value ?? 0) * 100 : (sourceInput.value ?? 0)}
+                    onChange={v => updateInputValue(sourceInput.id, port.unit === 'percent' ? v / 100 : v)}
+                  />
                   <UnitDropdown unit={port.unit} onChange={u => setOutputUnit(port.id, u)} />
                 </>
               )}

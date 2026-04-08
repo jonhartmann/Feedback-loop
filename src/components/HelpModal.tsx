@@ -296,12 +296,12 @@ function SectionUnits() {
         rows={[
           ['number', 'Plain decimal with commas', '42,300'],
           ['money', 'Dollar sign with cents', '$42,300.00'],
-          ['percent', 'Stored as decimal, shown as %', '0.425 → 42.5%'],
+          ['percent', 'Enter and display as whole numbers (0–100)', 'Enter 42.5 → displays 42.5%'],
         ]}
       />
 
       <Heading>Changing a unit</Heading>
-      <P>Click the <strong>unit button</strong> (<Code>#</Code> / <Code>$</Code> / <Code>%</Code>) on any output port to open a dropdown and select <Code>Number</Code>, <Code>Money</Code>, or <Code>Percent</Code>.</P>
+      <P>Click the <strong>unit button</strong> (<Code>#</Code> / <Code>$</Code> / <Code>%</Code>) on any output port to open a dropdown and select <Code>Number</Code>, <Code>Money</Code>, or <Code>Percent</Code>. Switching units preserves the displayed number — entering <Code>70</Code> as a Number then switching to Percent still shows <Code>70</Code>.</P>
 
       <Heading>Unit inference</Heading>
       <P>When a port has no explicit unit, it infers one from its upstream connections:</P>

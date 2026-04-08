@@ -161,9 +161,9 @@ Every output port has a unit that controls how its value is displayed.
 |------|--------|---------|
 | `number` | Plain decimal with commas | `42,300` |
 | `money` | Dollar sign with cents | `$42,300.00` |
-| `percent` | Stored as decimal, displayed as % | `0.425 → 42.5%` |
+| `percent` | Enter and display as whole numbers (0–100) | Enter `42.5` → displays `42.5%` |
 
-Click the **unit button** (`#` / `$` / `%`) on any output port to open a dropdown and select **Number**, **Money**, or **Percent**.
+Click the **unit button** (`#` / `$` / `%`) on any output port to open a dropdown and select **Number**, **Money**, or **Percent**. Switching units preserves the displayed number — entering `70` as Number then switching to Percent still shows `70`.
 
 When a port has no explicit unit it infers one from its upstream connections: `money` beats everything; `percent` only propagates when all inputs are `percent`; otherwise `number`.
 
