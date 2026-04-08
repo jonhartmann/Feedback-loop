@@ -10,6 +10,8 @@ math.import({
   createUnit: () => { throw new Error('disabled') },
   simplify:   () => { throw new Error('disabled') },
   derivative: () => { throw new Error('disabled') },
+  // Conditional: if(condition, thenValue, elseValue)
+  if: (cond: unknown, thenVal: unknown, elseVal: unknown) => (cond ? thenVal : elseVal),
 }, { override: true })
 
 // ── Built-in function catalogue ───────────────────────────────────────────────

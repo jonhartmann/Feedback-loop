@@ -34,7 +34,7 @@ export function useGraphState() {
         // Full port spec saved from a live node — regenerate IDs to avoid conflicts
         inputs = template.inputs.map(p => ({ ...p, id: newId() }))
         outputs = template.outputs?.length
-          ? template.outputs.map(p => ({ ...p, id: newId() }))
+          ? template.outputs.map(p => ({ ...p, id: p.id === METRIC_PORT_ID ? METRIC_PORT_ID : newId() }))
           : []
       } else if (variant === 'constant') {
         inputs = []
