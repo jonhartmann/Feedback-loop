@@ -62,8 +62,10 @@ export function useGraphState() {
           variant,
           inputs,
           outputs,
-          ...(template?.displayMode     ? { displayMode: template.displayMode }         : {}),
-          ...(template?.seriesChartType ? { seriesChartType: template.seriesChartType } : {}),
+          ...(template?.displayMode     ? { displayMode: template.displayMode }
+            : variant === 'measure'    ? { displayMode: 'series' as const }             : {}),
+          ...(template?.seriesChartType ? { seriesChartType: template.seriesChartType }
+            : variant === 'measure'    ? { seriesChartType: 'area' as const }            : {}),
         },
       }
       return [...nds, newNode]
