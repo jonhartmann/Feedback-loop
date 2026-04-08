@@ -3,7 +3,7 @@ import { addEdge, useReactFlow } from '@xyflow/react'
 import type { Edge, Connection, Node } from '@xyflow/react'
 import type { FeedbackNodeData, Port, OutputPort } from '../types/graph'
 import { findFreePosition } from '../utils/placement'
-import { toCamelCase } from '../utils/formulaEval'
+import { toCamelCase, labelToVarName } from '../utils/formulaEval'
 import { ADD_INPUT_HANDLE_ID } from './FeedbackNode/InputsColumn'
 
 interface UseCanvasConnectionsProps {
@@ -109,11 +109,21 @@ export function useCanvasConnections({ setEdges, setNodes }: UseCanvasConnection
             if (sd.variant === 'constant' || sd.variant === 'measure') {
               const newLabel = toCamelCase(sd.label) || 'value'
               const td = targetNode.data as FeedbackNodeData
-              updateNodeData(realConn.target, {
+              const oldPort = (td.inputs ?? []).find(p => p.id === realConn.targetHandle)
+              const oldVar = labelToVarName(oldPort?.label ?? '')
+              const newVar = labelToVarName(newLabel)
+              const update: Partial<FeedbackNodeData> = {
                 inputs: (td.inputs ?? []).map(p =>
                   p.id === realConn.targetHandle ? { ...p, label: newLabel } : p
                 ),
-              } as Partial<FeedbackNodeData>)
+              }
+              if (oldVar && oldVar !== newVar) {
+                const re = new RegExp(`\\b${oldVar}\\b`, 'g')
+                update.outputs = (td.outputs ?? []).map(p =>
+                  p.formula ? { ...p, formula: p.formula.replace(re, newVar) } : p
+                )
+              }
+              updateNodeData(realConn.target, update)
             }
           }
         }
@@ -165,11 +175,21 @@ export function useCanvasConnections({ setEdges, setNodes }: UseCanvasConnection
           if (sourceData.variant === 'constant' || sourceData.variant === 'measure') {
             const newLabel = toCamelCase(sourceData.label) || 'value'
             const targetData = targetNode.data as FeedbackNodeData
-            updateNodeData(connection.target, {
+            const oldPort = (targetData.inputs ?? []).find(p => p.id === connection.targetHandle)
+            const oldVar = labelToVarName(oldPort?.label ?? '')
+            const newVar = labelToVarName(newLabel)
+            const update: Partial<FeedbackNodeData> = {
               inputs: (targetData.inputs ?? []).map(p =>
                 p.id === connection.targetHandle ? { ...p, label: newLabel } : p
               ),
-            } as Partial<FeedbackNodeData>)
+            }
+            if (oldVar && oldVar !== newVar) {
+              const re = new RegExp(`\\b${oldVar}\\b`, 'g')
+              update.outputs = (targetData.outputs ?? []).map(p =>
+                p.formula ? { ...p, formula: p.formula.replace(re, newVar) } : p
+              )
+            }
+            updateNodeData(connection.target, update)
           }
         }
       }

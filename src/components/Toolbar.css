@@ -30,14 +30,14 @@
   background: transparent;
   border: none;
   border-bottom: 1px solid transparent;
-  color: var(--c-g3-20);
-  font-size: 14px;
+  color: var(--c-g2-10);
+  font-size: 17px;
   font-weight: 500;
   font-family: var(--font-body);
   padding: 1px 4px;
   outline: none;
-  min-width: 80px;
-  max-width: 240px;
+  min-width: 160px;
+  max-width: 480px;
   transition: border-color 0.15s;
 
   &:focus { border-bottom-color: var(--c-g2-40); }
@@ -53,6 +53,10 @@
 
 .toolbar__spacer {
   flex: 1;
+}
+
+.toolbar__spacer-fixed {
+  width: 0.5em;
 }
 
 .toolbar__btn-group {
@@ -73,6 +77,8 @@
   background: var(--c-g3-dk);
   color: #fff;
   transition: opacity 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
 
   &:hover { opacity: 0.8; }
 
@@ -92,8 +98,13 @@
   }
 
   &.toolbar__btn--metric,
-  &.toolbar__btn--active {
+  &.toolbar__btn--save {
     background: var(--c-g4);
+    border: none;
+  }
+
+  &.toolbar__btn--active {
+    background: var(--c-g2);
     border: none;
   }
 }

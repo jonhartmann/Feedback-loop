@@ -5,18 +5,20 @@ interface NodeHeaderProps {
   isEditingLabel: boolean
   labelDraft: string
   showExpanded: boolean
+  simMode: boolean
   setLabelDraft: (v: string) => void
   setIsEditingLabel: (v: boolean) => void
   commitLabel: () => void
   saveToLibrary: (e: React.MouseEvent) => void
   deleteNode: (e: React.MouseEvent) => void
   displayModeSlot?: React.ReactNode
+  simHeaderSlot?: React.ReactNode
 }
 
 export function NodeHeader({
-  nodeData, isEditingLabel, labelDraft, showExpanded,
+  nodeData, isEditingLabel, labelDraft, showExpanded, simMode,
   setLabelDraft, setIsEditingLabel,
-  commitLabel, saveToLibrary, deleteNode, displayModeSlot,
+  commitLabel, saveToLibrary, deleteNode, displayModeSlot, simHeaderSlot,
 }: NodeHeaderProps) {
   return (
     <div className="feedback-node__header">
@@ -43,9 +45,9 @@ export function NodeHeader({
         </span>
       )}
 
-      {showExpanded && displayModeSlot}
+      {showExpanded && !simMode && displayModeSlot}
 
-      {showExpanded && (
+      {showExpanded && !simMode && (
         <button
           className="feedback-node__save-btn"
           onMouseDown={e => e.stopPropagation()}
@@ -56,7 +58,7 @@ export function NodeHeader({
         </button>
       )}
 
-      {showExpanded && (
+      {showExpanded && !simMode && (
         <button
           className="feedback-node__delete-btn"
           onMouseDown={e => e.stopPropagation()}
@@ -66,6 +68,8 @@ export function NodeHeader({
           ✕
         </button>
       )}
+
+      {showExpanded && simMode && simHeaderSlot}
     </div>
   )
 }

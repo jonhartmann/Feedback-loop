@@ -65,10 +65,34 @@ export function useNodeActions({ id, nodeData }: NodeActionProps) {
   }, [id, inputs, updateNodeData])
 
   const setOutputUnit = useCallback((portId: string, unit: Unit | undefined) => {
-    updateNodeData(id, {
-      outputs: outputs.map(p => p.id === portId ? { ...p, unit } : p),
-    } as Partial<FeedbackNodeData>)
-  }, [id, outputs, updateNodeData])
+    const port = outputs.find(p => p.id === portId)
+    if (!port) return
+
+    const oldUnit = port.unit
+    const toPercent   = unit === 'percent' && oldUnit !== 'percent'
+    const fromPercent = oldUnit === 'percent' && unit !== 'percent'
+
+    const updatedOutputs = outputs.map(p => {
+      if (p.id !== portId) return p
+      if (toPercent   && isFinite(p.value ?? NaN)) return { ...p, unit, value: (p.value ?? 0) / 100 }
+      if (fromPercent && isFinite(p.value ?? NaN)) return { ...p, unit, value: (p.value ?? 0) * 100 }
+      return { ...p, unit }
+    })
+
+    const update: Partial<FeedbackNodeData> = { outputs: updatedOutputs }
+
+    // Measure nodes store the editable value on inputs[0], not on the output port
+    if (variant === 'measure' && (toPercent || fromPercent)) {
+      const src = inputs[0]
+      if (src) {
+        const current = src.value ?? 0
+        const newVal  = toPercent ? current / 100 : current * 100
+        update.inputs = inputs.map((p, i) => i === 0 ? { ...p, value: newVal } : p)
+      }
+    }
+
+    updateNodeData(id, update as Partial<FeedbackNodeData>)
+  }, [id, variant, inputs, outputs, updateNodeData])
 
   /** Update formula and/or unit on the metric output port (METRIC_PORT_ID). */
   const onMetricPortChange = useCallback((patch: { formula?: string; unit?: Unit | undefined }) => {

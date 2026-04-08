@@ -150,7 +150,7 @@ function SectionOverview({ onStartTour }: { onStartTour: () => void }) {
       <Heading>What is Feedback Loop?</Heading>
       <P>
         Feedback Loop is a visual canvas for building evaluatable models. You connect
-        <strong> constants</strong>, <strong>expressions</strong>, and <strong>metrics</strong> into a live graph
+        <strong> constants</strong>, <strong>measures</strong>, <strong>expressions</strong>, and <strong>metrics</strong> into a live graph
         that recalculates instantly whenever any input changes.
       </P>
       <P>
@@ -170,12 +170,13 @@ function SectionOverview({ onStartTour }: { onStartTour: () => void }) {
 
       <Heading>Quick start</Heading>
       <ol className="help-modal__ol">
-        <li>Click <strong>Templates</strong> (top-right) to load a starter graph, or add nodes with the toolbar buttons.</li>
+        <li>Click <strong>Templates</strong> or <strong>Library</strong> (top-right) to load a starter graph or add pre-built nodes, or create nodes with the toolbar buttons.</li>
         <li>Connect nodes by dragging from an output port to an input port.</li>
         <li>Write formulas in Expression/Metric nodes using the input port labels as variables.</li>
         <li>Adjust constants — all downstream values update immediately.</li>
-        <li>Click <strong>Experiment</strong> to enter simulation mode and run what-if scenarios.</li>
+        <li>Click <strong>Experiment</strong> (floating in the toolbar centre) to enter simulation mode and run what-if scenarios.</li>
         <li>Click <strong>Save</strong> to download your graph as a JSON file.</li>
+        <li>Open <strong>Library</strong> to drag pre-built Measures, Expressions, and Metrics onto the canvas.</li>
       </ol>
 
       <Heading>Canvas navigation</Heading>
@@ -206,7 +207,7 @@ function SectionNodeTypes() {
       </NodeTypeCard>
 
       <NodeTypeCard badge="Measure" color="#1E5270" label="Measure">
-        Like a Constant, but fetches its value from an external URL on a 3-second refresh interval. Use it for live data feeds.
+        Fetches its value from an external URL on a 3-second refresh interval. Defaults to <strong>Area Graph</strong> display mode to show how the value changes over time. Its input port can be overridden by connecting another node's output — the connected value takes precedence over the fetched one.
       </NodeTypeCard>
 
       <NodeTypeCard badge="Expression" color="#263640" label="Expression">
@@ -230,13 +231,18 @@ function SectionFormulas() {
         To delete an edge, click it and press <Code>Delete</Code>.
       </P>
       <P>
+        <em>Drop shortcuts:</em> releasing a drag over a <strong>node's body</strong> (not a specific handle) automatically creates a new input port on that node. Releasing over <strong>empty canvas space</strong> creates a new Expression node with a matching port already connected.
+      </P>
+      <P>
+        <em>Reconnecting:</em> drag from an occupied <strong>input</strong> handle to lift the existing edge and redirect it to a new target.
+      </P>
+      <P>
         <em>Cycle detection is automatic</em> — the graph will not allow circular connections.
       </P>
 
       <Heading>Writing formulas</Heading>
       <P>
-        Formulas use standard math syntax. The autocomplete dropdown shows available variables (from input port labels),
-        node-level constants, and built-in functions.
+        Formulas use standard math syntax. The autocomplete dropdown shows available variables (from input port labels) and built-in functions.
       </P>
 
       <CodeBlock>{`# Input port "Monthly Visitors" → variable monthlyVisitors
@@ -270,9 +276,9 @@ round(revenue / customers, 2)`}</CodeBlock>
       <Table
         headers={['Display', 'Meaning']}
         rows={[
-          ['A number', 'Evaluated successfully'],
-          ['—', 'Valid formula but upstream inputs are missing (symbolic)'],
-          ['⚠', 'Syntax error or evaluation failed'],
+          ['= 42.00', 'Evaluated successfully'],
+          ['= formula_text', 'Valid formula but some upstream inputs have no value yet — shown as a preview'],
+          ['⚠ message', 'Syntax error or evaluation failed'],
         ]}
       />
     </>
@@ -283,19 +289,19 @@ function SectionUnits() {
   return (
     <>
       <Heading>Units</Heading>
-      <P>Every port has a unit that controls how its value is displayed and how it propagates downstream.</P>
+      <P>Every <strong>output port</strong> has a unit that controls how its value is displayed and how it propagates downstream.</P>
 
       <Table
         headers={['Unit', 'Display format', 'Example']}
         rows={[
           ['number', 'Plain decimal with commas', '42,300'],
           ['money', 'Dollar sign with cents', '$42,300.00'],
-          ['percent', 'Stored as decimal, shown as %', '0.425 → 42.5%'],
+          ['percent', 'Enter and display as whole numbers (0–100)', 'Enter 42.5 → displays 42.5%'],
         ]}
       />
 
       <Heading>Changing a unit</Heading>
-      <P>Click the <strong>unit badge</strong> on any port to cycle: <Code>number</Code> → <Code>money</Code> → <Code>percent</Code> → <Code>number</Code>.</P>
+      <P>Click the <strong>unit button</strong> (<Code>#</Code> / <Code>$</Code> / <Code>%</Code>) on any output port to open a dropdown and select <Code>Number</Code>, <Code>Money</Code>, or <Code>Percent</Code>. Switching units preserves the displayed number — entering <Code>70</Code> as a Number then switching to Percent still shows <Code>70</Code>.</P>
 
       <Heading>Unit inference</Heading>
       <P>When a port has no explicit unit, it infers one from its upstream connections:</P>
@@ -312,24 +318,16 @@ function SectionEditingPorts() {
   return (
     <>
       <Heading>Renaming ports</Heading>
-      <P>Click a port label and type a new name, then press <Code>Enter</Code>. The new name becomes the variable name in downstream formulas (camelCased automatically).</P>
+      <P>Click a port label and type a new name, then press <Code>Enter</Code> or click away. Spaces become underscores in the variable name (e.g. <Code>demand signal</Code> → variable <Code>demand_signal</Code>); special characters also become underscores. Any formulas referencing the old name are updated automatically.</P>
 
       <Heading>Reordering ports</Heading>
       <P>Grab the <strong>⠿ drag handle</strong> to the left of any port label and drag it up or down to reorder.</P>
 
-      <Heading>Quick-add buttons</Heading>
-      <P>In expanded mode, Expression nodes show:</P>
-      <ul className="help-modal__list">
-        <li><strong>+ in</strong> — add a new input port</li>
-        <li><strong>+ const</strong> — add a node-level named constant (scoped to this node)</li>
-        <li><strong>+ out</strong> — add a new output port</li>
-      </ul>
+      <Heading>Removing a port</Heading>
+      <P>Hover over a port to reveal the <strong>✕</strong> button, then click it. The port and any connected edges are removed.</P>
 
-      <Heading>Full port editor</Heading>
-      <P>Click the <strong>Editor</strong> button when a node is expanded for a comprehensive panel covering all port properties: label, formula, value, and unit.</P>
-
-      <Heading>Expanding / collapsing nodes</Heading>
-      <P>Hover over or click a node to expand it and see all ports and formulas. Nodes collapse to a compact label + value view when not focused. In Experiment Mode they collapse automatically to keep the canvas readable.</P>
+      <Heading>Adding input ports</Heading>
+      <P>Drag a connection from any output and release it over an Expression or Metric node's body (not a specific handle) — a new input port is created and connected automatically. You can also drop the drag over empty canvas space to create a whole new connected node.</P>
     </>
   )
 }
@@ -360,17 +358,40 @@ function SectionExperiment() {
         The app automatically adjusts upstream constants — Monthly Visitors, Ad Spend, etc. — to reach that target.
       </P>
 
-      <Heading>Locking constants</Heading>
+      <Heading>Locking nodes</Heading>
       <P>
-        Click the <strong>lock icon</strong> on a Constant's sim slider to exclude it from back-propagation.
-        Only unlocked constants absorb the distributed change.
+        Each node's sim header shows a <strong>lock icon (🔒)</strong>. Click it to lock the node,
+        which excludes it from back-propagation. Locked nodes are also protected upstream:
+        any Constant that feeds into a locked node cannot be adjusted by back-prop, even if
+        that Constant is also reachable via an unlocked path. Only constants that are entirely
+        free of locked dependencies absorb a distributed change.
       </P>
       <P>
         <em>Tip:</em> Lock "Conversion Rate" (hard to change) and leave "Ad Spend" unlocked to ask:
         "How much more do I need to spend to hit this revenue number?"
       </P>
 
-      <Heading>Resetting</Heading>
+      <Heading>Highlight direction</Heading>
+      <P>
+        Each node's sim header shows an <strong>↑ / ↓ dropdown</strong>.
+        By default (↑ better) an increase is highlighted green and a decrease red.
+        Switch to <strong>↓ better</strong> for metrics where lower is good — error rates, latency, churn — so a decrease shows green instead.
+        The setting is saved with the node and persists between Experiment sessions.
+      </P>
+
+      <Heading>Resetting a node</Heading>
+      <P>
+        When a node has active overrides, a <strong>↺ button</strong> appears in its sim header.
+        Click it to reset all of that node's ports back to their formula-computed baseline values.
+      </P>
+
+      <Heading>Unevaluable nodes</Heading>
+      <P>
+        If an Expression or Metric node cannot be calculated — due to a bad formula, missing connection, or an upstream error — its sim panel shows <em>⚠ Cannot calculate — check formula or connections</em> instead of a slider.
+        Fix the formula or add the missing connection and the slider reappears automatically.
+      </P>
+
+      <Heading>Resetting everything</Heading>
       <P>Toggle the <strong>Experiment</strong> button off to clear all simulation overrides and return to the baseline graph.</P>
     </>
   )
@@ -380,16 +401,15 @@ function SectionSeries() {
   return (
     <>
       <Heading>Series Mode (Timeline View)</Heading>
-      <P>Any node can track a history of its primary output value and display it as a chart.</P>
+      <P>Measure nodes and any node downstream of a Measure can display a chart of their primary output value over time.</P>
 
       <Heading>Activating</Heading>
-      <P>Click the <strong>series icon</strong> in a node's header. The node expands to show a chart. The last 100 recorded values are stored.</P>
+      <P>Click the <strong>display mode dropdown</strong> (∿ / ◿ / ▮▮) in the node's header — it appears on hover. Choose <strong>Area Graph</strong> or <strong>Bar Graph</strong> to switch to chart view. The last <strong>20</strong> recorded values are stored. When you switch to series mode, the chart is pre-populated from buffered history so it doesn't start blank.</P>
 
       <Heading>Chart types</Heading>
       <Table
         headers={['Icon', 'Type', 'Best for']}
         rows={[
-          ['∿', 'Line', 'Continuous trends'],
           ['◿', 'Area', 'Filled trend with visual emphasis'],
           ['▮▮', 'Bar', 'Discrete values or step changes'],
         ]}
@@ -416,13 +436,20 @@ function SectionLibrary() {
         <li><strong>Drag</strong> an item onto the canvas and drop it at a specific position</li>
       </ul>
 
+      <Heading>Built-in library content</Heading>
+      <P>The library ships with a curated set of templates organized by type:</P>
+      <ul className="help-modal__list">
+        <li><strong>Math Constants</strong> — π, e, √2, φ, ln(2), ln(10)</li>
+        <li><strong>Web Performance Measures</strong> — Page Load Time, LCP, CLS, Conversion Rate, and more</li>
+        <li><strong>Expressions</strong> — Clamp, Safe Divide, Round to Step, Log Scale, Weighted Average</li>
+        <li><strong>Metrics</strong> — Monthly Revenue, Customer LTV, Acquisition Cost, Retention Rate, NPS</li>
+      </ul>
+
       <Heading>Saving nodes to the library</Heading>
-      <P>Right-click any node on the canvas and choose <strong>Save to Library</strong>. The full node configuration — ports, formulas, variables — is saved as a reusable template.</P>
+      <P>Hover over any node on the canvas to reveal the <strong>☆ star button</strong> in its header, then click it to save the full node configuration — ports and formulas — as a reusable template.</P>
 
       <Heading>Managing library items</Heading>
       <ul className="help-modal__list">
-        <li><strong>Edit</strong> — click the edit button on any item to modify its label or defaults</li>
-        <li><strong>+ New</strong> — create a library item from scratch</li>
         <li><strong>Reset</strong> — restore the built-in defaults (confirmation required)</li>
       </ul>
       <P>Library items are stored in your browser's <Code>localStorage</Code> and persist between sessions.</P>
@@ -460,7 +487,7 @@ function SectionKeyboard() {
         <li>Drag nodes from their <strong>header bar</strong> — clicking inside a node (on ports or buttons) won't accidentally move it.</li>
         <li>Click the canvas minimap (bottom-right) to jump to any area of a large graph.</li>
         <li>Use the <strong>fit view</strong> button (controls panel, bottom-left) to reset your zoom level.</li>
-        <li>In Experiment Mode, lock constants you don't want changed before dragging a back-propagation slider.</li>
+        <li>In Experiment Mode, lock any node you don't want changed before dragging a back-propagation slider — this also protects its upstream constants.</li>
       </ul>
     </>
   )

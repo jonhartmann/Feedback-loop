@@ -55,29 +55,34 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
         value={docName}
         onChange={e => onDocNameChange(e.target.value)}
         placeholder="Untitled"
-        style={{ width: `${Math.max(80, (docName || 'Untitled').length * 8.5)}px` }}
+        style={{ width: `${Math.max(160, (docName || 'Untitled').length * 10.5)}px` }}
         title="Document name (used as filename when saving)"
       />
 
-      <div className="toolbar__divider" />
+      <div className="toolbar__spacer-fixed" />
 
       <div className="toolbar__btn-group" data-tour="node-buttons">
-        <Button onClick={() => handleAddNode('constant')} variant="constant">+ Constant</Button>
-        <Button onClick={() => handleAddNode('measure')} variant="measure">+ Measure</Button>
-        <Button onClick={() => handleAddNode()} variant="expression">+ Expression</Button>
-        <Button onClick={() => handleAddNode('metric')} variant="metric">+ Metric</Button>
+        <Button onClick={() => handleAddNode('constant')} variant="constant" draggable onDragStart={e => { e.dataTransfer.setData('application/feedback-variant', 'constant'); e.dataTransfer.effectAllowed = 'copy' }}>+ Constant</Button>
+        <Button onClick={() => handleAddNode('measure')} variant="measure" draggable onDragStart={e => { e.dataTransfer.setData('application/feedback-variant', 'measure'); e.dataTransfer.effectAllowed = 'copy' }}>+ Measure</Button>
+        <Button onClick={() => handleAddNode()} variant="expression" draggable onDragStart={e => { e.dataTransfer.setData('application/feedback-variant', 'expression'); e.dataTransfer.effectAllowed = 'copy' }}>+ Expression</Button>
+        <Button onClick={() => handleAddNode('metric')} variant="metric" draggable onDragStart={e => { e.dataTransfer.setData('application/feedback-variant', 'metric'); e.dataTransfer.effectAllowed = 'copy' }}>+ Metric</Button>
       </div>
-      <span data-tour="library-btn"><Button onClick={onToggleDrawer} active={drawerOpen}>Library</Button></span>
-
-      <div className="toolbar__divider" />
-
-      <span data-tour="experiment-btn"><Button onClick={toggleSimMode} active={simMode}>Experiment</Button></span>
 
       <div className="toolbar__spacer" />
+      <span data-tour="experiment-btn"><Button onClick={toggleSimMode} active={simMode}>Experiment</Button></span>
+      <div className="toolbar__spacer" />
+
+      <div className="toolbar__spacer" />
+
       <Button onClick={onShowTemplates}>Templates</Button>
+      <span data-tour="library-btn"><Button onClick={onToggleDrawer} active={drawerOpen}>Library</Button></span>
+
+      <div className="toolbar__spacer-fixed" />
+
       <Button onClick={onShowHelp}>Help</Button>
+      <div className="toolbar__spacer-fixed" />
       <div className="toolbar__btn-group" data-tour="save-load">
-        <Button onClick={handleSave} active>Save</Button>
+        <Button onClick={handleSave} variant="save">Save</Button>
         <Button onClick={handleLoad}>Load</Button>
       </div>
       <input
@@ -94,18 +99,20 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
 interface ButtonProps {
   onClick: () => void;
   children: React.ReactNode;
-  variant?: 'constant' | 'measure' | 'metric' | 'expression';
+  variant?: 'constant' | 'measure' | 'metric' | 'expression' | 'save';
   active?: boolean;
+  draggable?: boolean;
+  onDragStart?: (e: React.DragEvent) => void;
 }
 
-function Button({ onClick, children, variant, active }: ButtonProps) {
+function Button({ onClick, children, variant, active, draggable, onDragStart }: ButtonProps) {
   const cls = clsx('toolbar__btn', {
     [`toolbar__btn--${variant}`]: !!variant,
     'toolbar__btn--active':       !!active,
   })
 
   return (
-    <button className={cls} onClick={onClick}>
+    <button className={cls} onClick={onClick} draggable={draggable} onDragStart={onDragStart}>
       {children}
     </button>
   )

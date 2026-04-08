@@ -24,7 +24,7 @@ const STEPS: Step[] = [
   {
     target: 'node-buttons',
     title: 'Creating nodes',
-    body: 'Nodes are the building blocks of your model. Constants hold fixed numbers, Measures pull live data, Expressions compute formulas across inputs, and Metrics display your key results.',
+    body: 'Nodes are the building blocks of your model. Constants hold fixed numbers, Measures pull live data, Expressions compute formulas across inputs, and Metrics display your key results. Click a button to add a node at the canvas centre, or drag it onto the canvas to place it exactly where you want.',
     placement: 'below',
   },
   {
@@ -48,7 +48,7 @@ const STEPS: Step[] = [
   {
     target: 'library-btn',
     title: 'The Library',
-    body: 'Save any node as a reusable template by right-clicking it. Open the Library drawer to drag saved nodes onto the canvas in any future graph.',
+    body: 'Save any node as a reusable template by clicking the ☆ star in its header (visible on hover). The Library also includes built-in templates for Measures, Expressions, and Metrics. Click an item to add it to the canvas, or drag it to a specific position.',
     placement: 'below',
   },
   {

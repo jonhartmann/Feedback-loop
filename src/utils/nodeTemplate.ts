@@ -10,5 +10,6 @@ export function nodeDataToTemplate(data: FeedbackNodeData): NodeTemplate {
     outputs: data.outputs,
     ...(data.displayMode !== undefined && { displayMode: data.displayMode }),
     ...(data.seriesChartType !== undefined && { seriesChartType: data.seriesChartType }),
+    ...(data.invertSimHighlight !== undefined && { invertSimHighlight: data.invertSimHighlight }),
   }
 }

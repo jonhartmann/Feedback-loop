@@ -17,6 +17,7 @@
   --node-header-bg:     var(--c-g3-10);
   --node-select-shadow: rgba(38,54,64,0.2);
 
+  cursor: default;
   background: var(--c-surface);
   border: 2px solid var(--node-border);
   border-radius: var(--r-xl);
@@ -54,7 +55,8 @@
   }
 
   &.feedback-node--sim-mode {
-    cursor: default;
+    /* Override header grab cursor during sim mode */
+    & .feedback-node__header { cursor: default; }
 
     /* Body stays in-flow to maintain dimensions; hidden + non-interactive */
     & .feedback-node__body {
@@ -105,6 +107,13 @@
   justify-content: space-between;
   gap: 6px;
   min-height: 34px;
+  cursor: grab;
+
+  &:active { cursor: grabbing; }
+
+  /* Interactive elements inside the header are not drag handles */
+  & button, & input { cursor: default; }
+  & button { cursor: pointer; }
 }
 
 .feedback-node__label {
@@ -159,6 +168,7 @@
   opacity: 0.55;
   transition: opacity 0.15s, color 0.15s;
   flex-shrink: 0;
+  visibility: hidden;
 
   &:hover { opacity: 1; color: var(--c-g4); }
 }
@@ -173,6 +183,7 @@
   white-space: nowrap;
   flex-shrink: 0;
   color: var(--c-g2-40);
+  visibility: hidden;
 
   &:hover {
     background: var(--c-error-bg);
@@ -190,8 +201,39 @@
   color: var(--c-g4);
   opacity: 0.65;
   flex-shrink: 0;
+  visibility: hidden;
 
   &:hover { opacity: 1; }
+}
+
+.feedback-node__header:hover {
+  .feedback-node__save-btn,
+  .feedback-node__delete-btn,
+  .feedback-node__mode-btn { visibility: visible; }
+}
+
+/* Sim-mode header buttons — always visible, not hover-gated */
+.feedback-node__sim-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1px 3px;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--c-g2-40);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  border-radius: var(--r-sm);
+  transition: color 0.15s;
+
+  &:hover { color: var(--c-g4); }
+
+  &.feedback-node__sim-btn--locked {
+    color: var(--c-g4);
+    opacity: 1;
+    &:hover { color: var(--c-g5); }
+  }
 }
 
 .feedback-node__chart-row {
@@ -789,6 +831,7 @@
   position: absolute;
   right: 0;
   top: calc(100% + 2px);
+  visibility: visible;
   z-index: 1000;
   background: var(--c-surface);
   border: 1px solid var(--c-g3-20);
@@ -837,6 +880,7 @@
   z-index: 3;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 2px;
   padding: 4px 10px 6px;
   border-top: 1px solid var(--c-g2-20);
@@ -873,7 +917,7 @@
 
 .sim-panel__value-display {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
 }
 
@@ -991,6 +1035,19 @@
 
     &:hover { color: var(--c-g5); }
   }
+}
+
+.sim-panel__error-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0;
+}
+
+.sim-panel__error {
+  font-size: 11px;
+  color: var(--c-error);
+  font-style: italic;
 }
 
 /* ── port-editor block ────────────────────────────────────────────────────── */
