@@ -213,6 +213,10 @@ Click **Experiment** in the toolbar to enter simulation mode. Every node gains a
 
 **Locking** — click the lock icon on a Constant's slider to exclude it from back-propagation. Only unlocked constants absorb a distributed change.
 
+**Highlight direction** — each node shows a small **↑ better** / **↓ better** toggle at the top of its sim panel. This controls whether an increase is highlighted green (↑ better, the default) or red (↓ better, for metrics where lower is good — error rates, latency, churn, etc.). The setting is saved with the node and persists between Experiment sessions.
+
+**Unevaluable nodes** — if an Expression or Metric node cannot be calculated (bad formula, missing connection, or upstream error), its sim panel shows ⚠ *Cannot calculate — check formula or connections* instead of a slider. Fix the formula or add the missing connection and the slider reappears automatically.
+
 Toggle **Experiment** off to discard all simulation overrides and return to the baseline graph.
 
 ---

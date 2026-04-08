@@ -19,7 +19,7 @@ export function formatSimValue(value: number, unit: Unit | undefined): string {
   return formatValue(value, unit)
 }
 
-function LockIcon({ locked }: { locked: boolean }) {
+export function LockIcon({ locked }: { locked: boolean }) {
   return (
     <svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden>
       <rect x="1.5" y="5.5" width="8" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
@@ -41,13 +41,14 @@ export interface SimSliderRowProps {
   showLabel: boolean
   /** If true, slider uses back-propagation (formula/metric nodes) instead of direct override */
   useBackProp: boolean
+  /** If true, a decrease is highlighted green and an increase red (e.g. for error rates) */
+  invertHighlight?: boolean
   simOverlay: Map<string, number>
   setSimValue: (key: string, value: number) => void
-  removeSimValue: (key: string) => void
 }
 
-export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBackProp, simOverlay, setSimValue, removeSimValue }: SimSliderRowProps) {
-  const { simEvalMap, backPropagate, lockedKeys, toggleLock } = useSimContext()
+export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBackProp, invertHighlight, simOverlay, setSimValue }: SimSliderRowProps) {
+  const { simEvalMap, backPropagate, lockedKeys } = useSimContext()
   const isLocked = lockedKeys.has(nodeKey)
 
   // simOverlay stores fractional adjustments (0.20 = +20%), not absolute values.
@@ -72,8 +73,11 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
 
   const sliderPct = Math.max(-80, Math.min(400, rawPct))
   const displayPct = Math.round(rawPct * 10) / 10
-  const isPositive = rawPct > 0.05
-  const isNegative = rawPct < -0.05
+  const rawPositive = rawPct > 0.05
+  const rawNegative = rawPct < -0.05
+  // When lower is better, swap which direction gets the positive (green) treatment
+  const isPositive = invertHighlight ? rawNegative : rawPositive
+  const isNegative = invertHighlight ? rawPositive : rawNegative
 
   const { draft, setDraft, focusedRef: pctFocusedRef } = useDraftValue(displayPct)
 
@@ -111,18 +115,6 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
             {isPositive ? '+' : ''}{Math.round(rawPct * 10) / 10}%
           </span>
         )}
-        <button
-          className={clsx('sim-panel__lock', { 'sim-panel__lock--locked': isLocked })}
-          title={isLocked
-            ? 'Locked — back-propagation stops here. Click to unlock.'
-            : useBackProp
-              ? 'Lock — back-propagation will not traverse through this node'
-              : 'Lock — prevent back-propagation from changing this value'}
-          onMouseDown={e => e.stopPropagation()}
-          onClick={() => toggleLock(nodeKey)}
-        >
-          <LockIcon locked={isLocked} />
-        </button>
       </div>
       <div className="sim-panel__control" onMouseDown={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
         <input
@@ -162,14 +154,6 @@ export function SimSliderRow({ nodeKey, label, unit, baseVal, showLabel, useBack
           }}
         />
         <span className="sim-panel__pct-unit">%</span>
-        {directPctFraction !== undefined && !isLocked && (
-          <button
-            className="sim-panel__reset"
-            title="Reset to formula-computed value"
-            onMouseDown={e => e.stopPropagation()}
-            onClick={() => removeSimValue(nodeKey)}
-          >↺</button>
-        )}
       </div>
     </div>
   )

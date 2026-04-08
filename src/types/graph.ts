@@ -30,6 +30,7 @@ export interface FeedbackNodeData extends Record<string, unknown> {
   formula?: string;             // DEPRECATED — read-only for migration
   displayMode?: 'value' | 'series';
   seriesChartType?: 'line' | 'area' | 'bar';
+  invertSimHighlight?: boolean;  // false/undefined = higher is better (green); true = lower is better (green)
 }
 
 export interface NodeTemplate {
@@ -40,6 +41,7 @@ export interface NodeTemplate {
   value?: number;         // shorthand: initial outputs[0].value on creation (constant nodes)
   displayMode?: 'value' | 'series';
   seriesChartType?: 'line' | 'area' | 'bar';
+  invertSimHighlight?: boolean;
 }
 
 export interface LibraryItem {

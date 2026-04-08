@@ -212,6 +212,30 @@
   .feedback-node__mode-btn { visibility: visible; }
 }
 
+/* Sim-mode header buttons — always visible, not hover-gated */
+.feedback-node__sim-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1px 3px;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--c-g2-40);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  border-radius: var(--r-sm);
+  transition: color 0.15s;
+
+  &:hover { color: var(--c-g4); }
+
+  &.feedback-node__sim-btn--locked {
+    color: var(--c-g4);
+    opacity: 1;
+    &:hover { color: var(--c-g5); }
+  }
+}
+
 .feedback-node__chart-row {
   display: flex;
   gap: 4px;
@@ -856,6 +880,7 @@
   z-index: 3;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 2px;
   padding: 4px 10px 6px;
   border-top: 1px solid var(--c-g2-20);
@@ -892,7 +917,7 @@
 
 .sim-panel__value-display {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
 }
 
@@ -1010,6 +1035,19 @@
 
     &:hover { color: var(--c-g5); }
   }
+}
+
+.sim-panel__error-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0;
+}
+
+.sim-panel__error {
+  font-size: 11px;
+  color: var(--c-error);
+  font-style: italic;
 }
 
 /* ── port-editor block ────────────────────────────────────────────────────── */

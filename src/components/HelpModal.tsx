@@ -368,6 +368,20 @@ function SectionExperiment() {
         "How much more do I need to spend to hit this revenue number?"
       </P>
 
+      <Heading>Highlight direction</Heading>
+      <P>
+        Each node's sim panel shows a small <strong>↑ better</strong> / <strong>↓ better</strong> toggle.
+        By default (↑ better) an increase is highlighted green and a decrease red.
+        Switch to <strong>↓ better</strong> for metrics where lower is good — error rates, latency, churn — so a decrease shows green instead.
+        The setting is saved with the node and persists between Experiment sessions.
+      </P>
+
+      <Heading>Unevaluable nodes</Heading>
+      <P>
+        If an Expression or Metric node cannot be calculated — due to a bad formula, missing connection, or an upstream error — its sim panel shows <em>⚠ Cannot calculate — check formula or connections</em> instead of a slider.
+        Fix the formula or add the missing connection and the slider reappears automatically.
+      </P>
+
       <Heading>Resetting</Heading>
       <P>Toggle the <strong>Experiment</strong> button off to clear all simulation overrides and return to the baseline graph.</P>
     </>

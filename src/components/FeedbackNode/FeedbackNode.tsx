@@ -9,6 +9,8 @@ import { DisplayModeDropdown } from './DisplayModeDropdown'
 import type { DisplayModeCombined } from './DisplayModeDropdown'
 import { useSimContext } from '../../context/SimContext'
 import { SimSliders } from './SimSliders'
+import { HighlightDropdown } from './HighlightDropdown'
+import { LockIcon } from './SimSliderRow'
 import { useDragDropPort } from './useDragDropPort'
 import { usePortEditing } from './usePortEditing'
 import { NodeContext } from './NodeContext'
@@ -32,7 +34,7 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
   const { updateNodeData } = useReactFlow()
   const evalMap = useEvalMap()
   const unitMap = useUnitMap()
-  const { simMode, simOverlay, setSimValue, removeSimValue, simEvalMap } = useSimContext()
+  const { simMode, simOverlay, setSimValue, removeSimValue, simEvalMap, lockedKeys, toggleLock } = useSimContext()
   const canShowSeries = useCanShowSeries(id as string)
 
   const activeEvalMap = simMode ? simEvalMap : evalMap
@@ -106,6 +108,46 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
     ? <DisplayModeDropdown displayMode={displayMode} seriesChartType={seriesChartType} onChange={handleDisplayModeChange} />
     : null
 
+  // Node-level lock for sim mode header: all output keys locked = node is locked
+  const nodeOutputKeys = outputs.map(p => `${id as string}:${p.id}`)
+  const isNodeLocked = nodeOutputKeys.length > 0 && nodeOutputKeys.every(k => lockedKeys.has(k))
+  function toggleNodeLock() {
+    const keysToToggle = isNodeLocked
+      ? nodeOutputKeys
+      : nodeOutputKeys.filter(k => !lockedKeys.has(k))
+    keysToToggle.forEach(k => toggleLock(k))
+  }
+
+  const hasSimOverrides = nodeOutputKeys.some(k => simOverlay.has(k))
+  function resetNodeSimValues() {
+    nodeOutputKeys.forEach(k => removeSimValue(k))
+  }
+
+  const simHeaderSlot = (
+    <>
+      <HighlightDropdown
+        inverted={!!nodeData.invertSimHighlight}
+        onChange={v => updateNodeData(id as string, { invertSimHighlight: v } as Partial<FeedbackNodeData>)}
+      />
+      {hasSimOverrides && (
+        <button
+          className="feedback-node__sim-btn"
+          onMouseDown={e => e.stopPropagation()}
+          onClick={resetNodeSimValues}
+          title="Reset to formula-computed values"
+        >↺</button>
+      )}
+      <button
+        className={clsx('feedback-node__sim-btn', { 'feedback-node__sim-btn--locked': isNodeLocked })}
+        onMouseDown={e => e.stopPropagation()}
+        onClick={toggleNodeLock}
+        title={isNodeLocked ? 'Locked — click to unlock' : 'Lock — exclude from back-propagation'}
+      >
+        <LockIcon locked={isNodeLocked} />
+      </button>
+    </>
+  )
+
   const nodeClass = clsx('feedback-node', {
     [`feedback-node--variant-${variant}`]: !!variant,
     'feedback-node--selected':             !!selected,
@@ -149,23 +191,25 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
         isEditingLabel={isEditingLabel}
         labelDraft={labelDraft}
         showExpanded={showExpanded}
+        simMode={!!simMode}
         setLabelDraft={setLabelDraft}
         setIsEditingLabel={setIsEditingLabel}
         commitLabel={() => actions.commitLabel(labelDraft, trimmed => { setLabelDraft(trimmed); setIsEditingLabel(false) })}
         saveToLibrary={actions.saveToLibrary}
         deleteNode={actions.deleteNode}
         displayModeSlot={displayModeSlot}
+        simHeaderSlot={simHeaderSlot}
       />
 
       {simMode && <SimSliders
         nodeId={id as string}
         isValueNode={isValueNode}
         outputs={outputs}
+        invertSimHighlight={!!nodeData.invertSimHighlight}
         simOverlay={simOverlay}
         baseEvalMap={evalMap}
         unitMap={unitMap}
         setSimValue={setSimValue}
-        removeSimValue={removeSimValue}
       />}
 
       {isValueNode && <ValueNodeBody />}

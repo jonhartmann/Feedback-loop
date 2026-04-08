@@ -18,6 +18,7 @@ export function serializeGraph(
       outputs: n.data.outputs,
       ...(n.data.displayMode !== undefined && { displayMode: n.data.displayMode }),
       ...(n.data.seriesChartType !== undefined && { seriesChartType: n.data.seriesChartType }),
+      ...(n.data.invertSimHighlight !== undefined && { invertSimHighlight: n.data.invertSimHighlight }),
       // legacy n.data.formula is intentionally not written
     },
   }))
@@ -87,6 +88,7 @@ export function deserializeGraph(graph: SerializedGraph): {
         outputs,
         ...(raw.displayMode !== undefined && { displayMode: raw.displayMode as 'value' | 'series' }),
         ...(raw.seriesChartType !== undefined && { seriesChartType: raw.seriesChartType as 'line' | 'area' | 'bar' }),
+        ...(raw.invertSimHighlight !== undefined && { invertSimHighlight: raw.invertSimHighlight as boolean }),
         // legacy formula, description, variables, metricFormula, metricUnit, sourceUrl silently dropped
       },
     }

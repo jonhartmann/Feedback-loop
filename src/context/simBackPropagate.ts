@@ -7,11 +7,59 @@ type EvalMap = Map<string, number>
 
 type ConstantPort = { key: string; nodeId: string; portId: string }
 
+/**
+ * Walk upstream from every locked expression/metric node and collect the keys
+ * of all constant/measure ports reachable from them.  These ports must not be
+ * modified during back-propagation even when also reachable via an unlocked
+ * path, because changing them would silently alter a locked node's output.
+ */
+function collectProtectedConstants(
+  nodes: Node<FeedbackNodeData>[],
+  edgeIndex: EdgeIndex,
+  lockedKeys: Set<string>,
+): Set<string> {
+  const protectedKeys = new Set<string>()
+  const visited = new Set<string>()
+
+  function walk(nId: string, pId: string) {
+    const vk = `${nId}::${pId}`
+    if (visited.has(vk)) return
+    visited.add(vk)
+
+    const node = nodes.find(n => n.id === nId)
+    if (!node) return
+
+    if (node.data.variant === 'constant' || node.data.variant === 'measure') {
+      protectedKeys.add(`${nId}:${pId}`)
+      return
+    }
+
+    for (const input of (node.data.inputs ?? [])) {
+      const edge = edgeIndex.get(`${nId}:${input.id}`)
+      if (edge?.sourceHandle) walk(edge.source, edge.sourceHandle)
+    }
+  }
+
+  for (const node of nodes) {
+    for (const port of (node.data.outputs ?? [])) {
+      if (lockedKeys.has(`${node.id}:${port.id}`)) {
+        for (const input of (node.data.inputs ?? [])) {
+          const edge = edgeIndex.get(`${node.id}:${input.id}`)
+          if (edge?.sourceHandle) walk(edge.source, edge.sourceHandle)
+        }
+      }
+    }
+  }
+
+  return protectedKeys
+}
+
 function collectUpstreamConstants(
   nodeId: string,
   nodes: Node<FeedbackNodeData>[],
   edgeIndex: EdgeIndex,
   lockedKeys: Set<string>,
+  protectedKeys: Set<string>,
 ): ConstantPort[] {
   const upstreamConstants: ConstantPort[] = []
   const visited = new Set<string>()
@@ -27,7 +75,7 @@ function collectUpstreamConstants(
     const key = `${nId}:${pId}`
 
     if (node.data.variant === 'constant' || node.data.variant === 'measure') {
-      if (!lockedKeys.has(key)) upstreamConstants.push({ key, nodeId: nId, portId: pId })
+      if (!lockedKeys.has(key) && !protectedKeys.has(key)) upstreamConstants.push({ key, nodeId: nId, portId: pId })
       return
     }
 
@@ -84,7 +132,8 @@ export function computeBackPropagateUpdates(
     if (e.targetHandle) edgeIndex.set(`${e.target}:${e.targetHandle}`, e)
   }
 
-  const upstreamConstants = collectUpstreamConstants(nodeId, nodes, edgeIndex, lockedKeys)
+  const protectedKeys = collectProtectedConstants(nodes, edgeIndex, lockedKeys)
+  const upstreamConstants = collectUpstreamConstants(nodeId, nodes, edgeIndex, lockedKeys, protectedKeys)
   if (upstreamConstants.length === 0) return new Map()
 
   // ── Step 2: compute log-derivatives at the BASE point ───────────────────
