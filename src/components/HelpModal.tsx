@@ -358,10 +358,13 @@ function SectionExperiment() {
         The app automatically adjusts upstream constants — Monthly Visitors, Ad Spend, etc. — to reach that target.
       </P>
 
-      <Heading>Locking constants</Heading>
+      <Heading>Locking nodes</Heading>
       <P>
-        Click the <strong>lock icon</strong> on a Constant's sim slider to exclude it from back-propagation.
-        Only unlocked constants absorb the distributed change.
+        Each node's sim header shows a <strong>lock icon (🔒)</strong>. Click it to lock the node,
+        which excludes it from back-propagation. Locked nodes are also protected upstream:
+        any Constant that feeds into a locked node cannot be adjusted by back-prop, even if
+        that Constant is also reachable via an unlocked path. Only constants that are entirely
+        free of locked dependencies absorb a distributed change.
       </P>
       <P>
         <em>Tip:</em> Lock "Conversion Rate" (hard to change) and leave "Ad Spend" unlocked to ask:
@@ -370,10 +373,16 @@ function SectionExperiment() {
 
       <Heading>Highlight direction</Heading>
       <P>
-        Each node's sim panel shows a small <strong>↑ better</strong> / <strong>↓ better</strong> toggle.
+        Each node's sim header shows an <strong>↑ / ↓ dropdown</strong>.
         By default (↑ better) an increase is highlighted green and a decrease red.
         Switch to <strong>↓ better</strong> for metrics where lower is good — error rates, latency, churn — so a decrease shows green instead.
         The setting is saved with the node and persists between Experiment sessions.
+      </P>
+
+      <Heading>Resetting a node</Heading>
+      <P>
+        When a node has active overrides, a <strong>↺ button</strong> appears in its sim header.
+        Click it to reset all of that node's ports back to their formula-computed baseline values.
       </P>
 
       <Heading>Unevaluable nodes</Heading>
@@ -382,7 +391,7 @@ function SectionExperiment() {
         Fix the formula or add the missing connection and the slider reappears automatically.
       </P>
 
-      <Heading>Resetting</Heading>
+      <Heading>Resetting everything</Heading>
       <P>Toggle the <strong>Experiment</strong> button off to clear all simulation overrides and return to the baseline graph.</P>
     </>
   )
@@ -478,7 +487,7 @@ function SectionKeyboard() {
         <li>Drag nodes from their <strong>header bar</strong> — clicking inside a node (on ports or buttons) won't accidentally move it.</li>
         <li>Click the canvas minimap (bottom-right) to jump to any area of a large graph.</li>
         <li>Use the <strong>fit view</strong> button (controls panel, bottom-left) to reset your zoom level.</li>
-        <li>In Experiment Mode, lock constants you don't want changed before dragging a back-propagation slider.</li>
+        <li>In Experiment Mode, lock any node you don't want changed before dragging a back-propagation slider — this also protects its upstream constants.</li>
       </ul>
     </>
   )

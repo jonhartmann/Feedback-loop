@@ -71,6 +71,8 @@ Three buttons are revealed in the header when you hover over a node:
 
 The display mode dropdown only appears on Measure nodes and on nodes that are downstream of a Measure.
 
+In **Experiment Mode**, the ☆ and ✕ buttons are hidden and replaced by sim controls — see the Experiment Mode section for details.
+
 ---
 
 ## Ports
@@ -211,9 +213,17 @@ Click **Experiment** in the toolbar to enter simulation mode. Every node gains a
 
 **Expressions and Metrics** — set a target percentage. Feedback Loop works *backwards* to find what upstream Constant values need to change, then distributes the required adjustment proportionally across all unlocked constants.
 
-**Locking** — click the lock icon on a Constant's slider to exclude it from back-propagation. Only unlocked constants absorb a distributed change.
+**Sim header controls** — in Experiment Mode the save (☆) and delete (✕) buttons in each node's header are replaced by three sim controls:
 
-**Highlight direction** — each node shows a small **↑ better** / **↓ better** toggle at the top of its sim panel. This controls whether an increase is highlighted green (↑ better, the default) or red (↓ better, for metrics where lower is good — error rates, latency, churn, etc.). The setting is saved with the node and persists between Experiment sessions.
+| Control | Description |
+|---------|-------------|
+| ↑ / ↓ dropdown | Whether higher (↑, default) or lower (↓) values are highlighted green. Saved with the node. |
+| ↺ | Resets all of this node's ports to their formula-computed baseline. Only appears when the node has active overrides. |
+| 🔒 | Locks / unlocks the node (see below). |
+
+**Locking** — click the **lock icon** in a node's sim header to lock it. A locked node is excluded from back-propagation, and any Constant that feeds into it is also protected — it cannot be adjusted by back-prop even if reachable through another unlocked path. Only constants that are entirely free of locked dependencies absorb a distributed change.
+
+**Highlight direction** — use the **↑/↓ dropdown** in the node's sim header to set whether higher or lower values are highlighted green. By default ↑ better (increase = green). Switch to ↓ better for metrics where lower is good — error rates, latency, churn, etc. The setting is saved with the node and persists between Experiment sessions.
 
 **Unevaluable nodes** — if an Expression or Metric node cannot be calculated (bad formula, missing connection, or upstream error), its sim panel shows ⚠ *Cannot calculate — check formula or connections* instead of a slider. Fix the formula or add the missing connection and the slider reappears automatically.
 
