@@ -55,6 +55,10 @@
   flex: 1;
 }
 
+.toolbar__spacer-fixed {
+  width: 0.5em;
+}
+
 .toolbar__btn-group {
   display: flex;
   gap: 8px;

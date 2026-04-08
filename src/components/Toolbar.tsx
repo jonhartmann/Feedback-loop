@@ -59,7 +59,7 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
         title="Document name (used as filename when saving)"
       />
 
-      <div className="toolbar__divider" />
+      <div className="toolbar__spacer-fixed" />
 
       <div className="toolbar__btn-group" data-tour="node-buttons">
         <Button onClick={() => handleAddNode('constant')} variant="constant" draggable onDragStart={e => { e.dataTransfer.setData('application/feedback-variant', 'constant'); e.dataTransfer.effectAllowed = 'copy' }}>+ Constant</Button>
@@ -72,15 +72,15 @@ export default function Toolbar({ onAddNode, onSave, onLoad, docName, onDocNameC
       <span data-tour="experiment-btn"><Button onClick={toggleSimMode} active={simMode}>Experiment</Button></span>
       <div className="toolbar__spacer" />
 
-      <div className="toolbar__divider" />
+      <div className="toolbar__spacer" />
 
       <Button onClick={onShowTemplates}>Templates</Button>
       <span data-tour="library-btn"><Button onClick={onToggleDrawer} active={drawerOpen}>Library</Button></span>
 
-      <div className="toolbar__divider" />
+      <div className="toolbar__spacer-fixed" />
 
       <Button onClick={onShowHelp}>Help</Button>
-      <div className="toolbar__divider" />
+      <div className="toolbar__spacer-fixed" />
       <div className="toolbar__btn-group" data-tour="save-load">
         <Button onClick={handleSave} variant="save">Save</Button>
         <Button onClick={handleLoad}>Load</Button>
