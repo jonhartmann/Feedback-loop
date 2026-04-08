@@ -17,6 +17,7 @@
   --node-header-bg:     var(--c-g3-10);
   --node-select-shadow: rgba(38,54,64,0.2);
 
+  cursor: default;
   background: var(--c-surface);
   border: 2px solid var(--node-border);
   border-radius: var(--r-xl);
@@ -54,7 +55,8 @@
   }
 
   &.feedback-node--sim-mode {
-    cursor: default;
+    /* Override header grab cursor during sim mode */
+    & .feedback-node__header { cursor: default; }
 
     /* Body stays in-flow to maintain dimensions; hidden + non-interactive */
     & .feedback-node__body {
@@ -105,6 +107,13 @@
   justify-content: space-between;
   gap: 6px;
   min-height: 34px;
+  cursor: grab;
+
+  &:active { cursor: grabbing; }
+
+  /* Interactive elements inside the header are not drag handles */
+  & button, & input { cursor: default; }
+  & button { cursor: pointer; }
 }
 
 .feedback-node__label {
@@ -159,6 +168,7 @@
   opacity: 0.55;
   transition: opacity 0.15s, color 0.15s;
   flex-shrink: 0;
+  visibility: hidden;
 
   &:hover { opacity: 1; color: var(--c-g4); }
 }
@@ -173,6 +183,7 @@
   white-space: nowrap;
   flex-shrink: 0;
   color: var(--c-g2-40);
+  visibility: hidden;
 
   &:hover {
     background: var(--c-error-bg);
@@ -190,8 +201,15 @@
   color: var(--c-g4);
   opacity: 0.65;
   flex-shrink: 0;
+  visibility: hidden;
 
   &:hover { opacity: 1; }
+}
+
+.feedback-node__header:hover {
+  .feedback-node__save-btn,
+  .feedback-node__delete-btn,
+  .feedback-node__mode-btn { visibility: visible; }
 }
 
 .feedback-node__chart-row {
@@ -789,6 +807,7 @@
   position: absolute;
   right: 0;
   top: calc(100% + 2px);
+  visibility: visible;
   z-index: 1000;
   background: var(--c-surface);
   border: 1px solid var(--c-g3-20);
