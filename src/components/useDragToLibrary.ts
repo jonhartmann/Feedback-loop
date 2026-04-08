@@ -1,11 +1,11 @@
 import { useRef } from 'react'
 import type { Node } from '@xyflow/react'
 import { useReactFlow } from '@xyflow/react'
-import type { FeedbackNodeData, NodeTemplate } from '../types/graph'
+import type { FeedbackNodeData, NodeTemplate, NodeVariant } from '../types/graph'
 
 interface UseDragToLibraryProps {
   setNodes: (updater: (nodes: Node<FeedbackNodeData>[]) => Node<FeedbackNodeData>[]) => void
-  addNode: (position: { x: number; y: number }, template: NodeTemplate) => void
+  addNode: (position: { x: number; y: number }, variantOrTemplate: NodeVariant | NodeTemplate) => void
   drawerOpen?: boolean
   drawerWidth?: number
   onSaveNodeToLibrary?: (data: FeedbackNodeData) => void
@@ -38,11 +38,19 @@ export function useDragToLibrary({
 
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault()
-    const raw = e.dataTransfer.getData('application/feedback-node')
-    if (!raw) return
-    const template: NodeTemplate = JSON.parse(raw)
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY })
-    addNode(position, template)
+
+    const raw = e.dataTransfer.getData('application/feedback-node')
+    if (raw) {
+      const template: NodeTemplate = JSON.parse(raw)
+      addNode(position, template)
+      return
+    }
+
+    const variant = e.dataTransfer.getData('application/feedback-variant')
+    if (variant) {
+      addNode(position, variant as NodeVariant)
+    }
   }
 
   return { onNodeDragStart, onNodeDragStop, handleDrop }
