@@ -1,10 +1,10 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import clsx from 'clsx'
 import type { Node, NodeProps } from '@xyflow/react'
 import { useReactFlow } from '@xyflow/react'
 import type { FeedbackNodeData } from '../../types/graph'
 import { METRIC_PORT_ID } from '../../types/graph'
-import { useEvalMap, useUnitMap, useCanShowSeries } from '../../context/GraphEvalContext'
+import { useEvalMap, useUnitMap, useCanShowSeries, useGetValueHistory } from '../../context/GraphEvalContext'
 import { DisplayModeDropdown } from './DisplayModeDropdown'
 import type { DisplayModeCombined } from './DisplayModeDropdown'
 import { useSimContext } from '../../context/SimContext'
@@ -49,13 +49,26 @@ export default function FeedbackNode({ id, data, selected }: NodeProps<Node<Feed
       : undefined)
   const primaryUnit   = unitMap.get(`${id as string}:${primaryPortId}`) ?? outputs[0]?.unit
 
+  const getValueHistory = useGetValueHistory()
   const [seriesHistory, setSeriesHistory] = useState<number[]>([])
 
+  // Seed history from pre-built buffer when transitioning into series mode
+  const prevDisplayModeRef = useRef(displayMode)
+  useEffect(() => {
+    const prev = prevDisplayModeRef.current
+    prevDisplayModeRef.current = displayMode
+    if (prev !== 'series' && displayMode === 'series') {
+      const history = getValueHistory(id as string, primaryPortId)
+      if (history.length > 0) setSeriesHistory(history)
+    }
+  }, [displayMode, id, primaryPortId, getValueHistory])
+
+  // Accumulate values while in series mode (cap at 20)
   useEffect(() => {
     if (displayMode !== 'series' || primaryValue === undefined) return
     setSeriesHistory(prev => {
       if (prev.length > 0 && prev[prev.length - 1] === primaryValue) return prev
-      return [...prev.slice(-99), primaryValue]
+      return [...prev.slice(-19), primaryValue]
     })
   }, [primaryValue, displayMode])
 
