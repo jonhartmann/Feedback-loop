@@ -1,17 +1,25 @@
 /* ── library-item block ───────────────────────────────────────────────────── */
 
 .library-item {
+  --item-accent: var(--c-g2-dk);
+
   display: flex;
   align-items: center;
-  padding: 4px 8px 4px 12px;
-  gap: 2px;
+  padding: 8px 10px 8px 14px;
+  gap: 4px;
   cursor: grab;
   user-select: none;
-  background: transparent;
-  transition: background 0.1s;
+  border-left: 3px solid transparent;
+  transition: background 0.1s, border-color 0.1s;
+
+  &[data-variant="constant"] { --item-accent: var(--c-g5); }
+  &[data-variant="measure"]  { --item-accent: var(--c-measure-border); }
+  &[data-variant="metric"]   { --item-accent: var(--c-g4); }
+  &[data-variant="expression"] { --item-accent: var(--c-g2); }
 
   &:hover {
     background: #1A2A36;
+    border-left-color: var(--item-accent);
 
     & .library-item__actions { display: flex; }
   }
@@ -19,7 +27,7 @@
 
 .library-item__label {
   flex: 1;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--c-g2-40);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -35,8 +43,8 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0 3px;
-  font-size: 12px;
+  padding: 0 4px;
+  font-size: 13px;
   line-height: 1;
   color: var(--c-g2);
 

@@ -1,22 +1,23 @@
-import type { LibraryItem, NodeTemplate } from '../types/graph'
+import type { LibraryItem, NodeTemplate, NodeVariant } from '../types/graph'
 import './LibraryItem.css'
 
 export function LibraryItemRow({
   item,
+  variant,
   onDragStart,
   onAddToCanvas,
-  onEdit,
   onDelete,
 }: {
   item: LibraryItem
+  variant: NodeVariant
   onDragStart: (e: React.DragEvent, template: NodeTemplate) => void
   onAddToCanvas: () => void
-  onEdit: () => void
   onDelete: () => void
 }) {
   return (
     <div
       className="library-item"
+      data-variant={variant}
       draggable
       onDragStart={e => onDragStart(e, item.template)}
       onClick={onAddToCanvas}
@@ -24,7 +25,6 @@ export function LibraryItemRow({
       <span className="library-item__label">{item.label}</span>
 
       <div className="library-item__actions">
-        <button className="library-item__btn" title="Edit"           onClick={e => { e.stopPropagation(); onEdit() }}>✎</button>
         <button className="library-item__btn library-item__btn--delete" title="Delete" onClick={e => { e.stopPropagation(); onDelete() }}>✕</button>
       </div>
     </div>

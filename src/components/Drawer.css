@@ -5,7 +5,7 @@
   right: 0;
   top: 0;
   height: 100%;
-  width: 260px;
+  width: 300px;
   background: var(--c-sidebar);
   border-left: 1px solid var(--c-g3);
   z-index: 10;
@@ -17,15 +17,15 @@
 .drawer__header {
   display: flex;
   align-items: center;
-  padding: 9px 10px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--c-g3);
   flex-shrink: 0;
-  gap: 6px;
+  gap: 8px;
 }
 
 .drawer__title {
   font-weight: 700;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--c-g3-20);
   flex: 1;
 }
@@ -34,8 +34,8 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0 3px;
-  font-size: 12px;
+  padding: 2px 5px;
+  font-size: 14px;
   line-height: 1;
   color: var(--c-g2);
 
@@ -45,41 +45,33 @@
 .drawer__body {
   flex: 1;
   overflow-y: auto;
-  padding: 6px 0;
+  padding: 10px 0;
 }
 
 .drawer__section {
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
+
+/* ── Section headings — colored per variant ────────────────────────────────── */
 
 .drawer__section-label {
-  padding: 4px 12px 5px;
-  font-size: 10px;
+  padding: 6px 14px 7px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--c-g2-dk);
+  color: #fff;
+  background: var(--c-g2-dk);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-}
 
-.drawer__btn {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  border: none;
-  background: #1A2A36;
-  color: var(--c-g2-40);
-  font-family: var(--font-body);
-
-  &.drawer__btn--primary {
-    background: var(--c-g4);
-    color: var(--c-g4-10);
-  }
+  &[data-variant="constant"]   { background: var(--c-g5); }
+  &[data-variant="measure"]    { background: var(--c-measure-border); }
+  &[data-variant="metric"]     { background: var(--c-g4); }
+  &[data-variant="expression"] { background: var(--c-g3); }
 }
 
 .drawer__empty {
-  padding: 20px 12px;
+  padding: 24px 14px;
   text-align: center;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--c-g2);
 }
